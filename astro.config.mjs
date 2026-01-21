@@ -6,6 +6,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'roborev',
+      logo: {
+        src: './src/assets/logo-transparent.svg',
+      },
       customCss: ['./src/styles/custom.css'],
       expressiveCode: {
         themes: ['dracula'],

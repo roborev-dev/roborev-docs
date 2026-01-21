@@ -357,6 +357,15 @@ img {
   border: 1px solid #333333;
 }
 
+/* Centered diagrams */
+img.diagram-center {
+  display: block !important;
+  margin: 2rem auto !important;
+  width: 100% !important;
+  max-width: 800px !important;
+  border: none !important;
+}
+
 /* Focus states */
 :focus-visible {
   outline: 2px solid #00ff9f;

@@ -64,6 +64,7 @@ export default defineConfig({
             { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
+            { label: 'PostgreSQL Sync', slug: 'integrations/postgres-sync' },
           ],
         },
         {
@@ -89,7 +90,6 @@ export default defineConfig({
             { label: 'Terminal UI (TUI)', slug: 'integrations/tui' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },
-            { label: 'PostgreSQL Sync', slug: 'integrations/postgres-sync' },
           ],
         },
         { label: 'Development', slug: 'development' },

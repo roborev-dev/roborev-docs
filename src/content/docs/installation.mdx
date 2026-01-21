@@ -8,7 +8,7 @@ description: Install roborev on your system
 The install script downloads the latest release binary for your platform:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/wesm/roborev/main/scripts/install.sh | bash
+curl -fsSL https://roborev.io/install.sh | bash
 ```
 
 This installs to `~/.local/bin` by default.
@@ -18,7 +18,7 @@ This installs to `~/.local/bin` by default.
 If you have Go installed:
 
 ```bash
-go install github.com/wesm/roborev/cmd/roborev@latest
+go install github.com/roborev-dev/roborev/cmd/roborev@latest
 ```
 
 Ensure `$GOPATH/bin` is in your PATH:
@@ -30,7 +30,7 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 ## Build from Source
 
 ```bash
-git clone https://github.com/wesm/roborev
+git clone https://github.com/roborev-dev/roborev
 cd roborev
 make install
 ```

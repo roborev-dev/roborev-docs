@@ -8,7 +8,7 @@ export default defineConfig({
       title: 'roborev',
       customCss: ['./src/styles/custom.css'],
       social: {
-        github: 'https://github.com/wesm/roborev',
+        github: 'https://github.com/roborev-dev/roborev',
       },
       head: [
         // Mermaid for diagrams (client-side)

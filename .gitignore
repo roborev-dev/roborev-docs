@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 .astro/
+public/
 
 # VHS demo data (contains private review data)
 vhs/demo-data/

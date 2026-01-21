@@ -20,7 +20,10 @@ Env ROBOREV_DATA_DIR "./demo-data"
 # Launch roborev tui
 Type "roborev tui"
 Enter
-Sleep 8s
+Sleep 2s
+Down
+Down
+Sleep 1s
 Enter
 Sleep 2s
 Type "a"

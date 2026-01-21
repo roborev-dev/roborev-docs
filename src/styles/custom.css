@@ -239,6 +239,38 @@ nav a[aria-current="page"] {
   transform: none !important;
 }
 
+/* Mobile: normal font size for Quick Start */
+@media (max-width: 50rem) {
+  /* Reset the negative margins on mobile */
+  .hero + .sl-markdown-content {
+    margin-top: 0 !important;
+  }
+
+  .content-panel:has(.hero) {
+    margin-bottom: 0 !important;
+  }
+
+  #quick-start ~ .expressive-code pre code,
+  #quick-start + .expressive-code pre code {
+    font-size: 0.875rem !important;
+  }
+
+  #quick-start ~ .expressive-code pre,
+  #quick-start + .expressive-code pre {
+    padding: 0.75rem 2.5rem 0.75rem 0.75rem !important;
+    overflow-x: auto !important;
+  }
+
+  /* Hide hero gif on mobile, show static fallback or just hide */
+  .hero > .hero-html {
+    display: none !important;
+  }
+
+  .hero {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Hero image container (html mode) */
 .hero > .hero-html {
   order: 2;

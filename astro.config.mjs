@@ -9,6 +9,10 @@ export default defineConfig({
       logo: {
         src: './src/assets/logo-transparent.svg',
       },
+      disable404Route: false,
+      components: {
+        ThemeSelect: './src/components/EmptyThemeSelect.astro',
+      },
       customCss: ['./src/styles/custom.css'],
       expressiveCode: {
         themes: ['dracula'],

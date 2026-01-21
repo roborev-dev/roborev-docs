@@ -26,6 +26,31 @@ export default defineConfig({
         github: 'https://github.com/roborev-dev/roborev',
       },
       head: [
+        // Open Graph / Social preview
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image', content: 'https://roborev.io/og-image.png' },
+        },
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image:width', content: '1200' },
+        },
+        {
+          tag: 'meta',
+          attrs: { property: 'og:image:height', content: '630' },
+        },
+        {
+          tag: 'meta',
+          attrs: { property: 'og:type', content: 'website' },
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'twitter:card', content: 'summary_large_image' },
+        },
+        {
+          tag: 'meta',
+          attrs: { name: 'twitter:image', content: 'https://roborev.io/og-image.png' },
+        },
         // Mermaid for diagrams (client-side)
         {
           tag: 'script',

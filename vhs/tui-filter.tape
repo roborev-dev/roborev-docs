@@ -2,7 +2,7 @@
 # Run with: vhs tui-filter.tape
 # Prerequisite: ./prepare-demo-db.sh
 
-Output ../src/assets/screenshots/tui-filter.gif
+Output ../public/tui-filter.gif
 
 # Terminal settings
 Set TypingSpeed 200ms

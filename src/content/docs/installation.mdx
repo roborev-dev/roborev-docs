@@ -3,15 +3,28 @@ title: Installation
 description: Install roborev on your system
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 ## Quick Install (Recommended)
 
 The install script downloads the latest release binary for your platform:
 
-```bash
-curl -fsSL https://roborev.io/install.sh | bash
-```
+<Tabs>
+  <TabItem label="macOS / Linux">
+    ```bash
+    curl -fsSL https://roborev.io/install.sh | bash
+    ```
 
-This installs to `~/.local/bin` by default.
+    This installs to `~/.local/bin` by default.
+  </TabItem>
+  <TabItem label="Windows">
+    ```powershell
+    powershell -ExecutionPolicy ByPass -c "irm https://roborev.io/install.ps1 | iex"
+    ```
+
+    This installs to `~/.roborev/bin` and adds it to your PATH.
+  </TabItem>
+</Tabs>
 
 ## Go Install
 

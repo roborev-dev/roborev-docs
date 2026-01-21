@@ -1,10 +1,14 @@
 {
-  "headers": [
+  "redirects": [
     {
       "source": "/install.sh",
-      "headers": [
-        { "key": "Content-Type", "value": "text/plain; charset=utf-8" }
-      ]
+      "destination": "https://raw.githubusercontent.com/roborev-dev/roborev/main/scripts/install.sh",
+      "permanent": false
+    },
+    {
+      "source": "/install.ps1",
+      "destination": "https://raw.githubusercontent.com/roborev-dev/roborev/main/scripts/install.ps1",
+      "permanent": false
     }
   ]
 }

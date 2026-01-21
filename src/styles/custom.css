@@ -343,6 +343,41 @@ h1 {
 .starlight-aside {
   border-radius: 0 !important;
   border-left-width: 3px;
+  background: #1a1a1a !important;
+  color: #e8e8e8 !important;
+}
+
+.starlight-aside--note {
+  border-color: #00ff9f !important;
+}
+
+.starlight-aside--note .starlight-aside__title {
+  color: #00ff9f !important;
+}
+
+.starlight-aside--tip {
+  border-color: #00ff9f !important;
+}
+
+.starlight-aside--caution {
+  border-color: #ffcc00 !important;
+}
+
+.starlight-aside--caution .starlight-aside__title {
+  color: #ffcc00 !important;
+}
+
+.starlight-aside--danger {
+  border-color: #ff4444 !important;
+}
+
+.starlight-aside--danger .starlight-aside__title {
+  color: #ff4444 !important;
+}
+
+.starlight-aside code {
+  background: #0f0f0f !important;
+  color: #e8e8e8 !important;
 }
 
 /* Search */

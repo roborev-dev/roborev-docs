@@ -1,11 +1,11 @@
 ---
 title: roborev
-description: Non-invasive, continuous Automatic code review for git commits using AI agents
+description: Continuous, non-invasive background code review for AI agents
 template: splash
 hero:
-  tagline: Automatic code review for git commits using AI agents (Claude Code, Codex, Gemini, Copilot, OpenCode)
+  tagline: Continuous, non-invasive background code review for agents (Claude Code, Codex, Gemini, Copilot, OpenCode)
   image:
-    file: ../../assets/screenshots/tui-queue.png
+    html: <img src="/tui-filter.gif?v=2" alt="roborev TUI" />
   actions:
     - text: Read Docs
       link: /quickstart/
@@ -18,12 +18,24 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## Quick Start
+
+```bash
+curl -fsSL https://roborev.io/install.sh | bash
+```
+
+Install the git post-commit hook and run the TUI:
+
+```bash
+roborev init && roborev tui
+```
+
 ## Why roborev?
 
 <CardGrid stagger>
   <Card title="Automatic Reviews" icon="pencil"> Continuously reviews
-    your agents' commits while you work via git hooks. Or manually
-    request custom reviews via the CLI.  </Card>
+    your agents' commits while you work via git hooks for rapid
+    feedback. Or manually request custom reviews via the CLI.  </Card>
   <Card title="Stay In Control" icon="laptop">
     `roborev` is not an agent orchestrator. You decide how to
     incorporate reviews into your workflow.
@@ -33,7 +45,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   </Card>
   <Card title="Local & Private" icon="laptop">
     Local-first experience, review earlier and faster than GitHub
-    PRs. 
+    PRs.
   </Card>
   <Card title="Auto-Fix with Refine" icon="setting">
     `roborev refine` allows for autonomously addressing reviews in a
@@ -43,18 +55,6 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     Bi-directionally sync review data to a shared PostgreSQL database.
   </Card>
 </CardGrid>
-
-## Quick Install
-
-```bash
-curl -fsSL https://roborev.io/install.sh | bash
-```
-
-Or with Go:
-
-```bash
-go install github.com/roborev-dev/roborev/cmd/roborev@latest
-```
 
 ## Architecture
 

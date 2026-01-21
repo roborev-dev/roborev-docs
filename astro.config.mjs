@@ -7,6 +7,14 @@ export default defineConfig({
     starlight({
       title: 'roborev',
       customCss: ['./src/styles/custom.css'],
+      expressiveCode: {
+        themes: ['dracula'],
+        styleOverrides: {
+          copyButton: {
+            visible: true,
+          },
+        },
+      },
       social: {
         github: 'https://github.com/roborev-dev/roborev',
       },

@@ -138,19 +138,138 @@ nav a[aria-current="page"] {
   color: #e8e8e8 !important;
 }
 
-/* Hero section */
+/* Hero section - side by side layout */
 .hero {
   background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
-  flex-direction: column !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: center !important;
+  gap: 2rem;
 }
 
-/* Hero image: display at natural size, shift left */
+/* Hero text content */
+.hero > .stack {
+  order: 1;
+}
+
+/* Hero title with logo */
+.hero h1 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem;
+}
+
+.hero h1::before {
+  content: '';
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  background-image: url('/logo.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+/* Reduce gap after hero */
+.hero + .sl-markdown-content {
+  margin-top: -4rem !important;
+}
+
+.content-panel:has(.hero) {
+  padding-bottom: 0 !important;
+  margin-bottom: -2rem !important;
+}
+
+/* Quick Start section - larger code, inline copy button */
+#quick-start ~ .expressive-code .header,
+#quick-start + .expressive-code .header {
+  display: none !important;
+}
+
+#quick-start ~ .expressive-code figure.frame,
+#quick-start + .expressive-code figure.frame {
+  position: relative !important;
+}
+
+#quick-start ~ .expressive-code pre,
+#quick-start + .expressive-code pre {
+  padding: 0.75rem 3.5rem 0.75rem 1rem !important;
+}
+
+#quick-start ~ .expressive-code pre code,
+#quick-start + .expressive-code pre code {
+  font-size: 1.4rem !important;
+}
+
+#quick-start ~ .expressive-code .copy,
+#quick-start + .expressive-code .copy {
+  position: absolute !important;
+  top: 50% !important;
+  right: 0.5rem !important;
+  transform: translateY(-50%) !important;
+  opacity: 1 !important;
+}
+
+#quick-start ~ .expressive-code .copy button,
+#quick-start + .expressive-code .copy button {
+  opacity: 1 !important;
+  background: #333 !important;
+  border-radius: 4px !important;
+  padding: 0.4rem 0.6rem !important;
+}
+
+/* Stop styling after Why roborev section */
+#why-roborev ~ .expressive-code .header {
+  display: block !important;
+}
+
+#why-roborev ~ .expressive-code pre {
+  padding: 1rem !important;
+}
+
+#why-roborev ~ .expressive-code pre code {
+  font-size: inherit !important;
+}
+
+#why-roborev ~ .expressive-code .copy {
+  position: absolute !important;
+  top: 0.5rem !important;
+  right: 0.5rem !important;
+  transform: none !important;
+}
+
+/* Hero image container (html mode) */
+.hero > .hero-html {
+  order: 2;
+  width: 100% !important;
+  max-width: none !important;
+  flex: none !important;
+}
+
+/* Hero image: fill container */
+.hero > .hero-html img,
 .hero > img {
-  width: auto !important;
+  display: block !important;
+  width: 100% !important;
   height: auto !important;
-  max-width: 90% !important;
-  margin-left: -3rem;
-  margin-bottom: 2rem;
+  max-width: none !important;
+  margin: 0 !important;
+  object-fit: contain !important;
+}
+
+/* Mobile: stack vertically */
+@media (max-width: 50rem) {
+  .hero {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .hero > .hero-html,
+  .hero > img {
+    max-width: 100% !important;
+    margin-bottom: 2rem !important;
+  }
 }
 
 /* Headings */

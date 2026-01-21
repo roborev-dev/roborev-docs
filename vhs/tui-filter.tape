@@ -5,12 +5,14 @@
 Output ../src/assets/screenshots/tui-filter.gif
 
 # Terminal settings
+Set TypingSpeed 200ms
 Set Theme "Dracula"
 Set FontFamily "MesloLGS NF"
-Set FontSize 16
-Set Width 1000
-Set Height 800
+Set FontSize 32
+Set Width 2000
+Set Height 1600
 Set Padding 20
+Set Framerate 25
 
 # Use demo database (isolated roborev-only data)
 Env ROBOREV_DATA_DIR "./demo-data"
@@ -18,8 +20,7 @@ Env ROBOREV_DATA_DIR "./demo-data"
 # Launch roborev tui
 Type "roborev tui"
 Enter
-Sleep 2s
-
+Sleep 8s
 Enter
 Sleep 2s
 Type "a"

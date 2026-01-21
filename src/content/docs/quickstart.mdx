@@ -1,0 +1,50 @@
+---
+title: Quick Start
+description: Get up and running with roborev in minutes
+---
+
+## Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/wesm/roborev/main/scripts/install.sh | bash
+```
+
+Or with Go:
+
+```bash
+go install github.com/wesm/roborev/cmd/roborev@latest
+```
+
+Ensure `$GOPATH/bin` is in your PATH:
+
+```bash
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+## Initialize in Your Repo
+
+```bash
+cd your-repo
+roborev init          # Install post-commit hook
+git commit -m "..."   # Reviews happen automatically
+roborev tui           # View reviews in interactive UI
+```
+
+:::note
+Hook installation automatically detects your git hook manager (Husky, etc.) via `core.hooksPath`.
+:::
+
+## What Happens
+
+1. **`roborev init`** installs a post-commit hook in your repo
+2. **On each commit**, the hook notifies the roborev daemon
+3. **The daemon** queues the commit for review by an AI agent
+4. **Reviews** are stored locally in SQLite
+5. **View results** with `roborev tui` or `roborev show`
+
+## Next Steps
+
+- [Installation](/installation/) - Detailed installation options
+- [Commands](/commands/) - Full command reference
+- [Configuration](/configuration/) - Customize roborev behavior
+- [TUI Guide](/integrations/tui/) - Master the terminal interface

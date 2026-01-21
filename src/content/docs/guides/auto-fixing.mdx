@@ -1,0 +1,85 @@
+---
+title: Auto-Fixing with Refine
+description: Automatically address failed reviews using AI agents
+---
+
+Use `refine` to automatically address failed reviews on your branch:
+
+```bash
+roborev refine                       # Fix failed reviews using default agent
+roborev refine --agent claude-code   # Use specific agent for addressing findings
+roborev refine --max-iterations 5    # Limit fix attempts
+roborev refine --quiet               # Show elapsed time instead of agent output
+roborev refine --reasoning thorough  # Use thorough reasoning (slower, more accurate)
+roborev refine --since abc123        # Refine commits since a specific commit
+roborev refine --since HEAD~3        # Refine the last 3 commits (works on main branch)
+```
+
+## How It Works
+
+<pre class="mermaid" set:html={`
+flowchart TD
+    Start([refine]) --> Find[Find oldest failed review]
+    Find --> A{Found?}
+    A -->|No| Branch[Run whole-branch review]
+    Branch --> C{Pass?}
+    C -->|Yes| Done([Done - all reviews pass])
+    C -->|No| Fix
+    A -->|Yes| Fix[AI agent addresses findings]
+    Fix --> Commit[Commit fix]
+    Commit --> Wait[Wait for re-review]
+    Wait --> Pass{Pass?}
+    Pass -->|Yes| Find
+    Pass -->|No| MaxCheck{Max iterations?}
+    MaxCheck -->|No| Fix
+    MaxCheck -->|Yes| Fail([Exit - max reached])
+`} />
+
+## Processing Order
+
+1. The loop processes commits **oldest-first**
+2. When a fix fails review, it keeps addressing that fix until it passes
+3. Passing reviews are automatically marked as addressed
+4. When no individual failed reviews remain, a whole-branch review runs
+5. If that passes, the refiner exits successfully
+
+## Options
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Agent to use for fixes |
+| `--max-iterations <n>` | Maximum fix attempts per commit (default: 3) |
+| `--quiet` | Show elapsed time instead of agent output |
+| `--reasoning <level>` | Reasoning depth: fast, standard, thorough |
+| `--since <commit>` | Refine commits since a specific commit |
+
+## Requirements
+
+- **Clean working tree**: No uncommitted changes
+- **Feature branch**: By default, compares against main
+- **Use `--since`**: To refine specific commits on any branch, including main
+
+## Security Considerations
+
+The refine command runs AI agents **without sandboxing** so they can install dependencies, run builds, and execute tests. This is safe for your own code, but use caution with untrusted sources:
+
+| Scenario | Risk Level | Recommendation |
+|----------|------------|----------------|
+| Your own branches | Low | Safe to run directly |
+| PRs from trusted contributors | Low-Medium | Review changes before refining |
+| PRs from strangers / untrusted code | High | Use isolation (see below) |
+
+### Isolation Options for Untrusted Code
+
+- Run in a container or VM
+- Use a low-privilege user account
+- Use a disposable cloud instance
+
+:::caution
+The risk is equivalent to running `claude --dangerously-skip-permissions` or `codex --dangerously-bypass-approvals-and-sandbox` manually - malicious code could potentially access credentials, exfiltrate data, or modify your system.
+:::
+
+## See Also
+
+- [Agent Modes](/agents/modes/) - Review vs agentic mode details
+- [Agent Skills](/guides/agent-skills/) - Fix findings interactively

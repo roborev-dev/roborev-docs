@@ -1,0 +1,68 @@
+---
+title: Git Worktrees
+description: Using roborev with git worktrees
+---
+
+roborev fully supports git worktrees. Reviews are stored against the main repository, so commits made in any worktree are associated with the same review history.
+
+## Usage
+
+```bash
+# In main repo
+git worktree add ../feature-branch feature-branch
+cd ../feature-branch
+
+# Reviews work normally - they're stored under the main repo
+roborev review --branch
+roborev refine
+roborev tui
+```
+
+## How It Works
+
+When running commands from a worktree:
+
+- Reviews are stored using the **main repository path** (not the worktree path)
+- The TUI shows all reviews for the repository regardless of which worktree you're in
+- `refine` correctly finds and addresses reviews for commits in any worktree
+
+This is handled automatically - no configuration needed.
+
+## Example Workflow
+
+```bash
+# You're working on main
+cd ~/projects/myapp
+roborev tui  # Shows all reviews
+
+# Create a worktree for a feature branch
+git worktree add ~/projects/myapp-feature feature-branch
+cd ~/projects/myapp-feature
+
+# Make commits - reviews are tracked under myapp
+git commit -m "Add feature"
+
+# View all reviews (same database)
+roborev tui
+
+# Run refine in the worktree
+roborev refine
+
+# Clean up when done
+cd ~/projects/myapp
+git worktree remove ~/projects/myapp-feature
+```
+
+## Why This Matters
+
+Without worktree support, you'd have:
+- Duplicate repository entries in the database
+- Scattered reviews across different paths
+- Confusion about which reviews belong to which code
+
+With proper worktree support, everything is consolidated under the main repository.
+
+## See Also
+
+- [Repository Management](/guides/repository-management/) - Managing tracked repos
+- [Configuration](/configuration/) - Per-repo and global settings

@@ -1,0 +1,71 @@
+---
+title: Repository Management
+description: Manage repositories tracked by roborev
+---
+
+Manage repositories tracked by roborev:
+
+```bash
+roborev repo list                    # List all repos with review counts
+roborev repo show my-project         # Show repo details and stats
+roborev repo rename old-name new-name # Rename display name
+roborev repo delete old-project      # Remove from tracking
+roborev repo merge source target     # Merge reviews into another repo
+```
+
+## Subcommands
+
+| Command | Description |
+|---------|-------------|
+| `repo list` | List all repositories with review counts |
+| `repo show <name>` | Show detailed stats for a repository |
+| `repo rename <old> <new>` | Rename a repository's display name |
+| `repo delete <name>` | Remove repository from tracking |
+| `repo merge <src> <dst>` | Move all reviews to another repo |
+
+## Common Use Cases
+
+### Rename for Clarity
+
+The rename command is useful when you want a friendlier display name than the directory name:
+
+```bash
+roborev repo rename my-project-v2 "My Project"
+```
+
+### Consolidate Duplicates
+
+The merge command consolidates duplicate entries (e.g., from symlinks or path changes):
+
+```bash
+# Reviews from /home/user/projects/myapp are stored under "myapp"
+# Reviews from /home/user/work/myapp are stored under "myapp-1"
+roborev repo merge myapp-1 myapp
+```
+
+### Clean Up Old Projects
+
+```bash
+roborev repo list                 # See all tracked repos
+roborev repo delete old-project   # Remove one you no longer need
+```
+
+## How Repositories Are Tracked
+
+roborev automatically creates a repository entry when you:
+
+1. Run `roborev init` in a repo
+2. Queue a review for a commit in a new repo
+3. Run any roborev command in an untracked repo
+
+The default display name is the directory name. You can customize this with:
+
+```toml
+# .roborev.toml in your repo
+display_name = "My Custom Name"
+```
+
+## See Also
+
+- [Git Worktrees](/integrations/git-worktrees/) - How worktrees are handled
+- [Configuration](/configuration/) - Per-repo and global settings

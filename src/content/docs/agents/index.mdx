@@ -1,0 +1,71 @@
+---
+title: Supported Agents
+description: AI agents supported by roborev
+---
+
+roborev supports multiple AI coding agents and auto-detects which ones are installed.
+
+## Supported Agents
+
+| Agent | CLI Command | Install |
+|-------|-------------|---------|
+| Codex | `codex` | `npm install -g @openai/codex` |
+| Claude Code | `claude` | `npm install -g @anthropic-ai/claude-code` |
+| Gemini | `gemini` | `npm install -g @google/gemini-cli` |
+| Copilot | `copilot` | `npm install -g @github/copilot` |
+| OpenCode | `opencode` | `npm install -g opencode-ai` |
+
+## Auto-Detection
+
+roborev auto-detects installed agents and falls back in this order:
+
+1. Codex
+2. Claude Code
+3. Gemini
+4. Copilot
+5. OpenCode
+
+The first available agent is used unless you specify one explicitly.
+
+## Specifying an Agent
+
+### Per-Command
+
+```bash
+roborev review --agent claude-code <sha>
+roborev prompt --agent codex "Explain this code"
+roborev refine --agent gemini
+```
+
+### Per-Repository
+
+```toml
+# .roborev.toml
+agent = "claude-code"
+```
+
+### Global Default
+
+```toml
+# ~/.roborev/config.toml
+default_agent = "codex"
+```
+
+## Agentic Support
+
+Different agents have different levels of support for agentic mode (file edits and commands):
+
+| Agent | Agentic Support |
+|-------|-----------------|
+| Codex | Full (uses `--dangerously-bypass-approvals-and-sandbox`) |
+| Claude Code | Full (uses `--dangerously-skip-permissions`) |
+| Gemini | Full (uses `--yolo` and `--allowed-tools`) |
+| Copilot | Limited (requires manual approval for actions) |
+| OpenCode | Full (auto-approves in non-interactive mode) |
+
+See [Agent Modes](/agents/modes/) for details on review vs agentic modes.
+
+## See Also
+
+- [Agent Modes](/agents/modes/) - Review vs agentic mode
+- [Authentication](/configuration/authentication/) - API keys and auth setup

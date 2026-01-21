@@ -1,0 +1,67 @@
+---
+title: Agent Skills
+description: Install slash commands that let AI agents fix review findings directly
+---
+
+Install slash commands that let AI agents fix review findings directly:
+
+```bash
+roborev skills install
+```
+
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `/roborev:address <job_id>` | Fetch a review and fix its findings |
+| `/roborev:respond <job_id> [message]` | Add a response to document changes |
+
+## Usage
+
+When you receive a review notification like "Review #1019: Fail", ask your agent:
+
+```
+/roborev:address 1019
+```
+
+The agent:
+1. Fetches the review
+2. Reads relevant files
+3. Fixes issues by priority (high severity first)
+4. Runs tests
+5. Offers to commit
+
+## Agent-Specific Syntax
+
+| Agent | Syntax |
+|-------|--------|
+| Claude Code | `/roborev:address`, `/roborev:respond` |
+| Codex | `$roborev:address`, `$roborev:respond` |
+
+## Updating Skills
+
+Skills are updated automatically when you run:
+
+```bash
+roborev update
+```
+
+## How It Works
+
+Skills are installed as agent-specific configuration:
+
+- **Claude Code**: Custom slash commands in `~/.claude/`
+- **Codex**: Custom agent skills directory
+
+The skill scripts call `roborev show --job <id> --json` to fetch review data, then parse and present findings to the agent in a structured format.
+
+## Interactive vs Automated
+
+Skills provide an **interactive** workflow - you ask your agent to address specific findings and review the changes before committing.
+
+For **automated** fixing, use `roborev refine` which runs in a loop until all reviews pass.
+
+## See Also
+
+- [Auto-Fixing](/guides/auto-fixing/) - Automated fix loop
+- [Commands Reference](/commands/) - Full command list

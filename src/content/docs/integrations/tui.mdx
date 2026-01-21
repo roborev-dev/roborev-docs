@@ -1,0 +1,75 @@
+---
+title: Terminal UI (TUI)
+description: Interactive terminal interface for viewing and managing reviews
+---
+
+import { Image } from 'astro:assets';
+import tuiQueue from '../../../assets/screenshots/tui-queue.png';
+import tuiFilter from '../../../assets/screenshots/tui-filter.png';
+import tuiReview from '../../../assets/screenshots/tui-review.png';
+
+The interactive terminal UI (`roborev tui`) provides a real-time view of the review queue.
+
+```bash
+roborev tui
+```
+
+## Queue View
+
+<Image src={tuiQueue} alt="TUI Queue View" />
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Navigate jobs |
+| `PgUp`, `PgDn` | Page through list |
+| `Enter` | View review |
+| `p` | View prompt |
+| `a` | Toggle addressed |
+| `x` | Cancel running/queued job |
+| `r` | Rerun completed/failed/canceled job |
+| `f` | Filter by repository |
+| `h` | Hide addressed/failed/canceled |
+| `Esc` | Clear all filters |
+| `q` | Quit |
+
+## Filtering
+
+Press `f` to filter to a single repository, or `h` to hide completed reviews and focus on items needing attention.
+
+<Image src={tuiFilter} alt="Filter Modal" />
+
+## Review View
+
+Press `Enter` on a job to view its review.
+
+<Image src={tuiReview} alt="Review View" />
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Scroll content |
+| `Left`/`h`, `Right`/`l` | Previous/next review |
+| `PgUp`, `PgDn` | Page through content |
+| `a` | Toggle addressed |
+| `p` | Switch between review/prompt |
+| `Esc`, `q` | Back to queue |
+
+## Verdicts
+
+Reviews display a **Verdict** (Pass/Fail) parsed from the AI response:
+
+- **Pass** (green): Code review passed with no issues
+- **Fail** (red): Issues found that need attention
+
+## Workflow
+
+1. Run `roborev tui` to open the interface
+2. Navigate to reviews needing attention
+3. Press `Enter` to view full review
+4. Address the findings in your code
+5. Press `a` to mark as addressed
+6. Use `h` to hide addressed items
+
+## See Also
+
+- [Commands Reference](/commands/) - Full command list
+- [Event Streaming](/integrations/streaming/) - Programmatic access to events

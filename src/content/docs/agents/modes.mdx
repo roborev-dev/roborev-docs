@@ -1,0 +1,91 @@
+---
+title: Review vs Agentic Modes
+description: Understanding agent operating modes in roborev
+---
+
+Agents run in one of two modes depending on the task.
+
+## Modes
+
+| Mode | Tools Available | Used By |
+|------|-----------------|---------|
+| **Review** (default) | Read, Glob, Grep | `roborev review`, `roborev prompt` |
+| **Agentic** | Read, Glob, Grep, Edit, Write, Bash | `roborev refine`, `roborev prompt --agentic` |
+
+## Review Mode
+
+**Review mode** is read-only - agents can inspect code but cannot make changes. This is the safe default for automated reviews triggered by post-commit hooks.
+
+The agent can:
+- Read files
+- Search for patterns
+- Analyze code structure
+
+The agent cannot:
+- Edit files
+- Create files
+- Run commands
+
+## Agentic Mode
+
+**Agentic mode** allows agents to edit files and run commands. Enable it in three ways:
+
+### 1. Per-Job
+
+```bash
+roborev prompt --agentic "Refactor the error handling"
+roborev prompt --yolo "Add input validation"   # --yolo is an alias
+```
+
+### 2. Per-Command
+
+The `refine` command automatically enables agentic mode:
+
+```bash
+roborev refine   # Always runs in agentic mode
+```
+
+### 3. Globally
+
+Set in your global config:
+
+```toml
+# ~/.roborev/config.toml
+allow_unsafe_agents = true
+```
+
+Then restart the daemon:
+
+```bash
+roborev daemon restart
+```
+
+:::caution
+Global agentic mode means all operations can potentially write to your codebase. Use with caution.
+:::
+
+## Agent-Specific Implementation
+
+| Agent | Review Mode | Agentic Mode |
+|-------|-------------|--------------|
+| Codex | `--sandbox-cmd-allowlist ""` | `--dangerously-bypass-approvals-and-sandbox` |
+| Claude Code | Default behavior | `--dangerously-skip-permissions` |
+| Gemini | Default behavior | `--yolo --allowed-tools` |
+| Copilot | Default behavior | Manual approval required |
+| OpenCode | Default behavior | Auto-approves in non-interactive mode |
+
+## Security Considerations
+
+When using agentic mode:
+
+- The agent can run arbitrary commands on your machine
+- This includes installing dependencies, running builds, etc.
+- Safe for your own code on trusted branches
+- Use isolation for untrusted code (containers, VMs)
+
+See [Auto-Fixing Security](/guides/auto-fixing/#security-considerations) for detailed guidance.
+
+## See Also
+
+- [Supported Agents](/agents/) - Agent installation and configuration
+- [Auto-Fixing](/guides/auto-fixing/) - The refine command

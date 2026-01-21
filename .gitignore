@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# VHS demo data (contains private review data)
+vhs/demo-data/
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/

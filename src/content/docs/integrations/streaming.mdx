@@ -1,0 +1,93 @@
+---
+title: Event Streaming
+description: Stream review events in real-time for integrations
+---
+
+Stream review events in real-time for integrations, notifications, or custom tooling:
+
+```bash
+roborev stream              # Stream all events
+roborev stream --repo .     # Stream events for current repo only
+```
+
+## Event Format
+
+Events are emitted as newline-delimited JSON (JSONL):
+
+```json
+{"type":"review.started","ts":"2025-01-11T10:00:00Z","job_id":42,"repo":"/path/to/repo","repo_name":"myrepo","sha":"abc123","agent":"codex"}
+{"type":"review.completed","ts":"2025-01-11T10:01:30Z","job_id":42,"repo":"/path/to/repo","repo_name":"myrepo","sha":"abc123","agent":"codex","verdict":"P"}
+```
+
+## Event Types
+
+| Type | Description |
+|------|-------------|
+| `review.started` | Review job started processing |
+| `review.completed` | Review finished successfully |
+| `review.failed` | Review failed (includes `error` field) |
+| `review.canceled` | Review was canceled |
+
+## Event Fields
+
+All events include:
+- `type`: Event type
+- `ts`: ISO 8601 timestamp
+- `job_id`: Unique job identifier
+- `repo`: Repository path
+- `repo_name`: Repository display name
+- `sha`: Commit SHA (or `dirty` for uncommitted changes)
+- `agent`: Agent that processed the review
+
+Additional fields:
+- `verdict`: Pass/Fail verdict (on `review.completed`)
+- `error`: Error message (on `review.failed`)
+
+## Filtering with jq
+
+Use `jq` to filter events:
+
+```bash
+# Only completed reviews
+roborev stream | jq -c 'select(.type == "review.completed")'
+
+# Only failures
+roborev stream | jq -c 'select(.type == "review.failed")'
+
+# Specific repo
+roborev stream | jq -c 'select(.repo_name == "myproject")'
+
+# Failed verdicts
+roborev stream | jq -c 'select(.verdict == "F")'
+```
+
+## Integration Examples
+
+### Desktop Notifications (macOS)
+
+```bash
+roborev stream | while read -r event; do
+  type=$(echo "$event" | jq -r '.type')
+  repo=$(echo "$event" | jq -r '.repo_name')
+  if [ "$type" = "review.completed" ]; then
+    verdict=$(echo "$event" | jq -r '.verdict')
+    if [ "$verdict" = "F" ]; then
+      osascript -e "display notification \"Review failed\" with title \"$repo\""
+    fi
+  fi
+done
+```
+
+### Webhook
+
+```bash
+roborev stream | while read -r event; do
+  curl -X POST -H "Content-Type: application/json" \
+    -d "$event" https://your-webhook.example.com/reviews
+done
+```
+
+## See Also
+
+- [TUI](/integrations/tui/) - Interactive terminal interface
+- [Commands Reference](/commands/) - Full command list

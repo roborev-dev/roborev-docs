@@ -1,0 +1,66 @@
+---
+title: Reviewing Uncommitted Changes
+description: Review your working tree changes before committing
+---
+
+Use `--dirty` to review working tree changes before committing:
+
+```bash
+roborev review --dirty           # Queue review of uncommitted changes
+roborev review --dirty --wait    # Wait for review and show result
+```
+
+## What Gets Reviewed
+
+The `--dirty` flag includes:
+
+- Staged changes
+- Unstaged changes to tracked files
+- Untracked files
+
+## Options
+
+| Flag | Description |
+|------|-------------|
+| `--wait` | Wait for review to complete |
+| `--quiet` | Suppress output |
+| `--agent <name>` | Use specific agent |
+| `--reasoning <level>` | Set reasoning depth |
+
+## Exit Codes
+
+The `--wait` flag exits with:
+- Code 0 for passing reviews
+- Code 1 for failing reviews
+
+This is useful for CI or pre-commit workflows:
+
+```bash
+if ! roborev review --dirty --wait --quiet; then
+    echo "Review failed - please address findings"
+    exit 1
+fi
+```
+
+## Reviewing Specific Commits
+
+Use `--since` to review commits since a specific point:
+
+```bash
+roborev review --since HEAD~5       # Review last 5 commits
+roborev review --since abc123       # Review commits since abc123 (exclusive)
+roborev review --since v1.0.0       # Review commits since a tag
+```
+
+The range is exclusive of the starting commit (like git's `..` range syntax). Unlike `--branch`, this works on any branch including main.
+
+## Large Diffs
+
+For `--dirty` reviews, diffs are limited to 200KB since uncommitted changes cannot be easily inspected by the agent. If your dirty diff exceeds this limit, commit your changes in smaller chunks.
+
+For committed changes, diffs over 250KB are omitted from the prompt - the agent is given only the commit hash and can inspect changes using `git show`.
+
+## See Also
+
+- [Reviewing Branches](/guides/reviewing-branches/) - Review entire feature branches
+- [Commands Reference](/commands/) - Full command list

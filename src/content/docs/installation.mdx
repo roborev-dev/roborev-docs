@@ -1,0 +1,76 @@
+---
+title: Installation
+description: Install roborev on your system
+---
+
+## Quick Install (Recommended)
+
+The install script downloads the latest release binary for your platform:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/wesm/roborev/main/scripts/install.sh | bash
+```
+
+This installs to `~/.local/bin` by default.
+
+## Go Install
+
+If you have Go installed:
+
+```bash
+go install github.com/wesm/roborev/cmd/roborev@latest
+```
+
+Ensure `$GOPATH/bin` is in your PATH:
+
+```bash
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+## Build from Source
+
+```bash
+git clone https://github.com/wesm/roborev
+cd roborev
+make install
+```
+
+The `make install` target builds with version information embedded (e.g., `v0.7.0-5-gabcdef`).
+
+For quick iteration during development:
+
+```bash
+go install ./cmd/...
+```
+
+## Verify Installation
+
+```bash
+roborev version
+```
+
+## Update
+
+Update to the latest version:
+
+```bash
+roborev update
+```
+
+This downloads and replaces the current binary with the latest release.
+
+## Agent Requirements
+
+roborev requires at least one AI agent CLI to be installed:
+
+| Agent | Install Command |
+|-------|-----------------|
+| Codex | `npm install -g @openai/codex` |
+| Claude Code | `npm install -g @anthropic-ai/claude-code` |
+| Gemini | `npm install -g @google/gemini-cli` |
+| Copilot | `npm install -g @github/copilot` |
+| OpenCode | `npm install -g opencode-ai` |
+
+roborev auto-detects installed agents and falls back in order: codex, claude-code, gemini, copilot, opencode.
+
+See [Supported Agents](/agents/) for more details on agent configuration.

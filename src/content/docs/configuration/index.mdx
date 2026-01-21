@@ -1,0 +1,65 @@
+---
+title: Configuration Overview
+description: How to configure roborev behavior
+---
+
+roborev uses a layered configuration system with multiple sources.
+
+## Priority Order
+
+Configuration is resolved in this order (highest to lowest priority):
+
+1. **CLI flags** (`--agent`, `--reasoning`)
+2. **Per-repo** `.roborev.toml` in your repository root
+3. **Global** `~/.roborev/config.toml`
+4. **Auto-detect** first available agent; defaults to thorough for reviews, standard for refine
+
+## Configuration Files
+
+### Per-Repository
+
+Create `.roborev.toml` in your repo root for project-specific settings:
+
+```toml
+agent = "claude-code"      # AI agent to use
+review_context_count = 5   # Recent reviews to include as context
+display_name = "backend"   # Custom name shown in TUI (optional)
+excluded_branches = ["wip", "scratch"]  # Branches to skip reviews on
+
+# Reasoning levels: thorough, standard, fast
+review_reasoning = "thorough"  # For code reviews (default: thorough)
+refine_reasoning = "standard"  # For refine command (default: standard)
+
+# Project-specific review guidelines
+review_guidelines = """
+No database migrations needed - no production databases yet.
+Prefer composition over inheritance.
+All public APIs must have documentation comments.
+"""
+```
+
+### Global
+
+Create `~/.roborev/config.toml` for system-wide defaults:
+
+```toml
+default_agent = "codex"
+server_addr = "127.0.0.1:7373"
+max_workers = 4
+job_timeout = "10m"  # Per-job timeout (default: 10m)
+```
+
+## Data Directory
+
+Override the data directory with the `ROBOREV_DATA_DIR` environment variable:
+
+```bash
+export ROBOREV_DATA_DIR=/custom/path  # Default: ~/.roborev
+```
+
+## Next Steps
+
+- [Per-Repository Configuration](/configuration/per-repo/) - Detailed per-repo options
+- [Global Configuration](/configuration/global/) - System-wide settings
+- [Authentication](/configuration/authentication/) - API keys and auth setup
+- [Reasoning Levels](/configuration/reasoning-levels/) - Control analysis depth

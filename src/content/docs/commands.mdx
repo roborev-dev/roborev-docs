@@ -1,0 +1,68 @@
+---
+title: Command Reference
+description: Complete reference of all roborev commands
+---
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `roborev init` | Initialize roborev in current repo |
+| `roborev status` | Show daemon and queue status |
+| `roborev tui` | Interactive terminal UI |
+| `roborev show [sha]` | Display review for commit |
+| `roborev show --job <id>` | Display review by job ID |
+| `roborev review <sha>` | Queue a commit for review |
+| `roborev review <start> <end>` | Queue a commit range (inclusive) |
+| `roborev review --branch` | Review all commits on current branch |
+| `roborev review --since <commit>` | Review commits since a specific commit |
+| `roborev review --dirty` | Review uncommitted changes |
+| `roborev review --reasoning <level>` | Set reasoning depth (thorough/standard/fast) |
+| `roborev prompt "<text>"` | Run ad-hoc prompt with AI agent |
+| `roborev respond <id> [msg]` | Add a response/note to a review |
+| `roborev address <id>` | Mark review as addressed |
+| `roborev refine` | Auto-fix failed reviews using AI |
+| `roborev repo list` | List tracked repositories |
+| `roborev repo rename <old> <new>` | Rename a repository's display name |
+| `roborev stream` | Stream review events (JSONL) |
+| `roborev daemon start\|stop\|restart` | Manage the daemon |
+| `roborev install-hook` | Install git post-commit hook |
+| `roborev uninstall-hook` | Remove git post-commit hook |
+| `roborev update` | Update roborev to latest version |
+| `roborev skills install` | Install agent skills (Claude Code, Codex) |
+| `roborev sync status` | Show PostgreSQL sync status |
+| `roborev sync now` | Trigger immediate sync |
+| `roborev version` | Show version information |
+
+## Common Workflows
+
+### Review a Feature Branch
+
+```bash
+roborev review --branch              # Review all commits since diverging from main
+roborev review --branch --base dev   # Compare against different base
+roborev review --branch --wait       # Wait and show result
+```
+
+### Review Before Committing
+
+```bash
+roborev review --dirty               # Review uncommitted changes
+roborev review --dirty --wait        # Wait for result
+```
+
+### Auto-Fix Failed Reviews
+
+```bash
+roborev refine                       # Fix failed reviews on current branch
+roborev refine --max-iterations 5    # Limit fix attempts
+```
+
+### Run Ad-Hoc Prompts
+
+```bash
+roborev prompt "Explain the architecture"
+roborev prompt --agentic "Refactor main.go"
+```
+
+See individual guide pages for detailed usage of each command.

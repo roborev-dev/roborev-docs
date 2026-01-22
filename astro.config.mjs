@@ -12,6 +12,7 @@ export default defineConfig({
       disable404Route: false,
       components: {
         ThemeSelect: './src/components/EmptyThemeSelect.astro',
+        Header: './src/components/Header.astro',
       },
       customCss: ['./src/styles/custom.css'],
       expressiveCode: {

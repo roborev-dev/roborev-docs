@@ -1,0 +1,69 @@
+---
+title: Responding to Reviews
+description: Add comments and context to reviews for future AI consideration
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+When the AI reviewer misses context or makes incorrect assumptions, you can add responses that will be included in future review prompts. This creates a feedback loop where the AI learns from your corrections.
+
+## Adding a Response
+
+### From the TUI
+
+Press `c` from either the queue view or review detail view to open the respond modal:
+
+![TUI respond modal](/tui-respond.gif)
+
+1. Navigate to the review you want to respond to
+2. Press `c` to open the respond modal
+3. Type your response (multi-line supported)
+4. Press `Enter` to submit, or `Esc` to cancel
+
+### From the CLI
+
+```bash
+roborev respond <review-id> "Your response text"
+```
+
+Or interactively:
+
+```bash
+roborev respond <review-id>
+# Opens your $EDITOR for multi-line input
+```
+
+## How Responses Are Used
+
+When the AI reviews the same commit again (or related commits), your responses are included in the prompt:
+
+- **Context about known issues**: "This null check is intentional, handled in caller"
+- **Clarifications**: "This is test code, different standards apply"
+- **Acknowledgments**: "Good catch, will fix in next commit"
+
+<Aside type="tip">
+Responses help train the AI's understanding of your codebase conventions and reduce false positives in future reviews.
+</Aside>
+
+## Best Practices
+
+1. **Be specific**: Reference line numbers and specific findings
+2. **Explain the "why"**: Help the AI understand your reasoning
+3. **Acknowledge valid findings**: Confirm when the AI catches real issues
+4. **Note false positives**: Mark findings that don't apply to your context
+
+## Example Responses
+
+```
+The singleton pattern here is intentional for the connection pool.
+Thread safety is handled by the underlying driver.
+```
+
+```
+This is generated code from protobuf - we don't modify it directly.
+Please ignore style issues in *.pb.go files.
+```
+
+```
+Good catch on the race condition! I'll add a mutex in the next commit.
+```

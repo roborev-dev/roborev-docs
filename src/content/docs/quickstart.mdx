@@ -42,9 +42,22 @@ Hook installation automatically detects your git hook manager (Husky, etc.) via 
 4. **Reviews** are stored locally in SQLite
 5. **View results** with `roborev tui` or `roborev show`
 
+Check the daemon status at any time:
+
+![Status](/cli-status.gif)
+
+## Addressing Reviews in the TUI
+
+One easy way to get going is to just look at reviews in the TUI and
+mark them addressed with the `a` key to help you keep track of what
+reviews you have addressed in your codebase. An easy way to address is
+to copy-and-paste the review into your agent session. You can also use
+the [agent skills](/guides/agent-skills/) for supported agents.
+
+![Address Findings](/tui-address.gif)
+
 ## Next Steps
 
-- [Installation](/installation/) - Detailed installation options
 - [Commands](/commands/) - Full command reference
 - [Configuration](/configuration/) - Customize roborev behavior
 - [TUI Guide](/integrations/tui/) - Master the terminal interface

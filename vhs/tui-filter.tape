@@ -1,40 +1,40 @@
-# VHS tape for generating TUI filter screenshot
+# VHS tape for TUI repo filter modal
 # Run with: vhs tui-filter.tape
-# Prerequisite: ./prepare-demo-db.sh
+# Shows pressing 'f' to open the repository filter modal
 
-Output ../public/tui-filter.gif
+Output ./output/tui-filter.gif
 
 # Terminal settings
-Set TypingSpeed 200ms
+Set TypingSpeed 50ms
 Set Theme "Dracula"
 Set FontFamily "MesloLGS NF"
-Set FontSize 32
-Set Width 2000
-Set Height 1600
+Set FontSize 16
+Set Width 1200
+Set Height 600
 Set Padding 20
 Set Framerate 25
-
-# Use demo database (isolated roborev-only data)
-Env ROBOREV_DATA_DIR "./demo-data"
 
 # Launch roborev tui
 Type "roborev tui"
 Enter
 Sleep 2s
+
+# Press 'f' to open the repo filter modal
+Type "f"
+Sleep 2s
+
+# Navigate through repos
 Down
+Sleep 500ms
 Down
+Sleep 500ms
+Up
 Sleep 1s
-Enter
-Sleep 2s
-Type "a"
-Sleep 2s
-Type "a"
-Sleep 2s
 
-Escape
-Down
-Down
+# Select a repo
 Enter
 Sleep 2s
 
-# Final frame is captured as the output
+# Quit
+Type "q"
+Sleep 500ms

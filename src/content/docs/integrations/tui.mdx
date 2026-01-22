@@ -3,11 +3,6 @@ title: Terminal UI (TUI)
 description: Interactive terminal interface for viewing and managing reviews
 ---
 
-import { Image } from 'astro:assets';
-import tuiQueue from '../../../assets/screenshots/tui-queue.png';
-import tuiFilter from '../../../assets/screenshots/tui-filter.png';
-import tuiReview from '../../../assets/screenshots/tui-review.png';
-
 The interactive terminal UI (`roborev tui`) provides a real-time view of the review queue.
 
 ```bash
@@ -16,7 +11,7 @@ roborev tui
 
 ## Queue View
 
-<Image src={tuiQueue} alt="TUI Queue View" />
+![TUI Queue View](/tui-queue.gif)
 
 | Key | Action |
 |-----|--------|
@@ -25,6 +20,7 @@ roborev tui
 | `Enter` | View review |
 | `p` | View prompt |
 | `a` | Toggle addressed |
+| `c` | Add response/comment |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
 | `f` | Filter by repository |
@@ -34,15 +30,16 @@ roborev tui
 
 ## Filtering
 
-Press `f` to filter to a single repository, or `h` to hide completed reviews and focus on items needing attention.
+Press `f` to filter to a single repository, or `h` to hide completed
+reviews and focus on items needing attention.
 
-<Image src={tuiFilter} alt="Filter Modal" />
+![Filter Modal](/tui-filter.gif)
 
 ## Review View
 
 Press `Enter` on a job to view its review.
 
-<Image src={tuiReview} alt="Review View" />
+![Review View](/tui-review.gif)
 
 | Key | Action |
 |-----|--------|
@@ -50,6 +47,7 @@ Press `Enter` on a job to view its review.
 | `Left`/`h`, `Right`/`l` | Previous/next review |
 | `PgUp`, `PgDn` | Page through content |
 | `a` | Toggle addressed |
+| `c` | Add response/comment |
 | `p` | Switch between review/prompt |
 | `Esc`, `q` | Back to queue |
 
@@ -69,7 +67,14 @@ Reviews display a **Verdict** (Pass/Fail) parsed from the AI response:
 5. Press `a` to mark as addressed
 6. Use `h` to hide addressed items
 
+## Help
+
+Press `?` to view the help overlay with all available keyboard shortcuts:
+
+![Help Overlay](/tui-help.gif)
+
 ## See Also
 
 - [Commands Reference](/commands/) - Full command list
+- [Responding to Reviews](/guides/responding-to-reviews/) - Add comments to reviews
 - [Event Streaming](/integrations/streaming/) - Programmatic access to events

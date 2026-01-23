@@ -150,7 +150,7 @@ done
 
 # Copy generated files to public
 echo "[INFO] Copying generated files to public..."
-cp "$SCRIPT_DIR/output/"*.gif "$SCRIPT_DIR/../public/" 2>/dev/null || true
+cp "$SCRIPT_DIR/output/"*.webm "$SCRIPT_DIR/../public/" 2>/dev/null || true
 
 # Clean up intermediate output directory
 rm -rf "$SCRIPT_DIR/output"

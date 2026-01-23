@@ -199,7 +199,7 @@ nav a[aria-current="page"] {
 
 #quick-start ~ .expressive-code pre code,
 #quick-start + .expressive-code pre code {
-  font-size: 1.4rem !important;
+  font-size: 1.1rem !important;
 }
 
 #quick-start ~ .expressive-code .copy,

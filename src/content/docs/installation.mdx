@@ -22,7 +22,15 @@ The install script downloads the latest release binary for your platform:
     powershell -ExecutionPolicy ByPass -c "irm https://roborev.io/install.ps1 | iex"
     ```
 
-    This installs to `~/.roborev/bin` and adds it to your PATH.
+    This installs to `%USERPROFILE%\.roborev\bin` and adds it to your PATH. Both x64 and ARM64 are supported.
+
+    The installer verifies SHA256 checksums by default. To customize installation:
+
+    | Environment Variable | Description |
+    |---------------------|-------------|
+    | `ROBOREV_INSTALL_DIR` | Custom install directory (default: `%USERPROFILE%\.roborev\bin`) |
+    | `ROBOREV_NO_MODIFY_PATH` | Set to skip adding install dir to PATH |
+    | `ROBOREV_SKIP_CHECKSUM` | Set to skip checksum verification (not recommended) |
   </TabItem>
 </Tabs>
 

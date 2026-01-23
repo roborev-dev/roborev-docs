@@ -21,6 +21,7 @@ roborev tui
 | `p` | View prompt |
 | `a` | Toggle addressed |
 | `c` | Add response/comment |
+| `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
 | `f` | Filter by repository |
@@ -48,8 +49,21 @@ Press `Enter` on a job to view its review.
 | `PgUp`, `PgDn` | Page through content |
 | `a` | Toggle addressed |
 | `c` | Add response/comment |
+| `y` | Copy review to clipboard |
 | `p` | Switch between review/prompt |
 | `Esc`, `q` | Back to queue |
+
+## Copying Reviews
+
+Press `y` to copy the review content to your clipboard. This works from both the queue view (on completed jobs) and the review detail view.
+
+![Copy to clipboard](/tui-copy.gif)
+
+A "Copied to clipboard" message confirms the action. This is useful for:
+
+- Sharing review findings with teammates
+- Pasting into issue trackers or documentation
+- Including in commit messages or PR descriptions
 
 ## Verdicts
 

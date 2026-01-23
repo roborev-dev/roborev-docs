@@ -16,14 +16,33 @@ job_timeout = "10m"  # Per-job timeout (default: 10m)
 
 ## Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `default_agent` | string | auto-detect | Default AI agent to use |
-| `server_addr` | string | 127.0.0.1:7373 | Daemon listen address |
-| `max_workers` | int | 4 | Number of parallel review workers |
-| `job_timeout` | duration | 10m | Per-job timeout |
-| `allow_unsafe_agents` | bool | false | Enable agentic mode globally |
-| `anthropic_api_key` | string | - | Anthropic API key for Claude Code |
+| Option | Type | Default | Description | Hot-Reload |
+|--------|------|---------|-------------|------------|
+| `default_agent` | string | auto-detect | Default AI agent to use | Yes |
+| `server_addr` | string | 127.0.0.1:7373 | Daemon listen address | No |
+| `max_workers` | int | 4 | Number of parallel review workers | No |
+| `job_timeout` | duration | 10m | Per-job timeout | Yes |
+| `allow_unsafe_agents` | bool | false | Enable agentic mode globally | Yes |
+| `anthropic_api_key` | string | - | Anthropic API key for Claude Code | Yes |
+| `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
+
+## Hot-Reload
+
+The daemon automatically watches `~/.roborev/config.toml` for changes. When you edit the file, most settings take effect immediately without restarting the daemon.
+
+**Settings that hot-reload:**
+- `default_agent`
+- `job_timeout`
+- `allow_unsafe_agents`
+- `anthropic_api_key`
+- `review_context_count`
+
+**Settings that require daemon restart:**
+- `server_addr` (the daemon listen address)
+- `max_workers` (worker pool size is set at startup)
+- `[sync]` section (PostgreSQL sync configuration)
+
+When a configuration change is detected, you'll see a "Config reloaded" notification in the TUI that displays for 5 seconds.
 
 ## Data Directory
 

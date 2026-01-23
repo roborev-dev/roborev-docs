@@ -2,7 +2,7 @@
 # Run with: vhs tui-respond.tape
 # Shows the respond modal for adding comments to reviews
 
-Output ./output/tui-respond.gif
+Output ./output/tui-respond.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

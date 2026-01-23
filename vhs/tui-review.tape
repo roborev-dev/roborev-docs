@@ -2,7 +2,7 @@
 # Run with: vhs tui-review.tape
 # Prerequisite: ./prepare-demo-db.sh
 
-Output ./output/tui-review.gif
+Output ./output/tui-review.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

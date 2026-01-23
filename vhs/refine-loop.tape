@@ -6,7 +6,7 @@
 #   - Have a review with findings ready in the demo database
 #   - Findings should be auto-fixable (code issues, not design)
 
-Output ./output/refine-loop.gif
+Output ./output/refine-loop.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

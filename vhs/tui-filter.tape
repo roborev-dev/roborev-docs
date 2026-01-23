@@ -2,7 +2,7 @@
 # Run with: vhs tui-filter.tape
 # Shows pressing 'f' to open the repository filter modal
 
-Output ./output/tui-filter.gif
+Output ./output/tui-filter.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

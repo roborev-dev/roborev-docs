@@ -9,7 +9,7 @@
 #   git add . && git commit -m "Initial commit"
 #   echo 'function foo() { return bar }' >> app.js  # Bad code to review
 
-Output ./output/quickstart-demo.gif
+Output ./output/quickstart-demo.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

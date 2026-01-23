@@ -2,7 +2,7 @@
 # Run with: vhs tui-navigation.tape
 # Prerequisite: ./prepare-demo-db.sh
 
-Output ./output/tui-navigation.gif
+Output ./output/tui-navigation.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

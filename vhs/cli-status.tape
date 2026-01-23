@@ -1,7 +1,7 @@
 # VHS tape for CLI status output
 # Run with: vhs cli-status.tape
 
-Output ./output/cli-status.gif
+Output ./output/cli-status.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

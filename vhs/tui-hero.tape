@@ -2,7 +2,7 @@
 # Run with: vhs tui-hero.tape
 # Prerequisite: ./prepare-demo-db.sh
 
-Output ./output/tui-hero.gif
+Output ./output/tui-hero.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

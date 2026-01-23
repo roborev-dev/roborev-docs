@@ -84,7 +84,8 @@ export default defineConfig({
       sidebar: [
         { label: 'Quick Start', slug: 'quickstart' },
         { label: 'Installation', slug: 'installation' },
-        { label: 'Commands', slug: 'commands' },
+        { label: 'CLI Commands', slug: 'commands' },
+        { label: 'Terminal UI', slug: 'integrations/tui' },
         {
           label: 'Guides',
           items: [
@@ -118,7 +119,6 @@ export default defineConfig({
         {
           label: 'Integrations',
           items: [
-            { label: 'Terminal UI (TUI)', slug: 'integrations/tui' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },
           ],

@@ -2,7 +2,7 @@
 # Run with: vhs tui-copy.tape
 # Shows copying review content to clipboard with 'y' key
 
-Output ./output/tui-copy.gif
+Output ./output/tui-copy.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

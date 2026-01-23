@@ -261,11 +261,6 @@ nav a[aria-current="page"] {
     overflow-x: auto !important;
   }
 
-  /* Hide hero gif on mobile, show static fallback or just hide */
-  .hero > .hero-html {
-    display: none !important;
-  }
-
   .hero {
     grid-template-columns: 1fr !important;
   }
@@ -279,9 +274,11 @@ nav a[aria-current="page"] {
   flex: none !important;
 }
 
-/* Hero image: fill container */
+/* Hero image/video: fill container */
 .hero > .hero-html img,
-.hero > img {
+.hero > .hero-html video,
+.hero > img,
+.hero > video {
   display: block !important;
   width: 100% !important;
   height: auto !important;
@@ -419,9 +416,15 @@ button, .button {
   border: 1px solid #333333;
 }
 
-/* Images */
-img {
+/* Images and videos */
+img,
+video {
   border: 1px solid #333333;
+}
+
+video {
+  width: 100%;
+  height: auto;
 }
 
 /* Centered diagrams */

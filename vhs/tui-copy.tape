@@ -27,14 +27,6 @@ Sleep 500ms
 Enter
 Sleep 2s
 
-# Scroll down a bit to show content
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 1s
-
 # Press 'y' to copy - watch for flash message
 Type "y"
 Sleep 2s

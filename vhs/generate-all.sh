@@ -46,8 +46,14 @@ done
 # Tapes that only need CLI (no daemon)
 CLI_ONLY_TAPES="cli-version cli-help"
 
-# Tapes that need the daemon running
-DAEMON_TAPES="cli-status cli-repo-list tui-filter tui-navigation tui-queue tui-review tui-address tui-respond tui-help tui-hero commands-status"
+# Build daemon tapes list from all .tape files, excluding CLI-only tapes
+DAEMON_TAPES=""
+for tape in *.tape; do
+    name="${tape%.tape}"
+    if [[ ! " $CLI_ONLY_TAPES " =~ " $name " ]]; then
+        DAEMON_TAPES="$DAEMON_TAPES $name"
+    fi
+done
 
 echo ""
 echo "=========================================="

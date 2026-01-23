@@ -1,9 +1,10 @@
 #!/bin/bash
 # Generate all VHS tape recordings for roborev documentation
-# Usage: ./generate-all.sh [--tape <name>] [--list] [--help]
+# Usage: ./generate-all.sh [--tape <name>] [--local] [--list] [--help]
 #
 # Options:
 #   --tape NAME Only generate specific tape (without .tape extension)
+#   --local     Build from local ../roborev sibling directory
 #   --list      List all available tapes
 #   --help      Show this help
 #
@@ -15,8 +16,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 DOCKER_IMAGE_NAME="roborev-vhs"
-ROBOREV_REPO="${ROBOREV_REPO:-$SCRIPT_DIR/../../roborev}"
+ROBOREV_REPO=""
 SINGLE_TAPE=""
+USE_LOCAL=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -24,6 +26,10 @@ while [[ $# -gt 0 ]]; do
         --tape)
             SINGLE_TAPE="$2"
             shift 2
+            ;;
+        --local)
+            USE_LOCAL=true
+            shift
             ;;
         --list)
             echo "Available tapes:"
@@ -33,7 +39,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         --help)
-            head -11 "$0" | tail -10
+            head -12 "$0" | tail -11
             exit 0
             ;;
         *)
@@ -43,11 +49,27 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Set ROBOREV_REPO based on flags
+if [[ "$USE_LOCAL" == "true" ]]; then
+    ROBOREV_REPO="$SCRIPT_DIR/../../roborev"
+    echo "[INFO] Using local roborev: $ROBOREV_REPO"
+elif [[ -z "$ROBOREV_REPO" ]]; then
+    echo "ERROR: Must specify --local or set ROBOREV_REPO"
+    echo "  --local uses sibling ../roborev directory"
+    exit 1
+fi
+
 # Tapes that only need CLI (no daemon)
 CLI_ONLY_TAPES="cli-version cli-help"
 
-# Tapes that need the daemon running
-DAEMON_TAPES="cli-status cli-repo-list tui-filter tui-navigation tui-queue tui-review tui-address tui-respond tui-help tui-hero commands-status"
+# Build daemon tapes list from all .tape files, excluding CLI-only tapes
+DAEMON_TAPES=""
+for tape in *.tape; do
+    name="${tape%.tape}"
+    if [[ ! " $CLI_ONLY_TAPES " =~ " $name " ]]; then
+        DAEMON_TAPES="$DAEMON_TAPES $name"
+    fi
+done
 
 echo ""
 echo "=========================================="
@@ -128,7 +150,7 @@ done
 
 # Copy generated files to public
 echo "[INFO] Copying generated files to public..."
-cp "$SCRIPT_DIR/output/"*.gif "$SCRIPT_DIR/../public/" 2>/dev/null || true
+cp "$SCRIPT_DIR/output/"*.webm "$SCRIPT_DIR/../public/" 2>/dev/null || true
 
 # Clean up intermediate output directory
 rm -rf "$SCRIPT_DIR/output"

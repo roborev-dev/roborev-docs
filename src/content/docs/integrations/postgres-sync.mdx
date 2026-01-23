@@ -20,6 +20,10 @@ interval = "1h"           # Sync interval (default: 1h)
 machine_name = "laptop"   # Friendly name for this machine
 ```
 
+:::note
+Sync configuration is not hot-reloaded. After changing `[sync]` settings in `config.toml`, restart the daemon with `roborev daemon restart` for changes to take effect.
+:::
+
 ## Key Features
 
 - **UUID-based deduplication**: Each job, review, and response has a globally unique UUID. Local review numeric IDs may differ between machines, but UUIDs ensure PostgreSQL stores only one copy of each item.

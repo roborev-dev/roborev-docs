@@ -1,7 +1,7 @@
 # VHS tape for roborev status and version commands
 # Run with: vhs commands-status.tape
 
-Output ./output/commands-status.gif
+Output ./output/commands-status.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

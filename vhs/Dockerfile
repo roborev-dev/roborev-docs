@@ -8,7 +8,7 @@ RUN go mod download
 
 # Copy source and build
 COPY . .
-RUN go build -ldflags="-X github.com/roborev-dev/roborev/internal/version.Version=vhs-demo" \
+RUN go build -ldflags="-X github.com/roborev-dev/roborev/internal/version.Version=v999.0.0" \
     -o /roborev ./cmd/roborev
 
 FROM alpine:3.19
@@ -41,5 +41,9 @@ RUN mkdir -p /root/.roborev && \
 RUN mv /usr/bin/chromium-browser /usr/bin/chromium-browser-real && \
     printf '#!/bin/sh\nexec /usr/bin/chromium-browser-real --no-sandbox --disable-gpu "$@"\n' > /usr/bin/chromium-browser && \
     chmod +x /usr/bin/chromium-browser
+
+# Mock xclip for clipboard operations (atotto/clipboard uses this on Linux)
+RUN printf '#!/bin/sh\ncat > /dev/null\n' > /usr/local/bin/xclip && \
+    chmod +x /usr/local/bin/xclip
 
 WORKDIR /tapes

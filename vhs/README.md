@@ -1,6 +1,6 @@
 # VHS Screenshot Generation
 
-This directory contains [VHS](https://github.com/charmbracelet/vhs) tape files for generating animated GIF screenshots of the roborev TUI and CLI.
+This directory contains [VHS](https://github.com/charmbracelet/vhs) tape files for generating animated WebM videos of the roborev TUI and CLI.
 
 ## Requirements
 
@@ -24,29 +24,29 @@ This creates `demo-data/reviews.db` with only roborev-related reviews extracted 
 ### TUI Demos
 | Tape | Description | Output |
 |------|-------------|--------|
-| `tui-filter.tape` | Hero banner GIF - TUI filtering demo | `public/tui-filter.gif` |
-| `tui-navigation.tape` | Basic TUI navigation (j/k, enter, escape, help) | `public/tui-navigation.gif` |
-| `tui-queue.tape` | Queue view with pending reviews | `public/tui-queue.gif` |
-| `tui-review.tape` | Review detail view with findings | `public/tui-review.gif` |
-| `tui-address.tape` | Addressing findings workflow | `public/tui-address.gif` |
-| `tui-respond.tape` | Respond modal for adding comments | `public/tui-respond.gif` |
-| `tui-help.tape` | Help screen overlay | `public/tui-help.gif` |
+| `tui-filter.tape` | Hero banner - TUI filtering demo | `public/tui-filter.webm` |
+| `tui-navigation.tape` | Basic TUI navigation (j/k, enter, escape, help) | `public/tui-navigation.webm` |
+| `tui-queue.tape` | Queue view with pending reviews | `public/tui-queue.webm` |
+| `tui-review.tape` | Review detail view with findings | `public/tui-review.webm` |
+| `tui-address.tape` | Addressing findings workflow | `public/tui-address.webm` |
+| `tui-respond.tape` | Respond modal for adding comments | `public/tui-respond.webm` |
+| `tui-help.tape` | Help screen overlay | `public/tui-help.webm` |
 
 ### CLI Demos
 | Tape | Description | Output |
 |------|-------------|--------|
-| `cli-help.tape` | CLI help output | `public/cli-help.gif` |
-| `cli-version.tape` | Version output | `public/cli-version.gif` |
-| `cli-status.tape` | Status output | `public/cli-status.gif` |
-| `cli-repo-list.tape` | Repo list and details | `public/cli-repo-list.gif` |
-| `commands-status.tape` | Combined version/status/help | `public/commands-status.gif` |
+| `cli-help.tape` | CLI help output | `public/cli-help.webm` |
+| `cli-version.tape` | Version output | `public/cli-version.webm` |
+| `cli-status.tape` | Status output | `public/cli-status.webm` |
+| `cli-repo-list.tape` | Repo list and details | `public/cli-repo-list.webm` |
+| `commands-status.tape` | Combined version/status/help | `public/commands-status.webm` |
 
 ### Workflow Demos (require git repo setup)
 | Tape | Description | Output |
 |------|-------------|--------|
-| `quickstart-demo.tape` | Fresh install, init, first review | `public/quickstart-demo.gif` |
-| `branch-review.tape` | Reviewing feature branches | `public/branch-review.gif` |
-| `refine-loop.tape` | Auto-fix cycle demo | `public/refine-loop.gif` |
+| `quickstart-demo.tape` | Fresh install, init, first review | `public/quickstart-demo.webm` |
+| `branch-review.tape` | Reviewing feature branches | `public/branch-review.webm` |
+| `refine-loop.tape` | Auto-fix cycle demo | `public/refine-loop.webm` |
 
 ## Generate Screenshots
 
@@ -92,6 +92,6 @@ All tapes use consistent settings:
 
 ## Output
 
-Screenshots are output to `../public/` as GIF files and are served directly by the docs site.
+Videos are output to `../public/` as WebM files and are served directly by the docs site. WebM is used instead of GIF for reliable autoplay on mobile browsers.
 
 Note: VHS supports GIF, WebM, MP4, and PNG output (not SVG).

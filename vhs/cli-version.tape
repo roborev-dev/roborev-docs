@@ -1,7 +1,7 @@
 # VHS tape for CLI version output
 # Run with: vhs cli-version.tape
 
-Output ./output/cli-version.gif
+Output ./output/cli-version.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

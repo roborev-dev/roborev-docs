@@ -5,7 +5,13 @@ description: Add comments and context to reviews for future AI consideration
 
 import { Aside } from '@astrojs/starlight/components';
 
-When the AI reviewer misses context or makes incorrect assumptions, you can add responses that will be included in future review prompts. This creates a feedback loop where the AI learns from your corrections.
+Reviews are designed to be fed back into your AI coding agent sessions to address findings. Copy a review into Claude Code, Codex, or another agent to fix issues directly. Review responses let you add context that appears in the TUI and is included in future review prompts, helping the review agent understand your codebase conventions and reduce false positives.
+
+## Copying Reviews
+
+Press `y` in the TUI to copy the full review content to your clipboard. Paste it into an AI coding agent session to address the findings. You can also share reviews with teammates, include them in GitHub issues, or reference them in commit messages.
+
+<video src="/tui-copy.webm" autoplay muted loop playsinline />
 
 ## Adding a Response
 
@@ -13,7 +19,7 @@ When the AI reviewer misses context or makes incorrect assumptions, you can add 
 
 Press `c` from either the queue view or review detail view to open the respond modal:
 
-![TUI respond modal](/tui-respond.gif)
+<video src="/tui-respond.webm" autoplay muted loop playsinline />
 
 1. Navigate to the review you want to respond to
 2. Press `c` to open the respond modal

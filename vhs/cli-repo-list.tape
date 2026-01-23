@@ -1,7 +1,7 @@
 # VHS tape for CLI repo list output
 # Run with: vhs cli-repo-list.tape
 
-Output ./output/cli-repo-list.gif
+Output ./output/cli-repo-list.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

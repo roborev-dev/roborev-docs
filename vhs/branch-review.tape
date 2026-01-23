@@ -8,7 +8,7 @@
 #   # Make some changes to review
 #   git add . && git commit -m "Add auth feature"
 
-Output ./output/branch-review.gif
+Output ./output/branch-review.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

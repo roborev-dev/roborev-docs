@@ -2,7 +2,7 @@
 # Run with: vhs tui-address.tape
 # Prerequisite: ./prepare-demo-db.sh
 
-Output ./output/tui-address.gif
+Output ./output/tui-address.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

@@ -2,7 +2,7 @@
 # Run with: vhs tui-queue.tape
 # Prerequisite: ./prepare-demo-db.sh
 
-Output ./output/tui-queue.gif
+Output ./output/tui-queue.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

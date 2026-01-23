@@ -1,7 +1,7 @@
 # VHS tape for CLI help output
 # Run with: vhs cli-help.tape
 
-Output ./output/cli-help.gif
+Output ./output/cli-help.webm
 
 # Terminal settings
 Set TypingSpeed 50ms

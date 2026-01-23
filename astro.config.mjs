@@ -84,15 +84,16 @@ export default defineConfig({
       sidebar: [
         { label: 'Quick Start', slug: 'quickstart' },
         { label: 'Installation', slug: 'installation' },
-        { label: 'Commands', slug: 'commands' },
+        { label: 'CLI Commands', slug: 'commands' },
+        { label: 'Terminal UI', slug: 'integrations/tui' },
         {
           label: 'Guides',
           items: [
+            { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Reviewing Branches', slug: 'guides/reviewing-branches' },
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Ad-Hoc Prompts', slug: 'guides/ad-hoc-prompts' },
             { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
-            { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
             { label: 'PostgreSQL Sync', slug: 'integrations/postgres-sync' },
@@ -118,7 +119,6 @@ export default defineConfig({
         {
           label: 'Integrations',
           items: [
-            { label: 'Terminal UI (TUI)', slug: 'integrations/tui' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },
           ],

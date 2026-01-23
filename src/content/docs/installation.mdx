@@ -3,15 +3,36 @@ title: Installation
 description: Install roborev on your system
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 ## Quick Install (Recommended)
 
 The install script downloads the latest release binary for your platform:
 
-```bash
-curl -fsSL https://roborev.io/install.sh | bash
-```
+<Tabs>
+  <TabItem label="macOS / Linux">
+    ```bash
+    curl -fsSL https://roborev.io/install.sh | bash
+    ```
 
-This installs to `~/.local/bin` by default.
+    This installs to `~/.local/bin` by default.
+  </TabItem>
+  <TabItem label="Windows">
+    ```powershell
+    powershell -ExecutionPolicy ByPass -c "irm https://roborev.io/install.ps1 | iex"
+    ```
+
+    This installs to `%USERPROFILE%\.roborev\bin` and adds it to your PATH. Both x64 and ARM64 are supported.
+
+    The installer verifies SHA256 checksums by default. To customize installation:
+
+    | Environment Variable | Description |
+    |---------------------|-------------|
+    | `ROBOREV_INSTALL_DIR` | Custom install directory (default: `%USERPROFILE%\.roborev\bin`) |
+    | `ROBOREV_NO_MODIFY_PATH` | Set to skip adding install dir to PATH |
+    | `ROBOREV_SKIP_CHECKSUM` | Set to skip checksum verification (not recommended) |
+  </TabItem>
+</Tabs>
 
 ## Go Install
 

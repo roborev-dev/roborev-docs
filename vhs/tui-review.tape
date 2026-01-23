@@ -20,7 +20,11 @@ Type "roborev tui"
 Enter
 Sleep 2s
 
-# Enter first review
+# Enter 5th review
+Down
+Down
+Down
+Down
 Enter
 Sleep 2s
 

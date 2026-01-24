@@ -1,70 +1,175 @@
 ---
-title: Command Reference
-description: Complete reference of all roborev commands
+title: Command Cheat Sheet
+description: Quick reference for all roborev commands and flags
 ---
 
 <video src="/cli-help.webm" autoplay muted loop playsinline />
 
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `roborev init` | Initialize roborev in current repo |
-| `roborev status` | Show daemon and queue status |
-| `roborev tui` | Interactive terminal UI |
-| `roborev show [sha]` | Display review for commit |
-| `roborev show --job <id>` | Display review by job ID |
-| `roborev review <sha>` | Queue a commit for review |
-| `roborev review <start> <end>` | Queue a commit range (inclusive) |
-| `roborev review --branch` | Review all commits on current branch |
-| `roborev review --since <commit>` | Review commits since a specific commit |
-| `roborev review --dirty` | Review uncommitted changes |
-| `roborev review --reasoning <level>` | Set reasoning depth (thorough/standard/fast) |
-| `roborev prompt "<text>"` | Run ad-hoc prompt with AI agent |
-| `roborev respond <id> [msg]` | Add a response/note to a review |
-| `roborev address <id>` | Mark review as addressed |
-| `roborev refine` | Auto-fix failed reviews using AI |
-| `roborev repo list` | List tracked repositories |
-| `roborev repo rename <old> <new>` | Rename a repository's display name |
-| `roborev stream` | Stream review events (JSONL) |
-| `roborev daemon start\|stop\|restart` | Manage the daemon |
-| `roborev install-hook` | Install git post-commit hook |
-| `roborev uninstall-hook` | Remove git post-commit hook |
-| `roborev update` | Update roborev to latest version |
-| `roborev skills install` | Install agent skills (Claude Code, Codex) |
-| `roborev sync status` | Show PostgreSQL sync status |
-| `roborev sync now` | Trigger immediate sync |
-| `roborev version` | Show version information |
-
-## Common Workflows
-
-### Review a Feature Branch
+## Essentials
 
 ```bash
-roborev review --branch              # Review all commits since diverging from main
-roborev review --branch --base dev   # Compare against different base
-roborev review --branch --wait       # Wait and show result
+roborev init [--agent <name>]    # Initialize repo + daemon + hook
+roborev status                   # Check daemon and queue
+roborev tui                      # Interactive terminal UI
+roborev version                  # Show version
 ```
 
-### Review Before Committing
+## Reviewing Code
 
 ```bash
-roborev review --dirty               # Review uncommitted changes
-roborev review --dirty --wait        # Wait for result
+# Single commits
+roborev review                   # Review HEAD
+roborev review <sha>             # Review specific commit
+
+# Commit ranges
+roborev review <start> <end>     # Review range (inclusive)
+roborev review --since <commit>  # Review since commit (exclusive)
+roborev review --since HEAD~5    # Review last 5 commits
+
+# Branch reviews
+roborev review --branch          # All commits since diverged from main
+roborev review --branch --base develop  # Against specific base
+
+# Uncommitted changes
+roborev review --dirty           # Review working tree
+roborev review --dirty --wait    # Wait for result
 ```
 
-### Auto-Fix Failed Reviews
+| Flag | Description |
+|------|-------------|
+| `--wait` | Wait for review to complete and display result |
+| `--quiet` | Only show progress/elapsed time |
+| `--agent <name>` | Use specific agent for review |
+| `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
+| `--repo <path>` | Specify repository path |
+
+See: [Reviewing Branches](/guides/reviewing-branches/), [Reviewing Uncommitted](/guides/reviewing-dirty/)
+
+## Viewing Reviews
 
 ```bash
-roborev refine                       # Fix failed reviews on current branch
-roborev refine --max-iterations 5    # Limit fix attempts
+roborev show                     # Show review for HEAD
+roborev show <sha>               # Show review for commit
+roborev show <job_id>            # Show review by job ID
+roborev show --job <id>          # Force interpretation as job ID
+roborev tui                      # Interactive browser
 ```
 
-### Run Ad-Hoc Prompts
+See: [Terminal UI](/integrations/tui/)
+
+## Responding to Reviews
+
+```bash
+roborev respond <id> "message"   # Add response with message
+roborev respond <id>             # Opens editor
+roborev address <id>             # Mark as addressed
+roborev address <id> --unaddress # Mark as unaddressed
+```
+
+| Flag | Description |
+|------|-------------|
+| `--message, -m` | Response message (inline) |
+| `--responder` | Name of responder |
+| `--job` | Force interpretation as job ID |
+
+See: [Responding to Reviews](/guides/responding-to-reviews/)
+
+## Auto-Fixing
+
+```bash
+roborev refine                   # Fix failed reviews on branch
+roborev refine --max-iterations 5
+roborev refine --since HEAD~3    # Refine specific range
+roborev refine --quiet           # Show elapsed time only
+```
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Use specific agent |
+| `--reasoning <level>` | Set reasoning depth |
+| `--max-iterations <n>` | Limit fix attempts (default: 3) |
+| `--since <commit>` | Refine commits since specific commit |
+| `--quiet` | Only show progress/elapsed time |
+| `--allow-unsafe-agents` | Allow agents without sandboxing |
+
+See: [Auto-Fixing](/guides/auto-fixing/)
+
+## Ad-Hoc Prompts
 
 ```bash
 roborev prompt "Explain the architecture"
-roborev prompt --agentic "Refactor main.go"
+roborev prompt --wait "What does main do?"
+roborev prompt --agentic "Add tests for main.go"
+cat instructions.txt | roborev prompt --wait
 ```
 
-See individual guide pages for detailed usage of each command.
+| Flag | Description |
+|------|-------------|
+| `--wait` | Wait for completion and display result |
+| `--quiet` | Only show progress/elapsed time |
+| `--agent <name>` | Use specific agent |
+| `--reasoning <level>` | Set reasoning depth |
+| `--agentic, --yolo` | Enable agentic mode (can modify files) |
+| `--no-context` | Don't include repository context |
+
+See: [Ad-Hoc Prompts](/guides/ad-hoc-prompts/)
+
+## Repository Management
+
+```bash
+roborev repo list                # List all repos
+roborev repo show <name>         # Show repo details
+roborev repo rename <old> <new>  # Rename display name
+roborev repo delete <name>       # Remove from tracking
+roborev repo merge <src> <dst>   # Merge reviews between repos
+```
+
+See: [Repository Management](/guides/repository-management/)
+
+## Daemon & Hooks
+
+```bash
+roborev daemon start             # Start background daemon
+roborev daemon stop              # Stop daemon
+roborev daemon restart           # Restart daemon
+roborev daemon run               # Run in foreground
+
+roborev install-hook             # Install post-commit hook
+roborev uninstall-hook           # Remove hook
+```
+
+## Agent Skills
+
+```bash
+roborev skills install           # Install skills for agents
+roborev skills update            # Update installed skills
+```
+
+See: [Agent Skills](/guides/agent-skills/)
+
+## Sync & Streaming
+
+```bash
+roborev sync status              # Show PostgreSQL sync status
+roborev sync now                 # Trigger immediate sync
+
+roborev stream                   # Stream all events (JSONL)
+roborev stream --repo .          # Filter to current repo
+```
+
+See: [PostgreSQL Sync](/integrations/postgres-sync/), [Event Streaming](/integrations/streaming/)
+
+## Global Flags
+
+These flags work across most commands:
+
+| Flag | Description |
+|------|-------------|
+| `--server <addr>` | Daemon address (default: `http://127.0.0.1:7373`) |
+| `-v, --verbose` | Verbose output |
+
+## Update
+
+```bash
+roborev update                   # Update to latest version
+```

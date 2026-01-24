@@ -30,7 +30,8 @@ This creates `demo-data/reviews.db` with only roborev-related reviews extracted 
 | `tui-review.tape` | Review detail view with findings | `public/tui-review.webm` |
 | `tui-address.tape` | Addressing findings workflow | `public/tui-address.webm` |
 | `tui-respond.tape` | Respond modal for adding comments | `public/tui-respond.webm` |
-| `tui-help.tape` | Help screen overlay | `public/tui-help.webm` |
+| `tui-copy.tape` | Copy review to clipboard | `public/tui-copy.webm` |
+| `tui-hero.tape` | Hero banner demo | `public/tui-hero.webm` |
 
 ### CLI Demos
 | Tape | Description | Output |

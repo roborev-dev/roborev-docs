@@ -16,7 +16,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 DOCKER_IMAGE_NAME="roborev-vhs"
-ROBOREV_REPO=""
+ROBOREV_REPO="${ROBOREV_REPO:-}"
 SINGLE_TAPE=""
 USE_LOCAL=false
 
@@ -34,6 +34,7 @@ while [[ $# -gt 0 ]]; do
         --list)
             echo "Available tapes:"
             for tape in *.tape; do
+                [[ -f "$tape" ]] || continue
                 echo "  - ${tape%.tape}"
             done
             exit 0
@@ -65,6 +66,7 @@ CLI_ONLY_TAPES="cli-version cli-help"
 # Build daemon tapes list from all .tape files, excluding CLI-only tapes
 DAEMON_TAPES=""
 for tape in *.tape; do
+    [[ -f "$tape" ]] || continue
     name="${tape%.tape}"
     if [[ ! " $CLI_ONLY_TAPES " =~ " $name " ]]; then
         DAEMON_TAPES="$DAEMON_TAPES $name"

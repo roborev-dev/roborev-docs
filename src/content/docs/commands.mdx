@@ -94,13 +94,14 @@ roborev refine --quiet           # Show elapsed time only
 
 See: [Auto-Fixing](/guides/auto-fixing/)
 
-## Ad-Hoc Prompts
+## Custom Tasks
 
 ```bash
-roborev prompt "Explain the architecture"
-roborev prompt --wait "What does main do?"
-roborev prompt --agentic "Add tests for main.go"
-cat instructions.txt | roborev prompt --wait
+roborev run "Explain the architecture"
+roborev run --wait "Review src/auth/ for security issues"
+roborev run "Find simplification opportunities in src/utils/"
+roborev run --agentic "Add input validation to all endpoints"
+cat review-checklist.txt | roborev run --wait
 ```
 
 | Flag | Description |
@@ -112,7 +113,7 @@ cat instructions.txt | roborev prompt --wait
 | `--agentic, --yolo` | Enable agentic mode (can modify files) |
 | `--no-context` | Don't include repository context |
 
-See: [Ad-Hoc Prompts](/guides/ad-hoc-prompts/)
+See: [Custom Tasks](/guides/custom-tasks/)
 
 ## Repository Management
 

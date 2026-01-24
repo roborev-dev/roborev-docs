@@ -9,8 +9,8 @@ Agents run in one of two modes depending on the task.
 
 | Mode | Tools Available | Used By |
 |------|-----------------|---------|
-| **Review** (default) | Read, Glob, Grep | `roborev review`, `roborev prompt` |
-| **Agentic** | Read, Glob, Grep, Edit, Write, Bash | `roborev refine`, `roborev prompt --agentic` |
+| **Review** (default) | Read, Glob, Grep | `roborev review`, `roborev run` |
+| **Agentic** | Read, Glob, Grep, Edit, Write, Bash | `roborev refine`, `roborev run --agentic` |
 
 ## Review Mode
 
@@ -33,8 +33,8 @@ The agent cannot:
 ### 1. Per-Job
 
 ```bash
-roborev prompt --agentic "Refactor the error handling"
-roborev prompt --yolo "Add input validation"   # --yolo is an alias
+roborev run --agentic "Refactor the error handling"
+roborev run --yolo "Add input validation"   # --yolo is an alias
 ```
 
 ### 2. Per-Command

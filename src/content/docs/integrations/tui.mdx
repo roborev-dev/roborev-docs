@@ -25,14 +25,19 @@ roborev tui
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
 | `f` | Filter by repository |
-| `h` | Hide addressed/failed/canceled |
-| `Esc` | Clear all filters |
+| `h` | Toggle hide addressed/failed/canceled |
+| `Esc` | Clear filters (one layer at a time) |
 | `q` | Quit |
 
 ## Filtering
 
-Press `f` to filter to a single repository, or `h` to hide completed
-reviews and focus on items needing attention.
+Press `f` to filter to a single repository, or `h` to hide addressed/failed/canceled reviews and focus on items needing attention.
+
+`Esc` clears filters one layer at a time:
+1. If filtered by repository, clears the repository filter first
+2. Then clears the hide-addressed filter
+
+Press `h` again to toggle hide-addressed off directly.
 
 <video src="/tui-filter.webm" autoplay muted loop playsinline />
 
@@ -58,6 +63,13 @@ Press `Enter` on a job to view its review.
 Press `y` to copy the review content to your clipboard. This works from both the queue view (on completed jobs) and the review detail view.
 
 <video src="/tui-copy.webm" autoplay muted loop playsinline />
+
+The copied content includes a metadata header for reference:
+
+```
+Review #42 /path/to/repo abc1234
+[review content...]
+```
 
 A "Copied to clipboard" message confirms the action. The primary use case is pasting the review into an AI coding agent session (like Claude Code) to address the findings. Other uses include sharing with teammates, pasting into issue trackers, or including in PR descriptions.
 

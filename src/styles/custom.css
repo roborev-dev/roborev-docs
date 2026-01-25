@@ -402,6 +402,18 @@ button, .button {
   border: 1px solid #333333;
 }
 
+/* Card icons - dark background with green icon for visibility */
+.card .title .icon,
+.sl-link-card .icon {
+  background: #1a1a1a !important;
+  color: #00ff9f !important;
+}
+
+.card .title .icon svg,
+.sl-link-card .icon svg {
+  fill: #00ff9f !important;
+}
+
 /* Mobile nav */
 @media (max-width: 50rem) {
   nav.sidebar {

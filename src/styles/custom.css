@@ -482,11 +482,11 @@ img.diagram-center {
   border: none !important;
 }
 
-.agent-matrix img[alt="Codex"] {
+.agent-matrix img[data-agent="codex"] {
   height: 65px;
 }
 
-.agent-matrix img[alt="Gemini"] {
+.agent-matrix img[data-agent="gemini"] {
   height: 34px;
 }
 
@@ -509,11 +509,11 @@ img.diagram-center {
     height: 20px;
   }
 
-  .agent-matrix img[alt="Codex"] {
+  .agent-matrix img[data-agent="codex"] {
     height: 50px;
   }
 
-  .agent-matrix img[alt="Gemini"] {
+  .agent-matrix img[data-agent="gemini"] {
     height: 24px;
   }
 

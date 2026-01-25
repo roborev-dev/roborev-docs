@@ -18,6 +18,15 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+<div class="agent-matrix">
+  <a href="/agents/"><img src="/agents/codex.svg" alt="Codex" /></a>
+  <a href="/agents/"><img src="/agents/claude-code.svg" alt="Claude Code" /></a>
+  <a href="/agents/"><img src="/agents/gemini.svg" alt="Gemini" /></a>
+  <a href="/agents/"><img src="/agents/opencode.svg" alt="OpenCode" /></a>
+  <a href="/agents/"><img src="/agents/copilot.svg" alt="Copilot" /></a>
+  <a href="/agents/"><span class="agent-text">Droid</span></a>
+</div>
+
 ## Quick Start
 
 ```bash
@@ -57,7 +66,7 @@ For Windows, see the [installation guide](/installation/#quick-install-recommend
     Local-first experience, review earlier and faster than GitHub
     PRs.
   </Card>
-  <Card title="Multi-Player, Multi-Machine" icon="random">
+  <Card title="Multi-Player, Multi-Machine" icon="external">
     Bi-directionally sync review data to a shared PostgreSQL database.
   </Card>
 </CardGrid>

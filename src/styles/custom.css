@@ -448,3 +448,76 @@ img.diagram-center {
   outline: 2px solid #00ff9f;
   outline-offset: 2px;
 }
+
+/* Agent support matrix */
+.agent-matrix {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding: 1rem 0.5rem;
+  margin: 0 auto 0;
+  max-width: 800px;
+}
+
+.agent-matrix + h2 {
+  margin-top: 0.5rem !important;
+}
+
+.agent-matrix a {
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.agent-matrix a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.agent-matrix img {
+  height: 20px;
+  width: auto;
+  border: none !important;
+}
+
+.agent-matrix img[alt="Codex"] {
+  height: 50px;
+}
+
+.agent-matrix img[alt="Gemini"] {
+  height: 24px;
+}
+
+.agent-matrix .agent-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--sl-color-gray-1);
+  letter-spacing: 0.02em;
+}
+
+/* Mobile: smaller logos, tighter spacing */
+@media (max-width: 50rem) {
+  .agent-matrix {
+    gap: 0.75rem 1rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .agent-matrix img {
+    height: 16px;
+  }
+
+  .agent-matrix img[alt="Codex"] {
+    height: 40px;
+  }
+
+  .agent-matrix img[alt="Gemini"] {
+    height: 19px;
+  }
+
+  .agent-matrix .agent-text {
+    font-size: 1.15rem;
+  }
+}

@@ -92,7 +92,7 @@ export default defineConfig({
             { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Reviewing Branches', slug: 'guides/reviewing-branches' },
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
-            { label: 'Custom Tasks', slug: 'guides/custom-tasks' },
+            { label: 'Custom Agent Tasks', slug: 'guides/custom-tasks' },
             { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Repository Management', slug: 'guides/repository-management' },

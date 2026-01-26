@@ -86,30 +86,21 @@ export default defineConfig({
         { label: 'Installation', slug: 'installation' },
         { label: 'CLI Commands', slug: 'commands' },
         { label: 'Terminal UI', slug: 'integrations/tui' },
+        { label: 'Configuration', slug: 'configuration' },
         {
           label: 'Guides',
           items: [
-            { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Reviewing Branches', slug: 'guides/reviewing-branches' },
-            { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Custom Agent Tasks', slug: 'guides/custom-tasks' },
             { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
+            { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
+            { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
             { label: 'PostgreSQL Sync', slug: 'integrations/postgres-sync' },
           ],
         },
-        {
-          label: 'Configuration',
-          items: [
-            { label: 'Overview', slug: 'configuration' },
-            { label: 'Per-Repository', slug: 'configuration/per-repo' },
-            { label: 'Global', slug: 'configuration/global' },
-            { label: 'Authentication', slug: 'configuration/authentication' },
-            { label: 'Reasoning Levels', slug: 'configuration/reasoning-levels' },
-          ],
-        },
-        {
+                {
           label: 'Agents',
           items: [
             { label: 'Supported Agents', slug: 'agents' },

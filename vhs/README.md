@@ -33,7 +33,6 @@ This creates `demo-data/reviews.db` with only roborev-related reviews extracted 
 | `tui-copy.tape` | Copy review to clipboard | `public/tui-copy.webm` |
 | `tui-hero.tape` | Hero banner demo | `public/tui-hero.webm` |
 | `tui-help.tape` | Keyboard shortcuts help overlay | `public/tui-help.webm` |
-| `tui-commit-message.tape` | View commit message | `public/tui-commit-message.webm` |
 
 ### CLI Demos
 | Tape | Description | Output |

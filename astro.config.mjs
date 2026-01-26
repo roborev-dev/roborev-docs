@@ -97,7 +97,7 @@ export default defineConfig({
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
-            { label: 'PostgreSQL Sync', slug: 'integrations/postgres-sync' },
+            { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
           ],
         },
                 {

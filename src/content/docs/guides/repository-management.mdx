@@ -52,6 +52,14 @@ roborev repo list                 # See all tracked repos
 roborev repo delete old-project   # Remove one you no longer need
 ```
 
+### Multiple Clones
+
+You can have multiple local clones of the same remote repository (e.g., `~/project-main` and `~/project-feature`). Each clone is tracked separately in roborev while sharing the same repository identity for sync purposes.
+
+When using [PostgreSQL Sync](/guides/postgres-sync/), reviews from teammates are intelligently matched:
+- If you have exactly one local clone with that identity, synced reviews appear there
+- If you have multiple clones, a placeholder repo is created to avoid ambiguity
+
 ## How Repositories Are Tracked
 
 roborev automatically creates a repository entry when you:

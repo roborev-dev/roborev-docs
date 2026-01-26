@@ -18,6 +18,7 @@ roborev tui
 | `Up`/`k`, `Down`/`j` | Navigate jobs |
 | `PgUp`, `PgDn` | Page through list |
 | `Enter` | View review |
+| `t` | View live agent output (running jobs) |
 | `p` | View prompt |
 | `m` | View commit message |
 | `a` | Toggle addressed |
@@ -30,6 +31,24 @@ roborev tui
 | `?` | Show keyboard shortcuts |
 | `Esc` | Clear filters (one layer at a time) |
 | `q` | Quit |
+
+## Tail View (Live Agent Output)
+
+Press `t` on a running job to view live agent output in real-time, similar to `tail -f`.
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Scroll output |
+| `PgUp`, `PgDn` | Page through output |
+| `g` | Toggle follow mode / jump to top/bottom |
+| `Esc`, `q` | Back to queue |
+
+The tail view features:
+- **Follow mode**: Auto-scrolls to show new output as it arrives (toggle with `g`)
+- **Memory-bounded**: Output is buffered with per-job and global limits
+- **Agent normalization**: Output from different agents is normalized to a consistent format
+
+Output is preserved after job completion, so you can review what happened.
 
 ## Filtering
 
@@ -87,12 +106,34 @@ Press `?` at any time to toggle the keyboard shortcuts help overlay. This displa
 
 <video src="/tui-help.webm" autoplay muted loop playsinline />
 
+## Review Screen Layout
+
+The review detail view shows:
+
+```
+Review #42 myrepo (codex: claude-sonnet-4-5-20250929)
+/path/to/repo abc1234 on feature-branch
+Verdict: Pass [ADDRESSED]
+```
+
+- **Line 1**: Review identity - job ID, repo name, agent and model (if explicitly configured)
+- **Line 2**: Location - repo path, git ref, branch
+- **Line 3**: Status - verdict and addressed state
+
 ## Verdicts
 
 Reviews display a **Verdict** (Pass/Fail) parsed from the AI response:
 
 - **Pass** (green): Code review passed with no issues
 - **Fail** (red): Issues found that need attention
+
+## Adaptive Colors
+
+The TUI automatically adapts to light and dark terminals. Colors are selected based on your terminal's background to ensure readability in both environments.
+
+## Version Mismatch Warning
+
+If the TUI binary version differs from the running daemon version, a persistent red banner displays at the top of the screen. This prevents confusing behavior from stale binaries (common in post-commit hooks). Restart the daemon with `roborev daemon restart` to resolve.
 
 ## Workflow
 

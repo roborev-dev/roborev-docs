@@ -3,6 +3,9 @@ import starlight from '@astrojs/starlight';
 
 export default defineConfig({
   site: 'https://roborev.io',
+  redirects: {
+    '/integrations/postgres-sync/': '/guides/postgres-sync/',
+  },
   integrations: [
     starlight({
       title: 'roborev',
@@ -97,7 +100,7 @@ export default defineConfig({
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
-            { label: 'PostgreSQL Sync', slug: 'integrations/postgres-sync' },
+            { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
           ],
         },
                 {

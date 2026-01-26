@@ -54,17 +54,22 @@ roborev show <sha>               # Show review for commit
 roborev show <job_id>            # Show review by job ID
 roborev show --job <id>          # Force interpretation as job ID
 roborev tui                      # Interactive browser
+roborev tail <job_id>            # View live agent output
 ```
 
 See: [Terminal UI](/integrations/tui/)
 
+:::tip
+Press `t` in the TUI on a running job to view live agent output, similar to `tail -f`.
+:::
+
 ## Commenting on Reviews
 
 ```bash
-roborev comment <id> "message"   # Add comment with message
-roborev comment <id>             # Opens editor
-roborev address <id>             # Mark as addressed
-roborev address <id> --unaddress # Mark as unaddressed
+roborev comment <job_id> "message"   # Add comment with message
+roborev comment <job_id>             # Opens editor
+roborev address <job_id>             # Mark as addressed
+roborev address <job_id> --unaddress # Mark as unaddressed
 ```
 
 | Flag | Description |
@@ -160,7 +165,7 @@ roborev stream                   # Stream all events (JSONL)
 roborev stream --repo .          # Filter to current repo
 ```
 
-See: [PostgreSQL Sync](/integrations/postgres-sync/), [Event Streaming](/integrations/streaming/)
+See: [PostgreSQL Sync](/guides/postgres-sync/), [Event Streaming](/integrations/streaming/)
 
 ## Global Flags
 

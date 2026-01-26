@@ -40,6 +40,7 @@ roborev review --dirty --wait    # Wait for result
 | `--wait` | Wait for review to complete and display result |
 | `--quiet` | Only show progress/elapsed time |
 | `--agent <name>` | Use specific agent for review |
+| `-m, --model <model>` | Model to use (format varies by agent) |
 | `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
 | `--repo <path>` | Specify repository path |
 
@@ -57,19 +58,19 @@ roborev tui                      # Interactive browser
 
 See: [Terminal UI](/integrations/tui/)
 
-## Responding to Reviews
+## Commenting on Reviews
 
 ```bash
-roborev respond <id> "message"   # Add response with message
-roborev respond <id>             # Opens editor
+roborev comment <id> "message"   # Add comment with message
+roborev comment <id>             # Opens editor
 roborev address <id>             # Mark as addressed
 roborev address <id> --unaddress # Mark as unaddressed
 ```
 
 | Flag | Description |
 |------|-------------|
-| `--message, -m` | Response message (inline) |
-| `--responder` | Name of responder |
+| `--message, -m` | Comment message (inline) |
+| `--commenter` | Name of commenter |
 | `--job` | Force interpretation as job ID |
 
 See: [Responding to Reviews](/guides/responding-to-reviews/)
@@ -86,6 +87,7 @@ roborev refine --quiet           # Show elapsed time only
 | Flag | Description |
 |------|-------------|
 | `--agent <name>` | Use specific agent |
+| `-m, --model <model>` | Model to use (format varies by agent) |
 | `--reasoning <level>` | Set reasoning depth |
 | `--max-iterations <n>` | Limit fix attempts (default: 3) |
 | `--since <commit>` | Refine commits since specific commit |
@@ -173,4 +175,5 @@ These flags work across most commands:
 
 ```bash
 roborev update                   # Update to latest version
+roborev update --force           # Force update (useful for dev builds)
 ```

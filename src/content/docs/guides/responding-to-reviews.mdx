@@ -5,7 +5,7 @@ description: Use reviews in your agent sessions and record responses and comment
 
 import { Aside } from '@astrojs/starlight/components';
 
-Reviews are designed to be fed back into your AI coding agent sessions to address findings. Copy a review into Claude Code, Codex, or another agent to fix issues directly. Review responses let you add context that appears in the TUI and is included in future review prompts, helping the review agent understand your codebase conventions and reduce false positives.
+Reviews are designed to be fed back into your AI coding agent sessions to address findings. Copy a review into Claude Code, Codex, or another agent to fix issues directly. Review comments let you add context that appears in the TUI and is included in future review prompts, helping the review agent understand your codebase conventions and reduce false positives.
 
 ## Copying Reviews
 
@@ -13,42 +13,42 @@ Press `y` in the TUI to copy the full review content to your clipboard. Paste it
 
 <video src="/tui-copy.webm" autoplay muted loop playsinline />
 
-## Adding a Response
+## Adding a Comment
 
 ### From the TUI
 
-Press `c` from either the queue view or review detail view to open the respond modal:
+Press `c` from either the queue view or review detail view to open the comment modal:
 
 <video src="/tui-respond.webm" autoplay muted loop playsinline />
 
-1. Navigate to the review you want to respond to
-2. Press `c` to open the respond modal
-3. Type your response (multi-line supported)
+1. Navigate to the review you want to comment on
+2. Press `c` to open the comment modal
+3. Type your comment (multi-line supported)
 4. Press `Enter` to submit, or `Esc` to cancel
 
 ### From the CLI
 
 ```bash
-roborev respond <review-id> "Your response text"
+roborev comment <review-id> "Your comment text"
 ```
 
 Or interactively:
 
 ```bash
-roborev respond <review-id>
+roborev comment <review-id>
 # Opens your $EDITOR for multi-line input
 ```
 
-## How Responses Are Used
+## How Comments Are Used
 
-When the AI reviews the same commit again (or related commits), your responses are included in the prompt:
+When the AI reviews the same commit again (or related commits), your comments are included in the prompt:
 
 - **Context about known issues**: "This null check is intentional, handled in caller"
 - **Clarifications**: "This is test code, different standards apply"
 - **Acknowledgments**: "Good catch, will fix in next commit"
 
 <Aside type="tip">
-Responses help train the AI's understanding of your codebase conventions and reduce false positives in future reviews.
+Comments help train the AI's understanding of your codebase conventions and reduce false positives in future reviews.
 </Aside>
 
 ## Best Practices
@@ -58,7 +58,7 @@ Responses help train the AI's understanding of your codebase conventions and red
 3. **Acknowledge valid findings**: Confirm when the AI catches real issues
 4. **Note false positives**: Mark findings that don't apply to your context
 
-## Example Responses
+## Example Comments
 
 ```
 The singleton pattern here is intentional for the connection pool.

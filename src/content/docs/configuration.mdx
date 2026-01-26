@@ -1,0 +1,199 @@
+---
+title: Configuration
+description: Configure roborev behavior globally and per-repository
+---
+
+roborev uses a layered configuration system. Settings are resolved in this order (highest to lowest priority):
+
+1. **CLI flags** (`--agent`, `--model`, `--reasoning`)
+2. **Per-repo** `.roborev.toml` in your repository root
+3. **Global** `~/.roborev/config.toml`
+4. **Defaults** (auto-detect agent, thorough reasoning for reviews)
+
+## Per-Repository Configuration
+
+Create `.roborev.toml` in your repository root to customize behavior for that project.
+
+```toml
+agent = "gemini"                  # AI agent to use
+model = "gemini-3-flash-preview"  # Model override for this repo
+review_context_count = 5   # Recent reviews to include as context
+display_name = "backend"   # Custom name shown in TUI (optional)
+excluded_branches = ["wip", "scratch"]  # Branches to skip reviews on
+
+# Reasoning levels: thorough, standard, fast
+review_reasoning = "thorough"  # For code reviews (default: thorough)
+refine_reasoning = "standard"  # For refine command (default: standard)
+
+# Project-specific review guidelines
+review_guidelines = """
+No database migrations needed - no production databases yet.
+Prefer composition over inheritance.
+All public APIs must have documentation comments.
+"""
+```
+
+### Per-Repository Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `agent` | string | AI agent to use for this repo |
+| `model` | string | Model to use (overrides global `default_model`) |
+| `display_name` | string | Custom name shown in TUI |
+| `review_context_count` | int | Number of recent reviews to include as context |
+| `excluded_branches` | array | Branches to skip automatic reviews on |
+| `review_reasoning` | string | Reasoning level for reviews: thorough, standard, fast |
+| `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
+| `review_guidelines` | string | Project-specific guidelines for the reviewer |
+
+### Review Guidelines
+
+Use `review_guidelines` to give the AI reviewer project-specific
+context—suppress irrelevant warnings, enforce conventions, or add
+domain-specific criteria:
+
+```toml
+review_guidelines = """
+This is a CLI tool - no web security concerns.
+Performance is critical - flag any O(n^2) or worse algorithms.
+All error messages must be user-friendly.
+"""
+```
+
+### Excluded Branches
+
+Skip automatic reviews on work-in-progress branches:
+
+```toml
+excluded_branches = ["wip", "scratch", "experiment"]
+```
+
+Reviews triggered manually with `roborev review` still work on these branches.
+
+## Global Configuration
+
+Create `~/.roborev/config.toml` to set system-wide defaults.
+
+```toml
+default_agent = "codex"
+default_model = "gpt-5.2-codex"  # Default LLM
+server_addr = "127.0.0.1:7373"
+max_workers = 4
+job_timeout = "10m"  # Per-job timeout (default: 10m)
+```
+
+### Global Options
+
+| Option | Type | Default | Description | Hot-Reload |
+|--------|------|---------|-------------|------------|
+| `default_agent` | string | auto-detect | Default AI agent to use | Yes |
+| `default_model` | string | agent default | Model to use (format varies by agent) | Yes |
+| `server_addr` | string | 127.0.0.1:7373 | Daemon listen address | No |
+| `max_workers` | int | 4 | Number of parallel review workers | No |
+| `job_timeout` | duration | 10m | Per-job timeout | Yes |
+| `allow_unsafe_agents` | bool | false | Enable agentic mode globally | Yes |
+| `anthropic_api_key` | string | - | Anthropic API key for Claude Code | Yes |
+| `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
+
+### Hot-Reload
+
+The daemon automatically watches `~/.roborev/config.toml` for
+changes. Most settings take effect immediately without restarting the
+daemon.
+
+**Settings that require daemon restart:** `server_addr`, `max_workers`, and the `[sync]` section.
+
+### Data Directory
+
+All roborev data is stored in `~/.roborev/` by default:
+
+```
+~/.roborev/
+├── config.toml    # Global configuration
+├── daemon.json    # Runtime state (port, PID)
+└── reviews.db     # SQLite database
+```
+
+Override with the `ROBOREV_DATA_DIR` environment variable:
+
+```bash
+export ROBOREV_DATA_DIR=/custom/path
+```
+
+### Model Selection
+
+The `default_model` setting specifies which model agents should use. The format varies by agent:
+
+```toml
+# OpenAI models (Codex, Copilot)
+default_model = "gpt-5.2"
+
+# Anthropic models (Claude Code)
+default_model = "claude-sonnet-4-5-20250929"
+
+# OpenCode (provider/model format)
+default_model = "anthropic/claude-sonnet-4-5-20250929"
+```
+
+### Agentic Mode
+
+Enable agentic mode globally (allows agents to edit files and run commands):
+
+```toml
+allow_unsafe_agents = true
+```
+
+:::caution
+This makes all review operations potentially write to your codebase. Use with caution. It's generally safer to enable agentic mode per-job with `--agentic`.
+:::
+
+## Reasoning Levels
+
+Reasoning levels control how deeply the AI analyzes code.
+
+| Level | Description | Best For |
+|-------|-------------|----------|
+| `thorough` | Deep analysis with extended thinking | Code reviews (default) |
+| `standard` | Balanced analysis | Refine command (default) |
+| `fast` | Quick responses | Rapid feedback |
+
+Set per-command with `--reasoning`, or per-repo in `.roborev.toml`:
+
+```bash
+roborev review --reasoning fast      # Quick review
+roborev refine --reasoning thorough  # Careful fixes
+```
+
+## Authentication
+
+### Claude Code
+
+Claude Code uses your Claude subscription by default. roborev
+deliberately ignores `ANTHROPIC_API_KEY` from the environment to avoid
+unexpected API charges.
+
+To use Anthropic API credits instead of your subscription:
+
+```toml
+# ~/.roborev/config.toml
+anthropic_api_key = "sk-ant-..."
+```
+
+### Other Agents
+
+- **Codex**: Uses authentication from `codex auth`
+- **Gemini**: Uses authentication from Gemini CLI
+- **Copilot**: Uses GitHub Copilot subscription via GitHub CLI
+- **OpenCode**: Uses API keys configured in its own settings, set
+    model to use in config TOML files
+
+### Environment Variable Expansion
+
+Sensitive values can reference environment variables:
+
+```toml
+# ~/.roborev/config.toml
+anthropic_api_key = "${ANTHROPIC_API_KEY}"
+```
+
+This keeps secrets out of config files while still allowing roborev to use them.

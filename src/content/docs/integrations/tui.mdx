@@ -19,13 +19,15 @@ roborev tui
 | `PgUp`, `PgDn` | Page through list |
 | `Enter` | View review |
 | `p` | View prompt |
+| `m` | View commit message |
 | `a` | Toggle addressed |
-| `c` | Add response/comment |
+| `c` | Add comment |
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
 | `f` | Filter by repository |
 | `h` | Toggle hide addressed/failed/canceled |
+| `?` | Show keyboard shortcuts |
 | `Esc` | Clear filters (one layer at a time) |
 | `q` | Quit |
 
@@ -53,9 +55,11 @@ Press `Enter` on a job to view its review.
 | `Left`/`h`, `Right`/`l` | Previous/next review |
 | `PgUp`, `PgDn` | Page through content |
 | `a` | Toggle addressed |
-| `c` | Add response/comment |
+| `c` | Add comment |
 | `y` | Copy review to clipboard |
 | `p` | Switch between review/prompt |
+| `m` | View commit message |
+| `?` | Show keyboard shortcuts |
 | `Esc`, `q` | Back to queue |
 
 ## Copying Reviews
@@ -72,6 +76,18 @@ Review #42 /path/to/repo abc1234
 ```
 
 A "Copied to clipboard" message confirms the action. The primary use case is pasting the review into an AI coding agent session (like Claude Code) to address the findings. Other uses include sharing with teammates, pasting into issue trackers, or including in PR descriptions.
+
+## Viewing Commit Messages
+
+Press `m` from either the queue view or review detail view to see the full commit message for the selected job. This is useful for understanding the context of the changes being reviewed.
+
+<video src="/tui-commit-message.webm" autoplay muted loop playsinline />
+
+## Keyboard Help
+
+Press `?` at any time to toggle the keyboard shortcuts help overlay. This displays all available shortcuts for the current view.
+
+<video src="/tui-help.webm" autoplay muted loop playsinline />
 
 ## Verdicts
 

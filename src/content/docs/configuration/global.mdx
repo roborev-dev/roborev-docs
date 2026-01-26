@@ -9,6 +9,7 @@ Create `~/.roborev/config.toml` to set system-wide defaults.
 
 ```toml
 default_agent = "codex"
+default_model = "gpt-4.1"  # Model to use across all agents
 server_addr = "127.0.0.1:7373"
 max_workers = 4
 job_timeout = "10m"  # Per-job timeout (default: 10m)
@@ -19,6 +20,7 @@ job_timeout = "10m"  # Per-job timeout (default: 10m)
 | Option | Type | Default | Description | Hot-Reload |
 |--------|------|---------|-------------|------------|
 | `default_agent` | string | auto-detect | Default AI agent to use | Yes |
+| `default_model` | string | agent default | Model to use (format varies by agent) | Yes |
 | `server_addr` | string | 127.0.0.1:7373 | Daemon listen address | No |
 | `max_workers` | int | 4 | Number of parallel review workers | No |
 | `job_timeout` | duration | 10m | Per-job timeout | Yes |
@@ -32,6 +34,7 @@ The daemon automatically watches `~/.roborev/config.toml` for changes. When you 
 
 **Settings that hot-reload:**
 - `default_agent`
+- `default_model`
 - `job_timeout`
 - `allow_unsafe_agents`
 - `anthropic_api_key`
@@ -76,6 +79,27 @@ The `job_timeout` setting controls how long a single review job can run before b
 ```toml
 job_timeout = "15m"  # 15 minutes
 ```
+
+## Model Selection
+
+The `default_model` setting specifies which model agents should use. The model format varies by agent:
+
+```toml
+# OpenAI models (Codex, Copilot)
+default_model = "gpt-4.1"
+
+# Anthropic models (Claude Code)
+default_model = "claude-sonnet-4-20250514"
+
+# OpenCode (provider/model format)
+default_model = "anthropic/claude-sonnet-4-20250514"
+```
+
+Model resolution priority:
+1. CLI flag (`--model` / `-m`)
+2. Per-repo config (`.roborev.toml`)
+3. Global config (`~/.roborev/config.toml`)
+4. Agent default
 
 ## Agentic Mode
 

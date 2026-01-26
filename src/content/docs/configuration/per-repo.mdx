@@ -9,6 +9,7 @@ Create `.roborev.toml` in your repository root to customize roborev behavior for
 
 ```toml
 agent = "claude-code"      # AI agent to use
+model = "claude-sonnet-4-20250514"  # Model override for this repo
 review_context_count = 5   # Recent reviews to include as context
 display_name = "backend"   # Custom name shown in TUI (optional)
 excluded_branches = ["wip", "scratch"]  # Branches to skip reviews on
@@ -30,6 +31,7 @@ All public APIs must have documentation comments.
 | Option | Type | Description |
 |--------|------|-------------|
 | `agent` | string | AI agent to use for this repo |
+| `model` | string | Model to use (overrides global `default_model`) |
 | `display_name` | string | Custom name shown in TUI |
 | `review_context_count` | int | Number of recent reviews to include as context |
 | `excluded_branches` | array | Branches to skip automatic reviews on |

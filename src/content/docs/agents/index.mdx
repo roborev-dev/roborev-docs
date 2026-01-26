@@ -53,6 +53,42 @@ agent = "claude-code"
 default_agent = "codex"
 ```
 
+## Model Selection
+
+You can override the default model for any agent using the `--model` / `-m` flag:
+
+```bash
+roborev review --model gpt-4.1 <sha>
+roborev refine --model claude-sonnet-4-20250514
+```
+
+### Model Format by Agent
+
+| Agent | Model Format | Example |
+|-------|--------------|---------|
+| Codex | OpenAI model name | `gpt-4.1`, `o3-mini` |
+| Claude Code | Anthropic model name | `claude-sonnet-4-20250514`, `claude-opus-4-20250514` |
+| Gemini | Google model name | `gemini-2.5-pro`, `gemini-2.5-flash` |
+| Copilot | OpenAI model name | `gpt-4.1` |
+| OpenCode | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
+| Droid | Factory model name | (see Factory.ai docs) |
+
+### Configuration
+
+Set a default model globally or per-repository:
+
+```toml
+# ~/.roborev/config.toml
+default_model = "claude-sonnet-4-20250514"
+```
+
+```toml
+# .roborev.toml
+model = "gpt-4.1"  # Override for this repo
+```
+
+Model resolution priority: CLI flag > per-repo config > global config > agent default.
+
 ## Agentic Support
 
 Different agents have different levels of support for agentic mode (file edits and commands):

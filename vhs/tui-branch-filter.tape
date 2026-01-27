@@ -40,7 +40,7 @@ Sleep 1s
 
 # Select a branch
 Enter
-Sleep 2s
+Sleep 8s
 
 # Quit
 Type "q"

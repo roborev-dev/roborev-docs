@@ -52,7 +52,6 @@ CREATE TABLE review_jobs (
   commit_id INTEGER REFERENCES commits(id),
   git_ref TEXT NOT NULL,
   agent TEXT NOT NULL DEFAULT 'codex',
-  reasoning TEXT NOT NULL DEFAULT 'thorough',
   status TEXT NOT NULL CHECK(status IN ('queued','running','done','failed','canceled')) DEFAULT 'queued',
   enqueued_at TEXT NOT NULL DEFAULT (datetime('now')),
   started_at TEXT,
@@ -61,7 +60,15 @@ CREATE TABLE review_jobs (
   error TEXT,
   prompt TEXT,
   retry_count INTEGER NOT NULL DEFAULT 0,
-  diff_content TEXT
+  diff_content TEXT,
+  reasoning TEXT NOT NULL DEFAULT 'thorough',
+  agentic INTEGER NOT NULL DEFAULT 0,
+  uuid TEXT,
+  source_machine_id TEXT,
+  updated_at TEXT,
+  synced_at TEXT,
+  model TEXT,
+  branch TEXT
 );
 
 CREATE TABLE reviews (
@@ -85,6 +92,8 @@ CREATE TABLE responses (
 CREATE INDEX idx_review_jobs_status ON review_jobs(status);
 CREATE INDEX idx_review_jobs_repo ON review_jobs(repo_id);
 CREATE INDEX idx_review_jobs_git_ref ON review_jobs(git_ref);
+CREATE UNIQUE INDEX idx_review_jobs_uuid ON review_jobs(uuid);
+CREATE INDEX idx_review_jobs_branch ON review_jobs(branch);
 CREATE INDEX idx_commits_sha ON commits(sha);
 SCHEMA
 
@@ -108,12 +117,14 @@ FROM source.commits c
 WHERE c.repo_id IN (SELECT id FROM repos);
 
 -- Copy review_jobs for those repos
-INSERT INTO review_jobs (id, repo_id, commit_id, git_ref, agent, reasoning, status,
+INSERT INTO review_jobs (id, repo_id, commit_id, git_ref, agent, status,
                          enqueued_at, started_at, finished_at, worker_id, error,
-                         prompt, retry_count, diff_content)
-SELECT j.id, j.repo_id, j.commit_id, j.git_ref, j.agent, j.reasoning, j.status,
+                         prompt, retry_count, diff_content, reasoning, agentic,
+                         uuid, source_machine_id, updated_at, synced_at, model, branch)
+SELECT j.id, j.repo_id, j.commit_id, j.git_ref, j.agent, j.status,
        j.enqueued_at, j.started_at, j.finished_at, j.worker_id, j.error,
-       j.prompt, j.retry_count, j.diff_content
+       j.prompt, j.retry_count, j.diff_content, j.reasoning, j.agentic,
+       j.uuid, j.source_machine_id, j.updated_at, j.synced_at, j.model, j.branch
 FROM source.review_jobs j
 WHERE j.repo_id IN (SELECT id FROM repos);
 
@@ -131,6 +142,14 @@ WHERE r.commit_id IN (SELECT id FROM commits);
 
 DETACH DATABASE source;
 SQL
+
+# Rewrite repo paths for Docker container
+# The repos will be mounted at /repos/roborev and /repos/roborev-docs
+echo "Rewriting repo paths for Docker..."
+sqlite3 "$DEST_DB" <<'PATHS'
+UPDATE repos SET root_path = '/repos/roborev' WHERE name = 'roborev';
+UPDATE repos SET root_path = '/repos/roborev-docs' WHERE name = 'roborev-docs';
+PATHS
 
 # Report stats
 echo ""

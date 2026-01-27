@@ -17,6 +17,7 @@ cd "$SCRIPT_DIR"
 
 DOCKER_IMAGE_NAME="roborev-vhs"
 ROBOREV_REPO="${ROBOREV_REPO:-}"
+ROBOREV_DOCS_REPO="$SCRIPT_DIR/.."
 SINGLE_TAPE=""
 USE_LOCAL=false
 
@@ -131,6 +132,8 @@ sleep 2
     docker run --rm \
         -v "$SCRIPT_DIR/demo-data:/data" \
         -v "$SCRIPT_DIR:/tapes" \
+        -v "$ROBOREV_REPO:/repos/roborev:ro" \
+        -v "$ROBOREV_DOCS_REPO:/repos/roborev-docs:ro" \
         -e ROBOREV_DATA_DIR=/data \
         "$DOCKER_IMAGE_NAME" \
         /bin/bash -c "${daemon_cmd}cd /tapes && vhs ${tape}.tape"

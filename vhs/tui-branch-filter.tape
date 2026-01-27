@@ -14,9 +14,12 @@ Set Height 600
 Set Padding 20
 Set Framerate 25
 
-# Launch roborev tui
+# Launch roborev tui (hidden)
+Hide
 Type "roborev tui"
 Enter
+Sleep 1s
+Show
 Sleep 2s
 
 # Press 'b' to open the branch filter modal
@@ -24,6 +27,10 @@ Type "b"
 Sleep 2s
 
 # Navigate through branches
+Down
+Sleep 500ms
+Down
+Sleep 500ms
 Down
 Sleep 500ms
 Down

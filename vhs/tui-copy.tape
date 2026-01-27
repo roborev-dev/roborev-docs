@@ -14,9 +14,12 @@ Set Height 600
 Set Padding 20
 Set Framerate 25
 
-# Launch roborev tui
+# Launch roborev tui (hidden)
+Hide
 Type "roborev tui"
 Enter
+Sleep 1s
+Show
 Sleep 2s
 
 # Navigate to a completed review

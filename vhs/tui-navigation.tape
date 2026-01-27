@@ -15,9 +15,12 @@ Set Padding 20
 Set Framerate 25
 
 
-# Launch roborev tui
+# Launch roborev tui (hidden)
+Hide
 Type "roborev tui"
 Enter
+Sleep 1s
+Show
 Sleep 2s
 
 # Navigate down through the queue with j/k

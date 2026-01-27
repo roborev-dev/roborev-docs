@@ -15,10 +15,12 @@ Set Padding 20
 Set Framerate 25
 
 
-# Launch roborev tui
+# Launch roborev tui (hidden)
+Hide
 Type "roborev tui"
-Sleep 2s
 Enter
+Sleep 1s
+Show
 Sleep 2s
 
 # Navigate to a review with findings

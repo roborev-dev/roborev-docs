@@ -1,8 +1,8 @@
-# VHS tape for TUI repo filter modal
-# Run with: vhs tui-filter.tape
-# Shows pressing 'f' to open the repository filter modal
+# VHS tape for TUI branch filter modal
+# Run with: vhs tui-branch-filter.tape
+# Shows pressing 'b' to open the branch filter modal
 
-Output ./output/tui-filter.webm
+Output ./output/tui-branch-filter.webm
 
 # Terminal settings
 Set TypingSpeed 50ms
@@ -22,11 +22,15 @@ Sleep 1s
 Show
 Sleep 2s
 
-# Press 'f' to open the repo filter modal
-Type "f"
+# Press 'b' to open the branch filter modal
+Type "b"
 Sleep 2s
 
-# Navigate through repos
+# Navigate through branches
+Down
+Sleep 500ms
+Down
+Sleep 500ms
 Down
 Sleep 500ms
 Down
@@ -34,9 +38,9 @@ Sleep 500ms
 Up
 Sleep 1s
 
-# Select a repo
+# Select a branch
 Enter
-Sleep 2s
+Sleep 8s
 
 # Quit
 Type "q"

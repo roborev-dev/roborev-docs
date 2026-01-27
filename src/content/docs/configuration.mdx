@@ -44,6 +44,10 @@ All public APIs must have documentation comments.
 | `excluded_branches` | array | Branches to skip automatic reviews on |
 | `review_reasoning` | string | Reasoning level for reviews: thorough, standard, fast |
 | `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
+| `review_agent_<level>` | string | Agent to use for reviews at specific reasoning level |
+| `review_model_<level>` | string | Model to use for reviews at specific reasoning level |
+| `refine_agent_<level>` | string | Agent to use for refine at specific reasoning level |
+| `refine_model_<level>` | string | Model to use for refine at specific reasoning level |
 | `review_guidelines` | string | Project-specific guidelines for the reviewer |
 
 ### Review Guidelines
@@ -59,6 +63,27 @@ Performance is critical - flag any O(n^2) or worse algorithms.
 All error messages must be user-friendly.
 """
 ```
+
+### Workflow-Specific Agent and Model
+
+Use different agents or models depending on the workflow and reasoning level:
+
+```toml
+# Use a faster model for quick reviews, thorough model for deep analysis
+review_model = "claude"
+review_model_fast = "claude-sonnet-4-5-20250929"
+review_model_thorough = "claude-opus-4-5-20251101"
+
+# Use different agents and models for refine
+refine_agent_fast = "gemini"
+refine_model_fast = "gemini-3-flash"
+refine_agent_thorough = "codex"
+refine_model_thorough = "gpt-5.2-codex"
+```
+
+The format is `{workflow}_agent_{level}` or `{workflow}_model_{level}` where:
+- `workflow` is `review` or `refine`
+- `level` is `thorough`, `standard`, or `fast`
 
 ### Excluded Branches
 

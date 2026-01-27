@@ -42,6 +42,7 @@ roborev review --dirty --wait    # Wait for result
 | `--agent <name>` | Use specific agent for review |
 | `-m, --model <model>` | Model to use (format varies by agent) |
 | `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
+| `--fast` | Shorthand for `--reasoning fast` |
 | `--repo <path>` | Specify repository path |
 
 See: [Reviewing Branches](/guides/reviewing-branches/), [Reviewing Uncommitted](/guides/reviewing-dirty/)
@@ -94,6 +95,7 @@ roborev refine --quiet           # Show elapsed time only
 | `--agent <name>` | Use specific agent |
 | `-m, --model <model>` | Model to use (format varies by agent) |
 | `--reasoning <level>` | Set reasoning depth |
+| `--fast` | Shorthand for `--reasoning fast` |
 | `--max-iterations <n>` | Limit fix attempts (default: 3) |
 | `--since <commit>` | Refine commits since specific commit |
 | `--quiet` | Only show progress/elapsed time |

@@ -27,6 +27,7 @@ roborev tui
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
 | `f` | Filter by repository |
+| `b` | Filter by branch |
 | `h` | Toggle hide addressed/failed/canceled |
 | `?` | Show keyboard shortcuts |
 | `Esc` | Clear filters (one layer at a time) |
@@ -52,15 +53,13 @@ Output is preserved after job completion, so you can review what happened.
 
 ## Filtering
 
-Press `f` to filter to a single repository, or `h` to hide addressed/failed/canceled reviews and focus on items needing attention.
+Press `f` to filter by repository, `b` to filter by branch, or `h` to hide addressed/failed/canceled reviews and focus on items needing attention.
 
-`Esc` clears filters one layer at a time:
-1. If filtered by repository, clears the repository filter first
-2. Then clears the hide-addressed filter
-
-Press `h` again to toggle hide-addressed off directly.
+`Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-addressed off directly.
 
 <video src="/tui-filter.webm" autoplay muted loop playsinline />
+
+<video src="/tui-branch-filter.webm" autoplay muted loop playsinline />
 
 ## Review View
 

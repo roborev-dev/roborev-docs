@@ -81,7 +81,8 @@ refine_agent_thorough = "codex"
 refine_model_thorough = "gpt-5.2-codex"
 ```
 
-The format is `{workflow}_agent_{level}` or `{workflow}_model_{level}` where:
+Base keys (`review_model`, `refine_agent`) set the default. Level-specific keys override for that reasoning level:
+- `{workflow}_model_{level}` or `{workflow}_agent_{level}`
 - `workflow` is `review` or `refine`
 - `level` is `thorough`, `standard`, or `fast`
 

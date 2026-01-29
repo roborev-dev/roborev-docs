@@ -1,14 +1,14 @@
 ---
-title: Code Analysis & Assisted Refactoring
+title: Code Analysis and Assisted Refactoring
 description: Run built-in code analysis and automatically apply fixes with roborev analyze and roborev fix
 ---
 
 Use `roborev analyze` to run structured code analysis on your files, and `roborev fix` to automatically apply the suggested changes. Together they provide a repeatable workflow for codebase-wide refactoring driven by AI agents.
 
 ```bash
-roborev analyze refactor src/handlers/*.go                    # Analyze files for refactoring opportunities
+roborev analyze refactor 'src/handlers/*.go'                    # Analyze files for refactoring opportunities
 roborev analyze complexity --fix internal/storage/            # Analyze and automatically fix
-roborev analyze duplication --per-file --fix internal/*.go    # Analyze and fix one file at a time
+roborev analyze duplication --per-file --fix 'internal/*.go'    # Analyze and fix one file at a time
 roborev fix --agent claude 1234                               # Apply fixes from a previous analysis
 roborev fix 42 43 44                                          # Fix multiple analysis jobs sequentially
 ```
@@ -35,13 +35,13 @@ Point `analyze` at an analysis type and one or more file paths, directories, or 
 
 ```bash
 # Analyze test files for fixture opportunities
-roborev analyze test-fixtures internal/storage/*_test.go
+roborev analyze test-fixtures 'internal/storage/*_test.go'
 
 # Find duplication across a package
 roborev analyze duplication cmd/roborev/
 
 # Review API design patterns
-roborev analyze api-design pkg/api/*.go
+roborev analyze api-design 'pkg/api/*.go'
 
 # Architecture review of a directory
 roborev analyze architecture internal/storage/
@@ -54,8 +54,8 @@ Results appear in the TUI as jobs labeled with their analysis type (e.g. `test-f
 By default, all files are bundled into a single analysis job. Use `--per-file` to create a separate job for each file:
 
 ```bash
-roborev analyze complexity --per-file internal/storage/*.go
-roborev analyze refactor --per-file --wait *.go
+roborev analyze complexity --per-file 'internal/storage/*.go'
+roborev analyze refactor --per-file --wait '*.go'
 ```
 
 Per-file mode is useful when:
@@ -80,7 +80,7 @@ roborev analyze duplication --fix --fix-agent claude-code src/
 When combined with `--per-file`, files are analyzed and fixed sequentially:
 
 ```bash
-roborev analyze complexity --per-file --fix internal/storage/*.go
+roborev analyze complexity --per-file --fix 'internal/storage/*.go'
 ```
 
 ### Separately with `roborev fix`
@@ -89,7 +89,7 @@ Run analysis first, review the results, then apply fixes for specific jobs:
 
 ```bash
 # Step 1: Analyze
-roborev analyze test-fixtures internal/storage/*_test.go
+roborev analyze test-fixtures 'internal/storage/*_test.go'
 # => Job 42
 
 # Step 2: Review findings in TUI or with roborev show
@@ -130,7 +130,7 @@ roborev fix 42 | tee fix-log.json
 Use `--json` for programmatic output, useful for agent-driven workflows:
 
 ```bash
-roborev analyze refactor --json cmd/*.go
+roborev analyze refactor --json 'cmd/*.go'
 ```
 
 ```json

@@ -5,6 +5,10 @@ description: Run custom AI tasks beyond automatic code review
 
 Use `roborev run` to execute custom tasks with AI agents. While automatic reviews focus on commits, `run` lets you target specific files, ask questions, or perform targeted analysis.
 
+:::tip
+For common analysis tasks like finding duplication, reducing complexity, or identifying dead code, see [Assisted Refactoring](/guides/assisted-refactoring/). The `roborev analyze` command provides built-in prompts for these use cases and can automatically apply fixes.
+:::
+
 ```bash
 roborev run "Review src/auth.go for security issues"
 roborev run --wait "Find simplification opportunities in this codebase"
@@ -112,5 +116,6 @@ Use `--no-context` for raw prompts without this context.
 ## See Also
 
 - [Agent Modes](/agents/modes/) - Details on review vs agentic modes
+- [Assisted Refactoring](/guides/assisted-refactoring/) - Built-in analysis types with `roborev analyze` and `roborev fix`
 - [Auto-Fixing](/guides/auto-fixing/) - Automated issue resolution
 - [Terminal UI](/integrations/tui/) - View task results

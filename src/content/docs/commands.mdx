@@ -103,6 +103,33 @@ roborev refine --quiet           # Show elapsed time only
 
 See: [Auto-Fixing](/guides/auto-fixing/)
 
+## Code Analysis & Assisted Refactoring
+
+```bash
+roborev analyze test-fixtures internal/*_test.go   # Run built-in analysis
+roborev analyze refactor --fix ./...               # Analyze and auto-fix
+roborev analyze complexity --per-file src/*.go      # One job per file
+roborev analyze --list                             # List analysis types
+roborev fix 1234                                   # Apply fixes for a job
+roborev fix 123 124 125                            # Fix multiple jobs
+```
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Use specific agent |
+| `-m, --model <model>` | Model to use |
+| `--reasoning <level>` | Set reasoning depth |
+| `--wait` | Wait for completion and display result |
+| `--quiet` | Suppress output |
+| `--per-file` | One analysis job per file |
+| `--fix` | Analyze then apply fixes automatically |
+| `--fix-agent <name>` | Agent for fix step |
+| `--json` | Output job info as JSON |
+| `--list` | List available analysis types |
+| `--show-prompt <type>` | Show prompt template |
+
+See: [Assisted Refactoring](/guides/assisted-refactoring/)
+
 ## Custom Agent Tasks
 
 ```bash

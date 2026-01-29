@@ -94,12 +94,12 @@ export default defineConfig({
           label: 'Guides',
           items: [
             { label: 'Reviewing Branches', slug: 'guides/reviewing-branches' },
-            { label: 'Custom Agent Tasks', slug: 'guides/custom-tasks' },
             { label: 'Code Analysis & Assisted Refactoring', slug: 'guides/assisted-refactoring' },
             { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
             { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
+            { label: 'Custom Agent Tasks', slug: 'guides/custom-tasks' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
             { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
           ],

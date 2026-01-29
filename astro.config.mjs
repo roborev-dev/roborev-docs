@@ -95,6 +95,7 @@ export default defineConfig({
           items: [
             { label: 'Reviewing Branches', slug: 'guides/reviewing-branches' },
             { label: 'Custom Agent Tasks', slug: 'guides/custom-tasks' },
+            { label: 'Code Analysis & Assisted Refactoring', slug: 'guides/assisted-refactoring' },
             { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
             { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },

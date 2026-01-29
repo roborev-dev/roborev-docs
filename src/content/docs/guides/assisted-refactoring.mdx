@@ -1,0 +1,206 @@
+---
+title: Code Analysis & Assisted Refactoring
+description: Run built-in code analysis and automatically apply fixes with roborev analyze and roborev fix
+---
+
+Use `roborev analyze` to run structured code analysis on your files, and `roborev fix` to automatically apply the suggested changes. Together they provide a repeatable workflow for codebase-wide refactoring driven by AI agents.
+
+```bash
+roborev analyze refactor src/handlers/*.go                    # Analyze files for refactoring opportunities
+roborev analyze complexity --fix internal/storage/            # Analyze and automatically fix
+roborev analyze duplication --per-file --fix internal/*.go    # Analyze and fix one file at a time
+roborev fix --agent claude 1234                               # Apply fixes from a previous analysis
+roborev fix 42 43 44                                          # Fix multiple analysis jobs sequentially
+```
+
+## Analysis Types
+
+Seven built-in analysis types target common refactoring concerns:
+
+| Type | Description |
+|------|-------------|
+| `test-fixtures` | Find test fixture and helper opportunities to reduce duplication |
+| `duplication` | Find code duplication across files |
+| `refactor` | Suggest refactoring opportunities |
+| `complexity` | Analyze complexity and suggest simplifications |
+| `api-design` | Review API consistency and design patterns |
+| `dead-code` | Find unused exports and unreachable code |
+| `architecture` | Review architectural patterns and structure |
+
+List available types with `roborev analyze --list`, or preview a prompt template with `roborev analyze --show-prompt <type>`.
+
+## Basic Usage
+
+Point `analyze` at an analysis type and one or more file paths, directories, or glob patterns:
+
+```bash
+# Analyze test files for fixture opportunities
+roborev analyze test-fixtures internal/storage/*_test.go
+
+# Find duplication across a package
+roborev analyze duplication cmd/roborev/
+
+# Review API design patterns
+roborev analyze api-design pkg/api/*.go
+
+# Architecture review of a directory
+roborev analyze architecture internal/storage/
+```
+
+Results appear in the TUI as jobs labeled with their analysis type (e.g. `test-fixtures`, `duplication`). Use `roborev show <job_id>` or the TUI to read findings. You can then use the job IDs to address findings at your discretion with `roborev fix <job_id>`.
+
+## Per-File Mode
+
+By default, all files are bundled into a single analysis job. Use `--per-file` to create a separate job for each file:
+
+```bash
+roborev analyze complexity --per-file internal/storage/*.go
+roborev analyze refactor --per-file --wait *.go
+```
+
+Per-file mode is useful when:
+
+- Total file content would be too large for a single prompt
+- You want analysis jobs to run in parallel across the worker queue
+- You plan to fix files one at a time
+
+## Applying Fixes
+
+There are two ways to apply fixes from analysis results.
+
+### Inline with `--fix`
+
+Add `--fix` to run analysis and then immediately invoke an agent to apply the suggested changes:
+
+```bash
+roborev analyze refactor --fix ./...
+roborev analyze duplication --fix --fix-agent claude-code src/
+```
+
+When combined with `--per-file`, files are analyzed and fixed sequentially:
+
+```bash
+roborev analyze complexity --per-file --fix internal/storage/*.go
+```
+
+### Separately with `roborev fix`
+
+Run analysis first, review the results, then apply fixes for specific jobs:
+
+```bash
+# Step 1: Analyze
+roborev analyze test-fixtures internal/storage/*_test.go
+# => Job 42
+
+# Step 2: Review findings in TUI or with roborev show
+roborev show 42
+
+# Step 3: Apply fixes
+roborev fix 42
+```
+
+Fix multiple jobs sequentially:
+
+```bash
+roborev fix 42 43 44
+```
+
+When complete, the agent commits its changes and the job is marked as addressed.
+
+## Stream Output
+
+When `roborev fix` or `analyze --fix` runs an agent, output is formatted as compact progress lines showing tool calls:
+
+```
+Read   internal/gmail/ratelimit_test.go
+Edit   internal/gmail/ratelimit_test.go
+Bash   go test ./internal/gmail/ -run TestRateLimiter
+Edit   internal/gmail/ratelimit_test.go
+Grep   TODO  internal/
+```
+
+When piped (non-TTY), raw JSON is passed through for logging or scripting:
+
+```bash
+roborev fix 42 | tee fix-log.json
+```
+
+## JSON Output
+
+Use `--json` for programmatic output, useful for agent-driven workflows:
+
+```bash
+roborev analyze refactor --json cmd/*.go
+```
+
+```json
+{
+  "jobs": [
+    {"id": 1, "agent": "codex"}
+  ],
+  "analysis_type": "refactor",
+  "files": ["main.go"]
+}
+```
+
+In `--per-file` mode, each job includes a `file` field:
+
+```json
+{
+  "jobs": [
+    {"id": 1, "agent": "codex", "file": "a.go"},
+    {"id": 2, "agent": "codex", "file": "b.go"}
+  ],
+  "analysis_type": "complexity",
+  "files": ["a.go", "b.go"]
+}
+```
+
+## Large File Handling
+
+When file content exceeds the configured prompt size limit (default 200KB), roborev switches to **agentic mode** automatically. Instead of embedding file contents in the prompt, it passes file paths and lets the agent read them directly.
+
+Configure the limit in `config.toml`:
+
+```toml
+default_max_prompt_size = 204800   # bytes (default: 200KB)
+```
+
+Or per-repository in `.roborev.toml`:
+
+```toml
+max_prompt_size = 204800
+```
+
+## `roborev analyze` Flags
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Agent to use for analysis (default: from config) |
+| `--model <model>` | Model for analysis agent |
+| `--reasoning <level>` | Reasoning depth: `fast`, `standard`, or `thorough` |
+| `--wait` | Wait for job to complete and show result |
+| `--quiet` | Suppress output (just enqueue) |
+| `--per-file` | Create one job per file |
+| `--fix` | Run analysis then apply fixes automatically |
+| `--fix-agent <name>` | Agent for fix step (default: same as `--agent`) |
+| `--fix-model <model>` | Model for fix step (default: same as `--model`) |
+| `--json` | Output job info as JSON |
+| `--list` | List available analysis types |
+| `--show-prompt <type>` | Show the prompt template for an analysis type |
+
+## `roborev fix` Flags
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Agent to use for fixes (default: from config) |
+| `--model <model>` | Model for fix agent |
+| `--reasoning <level>` | Reasoning depth: `fast`, `standard`, or `thorough` |
+| `--quiet` | Suppress agent output |
+
+## See Also
+
+- [Custom Agent Tasks](/guides/custom-tasks/) - Ad hoc analysis with `roborev run`
+- [Auto-Fixing with Refine](/guides/auto-fixing/) - Fix failed reviews automatically
+- [Terminal UI](/integrations/tui/) - Browse analysis results interactively
+- [Configuration](/configuration/) - Prompt size and agent settings

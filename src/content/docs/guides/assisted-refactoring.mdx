@@ -9,8 +9,7 @@ Use `roborev analyze` to run structured code analysis on your files, and `robore
 roborev analyze refactor 'src/handlers/*.go'                    # Analyze files for refactoring opportunities
 roborev analyze complexity --fix internal/storage/            # Analyze and automatically fix
 roborev analyze duplication --per-file --fix 'internal/*.go'    # Analyze and fix one file at a time
-roborev fix --agent claude 1234                               # Apply fixes from a previous analysis
-roborev fix 42 43 44                                          # Fix multiple analysis jobs sequentially
+roborev fix                                                    # Address all unaddressed findings
 ```
 
 ## Analysis Types

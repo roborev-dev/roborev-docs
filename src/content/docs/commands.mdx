@@ -54,9 +54,15 @@ roborev show                     # Show review for HEAD
 roborev show <sha>               # Show review for commit
 roborev show <job_id>            # Show review by job ID
 roborev show --job <id>          # Force interpretation as job ID
+roborev show --prompt <job_id>   # Show the prompt sent to the agent
 roborev tui                      # Interactive browser
 roborev tail <job_id>            # View live agent output
 ```
+
+| Flag | Description |
+|------|-------------|
+| `--job` | Force interpretation as job ID |
+| `--prompt` | Show the prompt sent to the agent instead of the review output |
 
 See: [Terminal UI](/integrations/tui/)
 
@@ -81,7 +87,7 @@ roborev address <job_id> --unaddress # Mark as unaddressed
 
 See: [Responding to Reviews](/guides/responding-to-reviews/)
 
-## Auto-Fixing
+## Auto-Fix Agentic Loop
 
 ```bash
 roborev refine                   # Fix failed reviews on branch
@@ -101,17 +107,33 @@ roborev refine --quiet           # Show elapsed time only
 | `--quiet` | Only show progress/elapsed time |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
 
-See: [Auto-Fixing](/guides/auto-fixing/)
+See: [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/)
 
-## Code Analysis & Assisted Refactoring
+## Fixing Reviews
+
+```bash
+roborev fix                        # Fix all unaddressed reviews on this branch
+roborev fix 123                    # Fix a specific review by job ID
+roborev fix 42 43 44               # Fix multiple reviews sequentially
+```
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Use specific agent |
+| `-m, --model <model>` | Model to use |
+| `--reasoning <level>` | Set reasoning depth |
+| `--quiet` | Suppress agent output |
+| `--unaddressed` | Fix all unaddressed reviews on branch (default when no job IDs given) |
+
+See: [Assisted Refactoring](/guides/assisted-refactoring/)
+
+## Code Analysis
 
 ```bash
 roborev analyze test-fixtures internal/*_test.go   # Run built-in analysis
 roborev analyze refactor --fix ./...               # Analyze and auto-fix
 roborev analyze complexity --per-file src/*.go      # One job per file
 roborev analyze --list                             # List analysis types
-roborev fix 1234                                   # Apply fixes for a job
-roborev fix 123 124 125                            # Fix multiple jobs
 ```
 
 | Flag | Description |
@@ -174,6 +196,19 @@ roborev daemon run               # Run in foreground
 roborev install-hook             # Install post-commit hook
 roborev uninstall-hook           # Remove hook
 ```
+
+## Checking Agents
+
+```bash
+roborev check-agents                # Smoke-test all installed agents
+roborev check-agents --agent codex  # Test a specific agent
+roborev check-agents --timeout 30   # Set timeout per agent (seconds)
+```
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Test only this agent |
+| `--timeout <secs>` | Timeout per agent (default: 60) |
 
 ## Agent Skills
 

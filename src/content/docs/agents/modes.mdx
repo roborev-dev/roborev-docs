@@ -72,6 +72,7 @@ Global agentic mode means all operations can potentially write to your codebase.
 | Claude Code | Default behavior | `--dangerously-skip-permissions` |
 | Gemini | Default behavior | `--yolo --allowed-tools` |
 | Copilot | Default behavior | Manual approval required |
+| Cursor | Default behavior | `--yolo` |
 | OpenCode | Default behavior | Auto-approves in non-interactive mode |
 
 ## Security Considerations
@@ -83,9 +84,9 @@ When using agentic mode:
 - Safe for your own code on trusted branches
 - Use isolation for untrusted code (containers, VMs)
 
-See [Auto-Fixing Security](/guides/auto-fixing/#security-considerations) for detailed guidance.
+See [Auto-Fix Agentic Loop Security](/guides/auto-fixing/#security-considerations) for detailed guidance.
 
 ## See Also
 
 - [Supported Agents](/agents/) - Agent installation and configuration
-- [Auto-Fixing](/guides/auto-fixing/) - The refine command
+- [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/) - The refine command

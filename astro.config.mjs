@@ -95,7 +95,7 @@ export default defineConfig({
           items: [
             { label: 'Reviewing Branches', slug: 'guides/reviewing-branches' },
             { label: 'Code Analysis & Assisted Refactoring', slug: 'guides/assisted-refactoring' },
-            { label: 'Auto-Fixing with Refine', slug: 'guides/auto-fixing' },
+            { label: 'Auto-Fix Agentic Loop with Refine', slug: 'guides/auto-fixing' },
             { label: 'Responding to Reviews', slug: 'guides/responding-to-reviews' },
             { label: 'Reviewing Uncommitted Changes', slug: 'guides/reviewing-dirty' },
             { label: 'Agent Skills', slug: 'guides/agent-skills' },

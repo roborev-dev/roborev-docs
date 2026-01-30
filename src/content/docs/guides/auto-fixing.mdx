@@ -1,18 +1,20 @@
 ---
-title: Auto-Fixing with Refine
-description: Automatically address failed reviews using AI agents
+title: Auto-Fix with Refine
+description: Iterative review-fix loop that keeps going until all reviews pass
 ---
 
-Use `refine` to automatically address failed reviews on your branch.
+`roborev refine` is a fully automated loop: it finds failed reviews on your branch, runs an agent to fix them, waits for re-review, and repeats until everything passes or the iteration limit is reached.
+
+For a one-shot fix without re-review, see [`roborev fix`](/guides/assisted-refactoring/#using-fix-with-reviews).
 
 ```bash
 roborev refine                       # Fix failed reviews using default agent
-roborev refine --agent claude-code   # Use specific agent for addressing findings
-roborev refine --max-iterations 5    # Limit fix attempts
+roborev refine --agent claude-code   # Use specific agent
+roborev refine --max-iterations 5    # Limit iterations (default: 10)
 roborev refine --quiet               # Show elapsed time instead of agent output
-roborev refine --reasoning thorough  # Use thorough reasoning (slower, more accurate)
+roborev refine --reasoning thorough  # Thorough reasoning (slower, more accurate)
 roborev refine --since abc123        # Refine commits since a specific commit
-roborev refine --since HEAD~3        # Refine the last 3 commits (works on main branch)
+roborev refine --since HEAD~3        # Refine the last 3 commits
 ```
 
 ## How It Works
@@ -26,7 +28,10 @@ flowchart TD
     C -->|Yes| Done([Done - all reviews pass])
     C -->|No| Fix
     A -->|Yes| Fix[AI agent addresses findings]
-    Fix --> Commit[Commit fix]
+    Fix --> Changes{Changes made?}
+    Changes -->|No| Skip[Skip review, try next]
+    Skip --> Find
+    Changes -->|Yes| Commit[Commit fix]
     Commit --> Wait[Wait for re-review]
     Wait --> Pass{Pass?}
     Pass -->|Yes| Find
@@ -35,28 +40,46 @@ flowchart TD
     MaxCheck -->|Yes| Fail([Exit - max reached])
 `} />
 
-## Processing Order
+## What Refine Does
 
-1. The loop processes commits **oldest-first**
-2. When a fix fails review, it keeps addressing that fix until it passes
-3. Passing reviews are automatically marked as addressed
-4. When no individual failed reviews remain, a whole-branch review runs
-5. If that passes, the refiner exits successfully
+1. Finds the **oldest failed review** on your branch
+2. Runs an agent in an **isolated worktree** to address the findings
+3. If the agent makes changes, applies them and **commits**
+4. **Waits for re-review** of the new commit
+5. If the new commit fails review, addresses those findings too
+6. Once all per-commit reviews pass, runs a **whole-branch review**
+7. If the branch review passes, exits successfully
+8. If the branch review fails, addresses those findings and loops back
+
+If the agent makes no changes for a review, that review is skipped and refine moves on to the next failed review.
+
+## Refine vs Fix
+
+| | `roborev fix` | `roborev refine` |
+|---|---|---|
+| **Scope** | One-shot fix, no re-review | Iterative loop with re-review |
+| **Commit review** | Enqueues but doesn't wait | Waits and re-addresses if failed |
+| **Branch review** | No | Runs after all commits pass |
+| **Isolation** | Runs directly on your repo | Uses a temp worktree |
+| **Use case** | Quick fix for a known issue | Polish a branch before merge |
 
 ## Options
 
 | Flag | Description |
 |------|-------------|
 | `--agent <name>` | Agent to use for fixes |
-| `--max-iterations <n>` | Maximum fix attempts per commit (default: 3) |
+| `--model <model>` | Model for agent |
+| `--max-iterations <n>` | Maximum fix iterations (default: 10) |
 | `--quiet` | Show elapsed time instead of agent output |
 | `--reasoning <level>` | Reasoning depth: fast, standard, thorough |
+| `--fast` | Shorthand for `--reasoning fast` |
 | `--since <commit>` | Refine commits since a specific commit |
+| `--allow-unsafe-agents` | Allow agents without sandboxing |
 
 ## Requirements
 
 - **Clean working tree**: No uncommitted changes
-- **Feature branch**: By default, compares against main
+- **Feature branch**: By default, compares against the default branch
 - **Use `--since`**: To refine specific commits on any branch, including main
 
 ## Security Considerations
@@ -81,5 +104,6 @@ The risk is equivalent to running `claude --dangerously-skip-permissions` or `co
 
 ## See Also
 
+- [Assisted Refactoring](/guides/assisted-refactoring/) - One-shot fix and analysis workflows
 - [Agent Modes](/agents/modes/) - Review vs agentic mode details
 - [Agent Skills](/guides/agent-skills/) - Fix findings interactively

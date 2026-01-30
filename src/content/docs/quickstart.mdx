@@ -32,7 +32,8 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 ```bash
 cd your-repo
 roborev init          # Install post-commit hook
-git commit -m "..."   # Reviews happen automatically
+# do some work, generate commits
+roborev fix           # Fixes unaddressed reviews
 roborev tui           # View reviews in interactive UI
 ```
 
@@ -52,18 +53,44 @@ Check the daemon status at any time:
 
 <video src="/cli-status.webm" autoplay muted loop playsinline />
 
-## Addressing Reviews in the TUI
+## Addressing Reviews
 
-One easy way to get going is to just look at reviews in the TUI and
-mark them addressed with the `a` key to help you keep track of what
-reviews you have addressed in your codebase. Press `y` to copy the review
-to your clipboard, then paste it into your agent session. You can also use
-the [agent skills](/guides/agent-skills/) for supported agents.
+### With `roborev fix`
+
+The quickest way to address a review is to let an agent fix it:
+
+```bash
+roborev fix                        # Fix all unaddressed reviews on this branch
+roborev fix 123                    # Fix a specific review by job ID
+```
+
+The agent applies changes, commits, and marks the review as addressed.
+This is a one-shot fix — use `refine` (below) if you want automatic re-review.
+
+### With `roborev refine`
+
+For a fully automated loop that re-reviews fixes and keeps iterating:
+
+```bash
+roborev refine                     # Fix all failed reviews, re-review, repeat
+roborev refine --max-iterations 5  # Limit iterations
+```
+
+Refine finds failed reviews, runs an agent to fix them, waits for re-review, and
+repeats until everything passes. See [Auto-Fix with Refine](/guides/auto-fixing/).
+
+### In the TUI
+
+You can also browse reviews in the TUI, mark them addressed with the `a` key,
+and press `y` to copy a review to your clipboard for pasting into your agent
+session. You can also use the [agent skills](/guides/agent-skills/) for
+supported agents.
 
 <video src="/tui-address.webm" autoplay muted loop playsinline />
 
 ## Next Steps
 
 - [Commands](/commands/) - Full command reference
+- [Assisted Refactoring](/guides/assisted-refactoring/) - Code analysis and fix workflows
 - [Configuration](/configuration/) - Customize roborev behavior
 - [TUI Guide](/integrations/tui/) - Master the terminal interface

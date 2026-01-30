@@ -1,9 +1,9 @@
 ---
 title: roborev
-description: Continuous, non-invasive background code review for AI agents
+description: Background code review, analysis, and auto-fix for AI agents
 template: splash
 hero:
-  tagline: Continuous, non-invasive background code review for agents (Claude Code, Codex, Gemini, and more)
+  tagline: Background code review, analysis, and auto-fix for AI agents
   image:
     html: <video src="/tui-hero.webm" autoplay muted loop playsinline />
   actions:
@@ -24,6 +24,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <a href="/agents/"><img src="/agents/gemini.svg" alt="Gemini" data-agent="gemini" width="344" height="127" /></a>
   <a href="/agents/"><img src="/agents/opencode.svg" alt="OpenCode" data-agent="opencode" width="641" height="115" /></a>
   <a href="/agents/"><img src="/agents/copilot.svg" alt="Copilot" data-agent="copilot" width="419" height="95" /></a>
+  <a href="/agents/"><img src="/agents/cursor.svg" alt="Cursor" data-agent="cursor" width="800" height="190" /></a>
   <a href="/agents/"><span class="agent-text">Droid</span></a>
 </div>
 
@@ -36,7 +37,10 @@ curl -fsSL https://roborev.io/install.sh | bash
 Then from within your git repositories:
 
 ```bash
-roborev init && roborev tui
+roborev init          # Install post-commit hook
+# do some work, generate commits
+roborev fix           # Fixes unaddressed reviews
+roborev tui           # View reviews in interactive UI
 ```
 
 For Windows, see the [installation guide](/installation/#quick-install-recommended).
@@ -52,15 +56,16 @@ For Windows, see the [installation guide](/installation/#quick-install-recommend
     Check files for security issues, find refactoring opportunities, or ask questions about your codebase.
   </Card>
   <Card title="Multi-Agent Support" icon="rocket">
-    Works with Claude Code, Codex, Gemini, Copilot, OpenCode, and Droid. Auto-detects installed agents.
+    Works with Claude Code, Codex, Cursor, Gemini, Copilot, OpenCode, and Droid. Auto-detects installed agents.
   </Card>
   <Card title="Stay In Control" icon="laptop">
     `roborev` is not an agent orchestrator. You decide how to
     incorporate reviews into your workflow.
   </Card>
-  <Card title="Auto-Fix with Refine" icon="setting">
-    `roborev refine` allows for autonomously addressing reviews in a
-    branch or commit range with your preferred agent.
+  <Card title="One-Shot Fix & Iterative Refine" icon="setting">
+    `roborev fix` addresses review findings in a single pass.
+    `roborev refine` runs an iterative loop that re-reviews and
+    re-fixes until everything passes.
   </Card>
   <Card title="Local & Private" icon="laptop">
     Local-first experience, review earlier and faster than GitHub

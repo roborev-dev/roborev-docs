@@ -48,6 +48,10 @@ All public APIs must have documentation comments.
 | `review_model_<level>` | string | Model to use for reviews at specific reasoning level |
 | `refine_agent_<level>` | string | Agent to use for refine at specific reasoning level |
 | `refine_model_<level>` | string | Model to use for refine at specific reasoning level |
+| `fix_agent` | string | Agent to use for fix / analyze --fix |
+| `fix_agent_<level>` | string | Agent to use for fix at specific reasoning level |
+| `fix_model` | string | Model to use for fix / analyze --fix |
+| `fix_model_<level>` | string | Model to use for fix at specific reasoning level |
 | `review_guidelines` | string | Project-specific guidelines for the reviewer |
 
 ### Review Guidelines
@@ -81,10 +85,13 @@ refine_agent_thorough = "codex"
 refine_model_thorough = "gpt-5.2-codex"
 ```
 
-Base keys (`review_model`, `refine_agent`) set the default. Level-specific keys override for that reasoning level:
+Base keys (`review_model`, `refine_agent`, `fix_agent`) set the default for each workflow. Level-specific keys override for that reasoning level:
 - `{workflow}_model_{level}` or `{workflow}_agent_{level}`
-- `workflow` is `review` or `refine`
+- `workflow` is `review`, `refine`, or `fix`
 - `level` is `thorough`, `standard`, or `fast`
+
+The fallback hierarchy for each workflow is:
+- **CLI flag** > **repo `{workflow}_agent_{level}`** > **repo `{workflow}_agent`** > **repo `agent`** > **global `{workflow}_agent_{level}`** > **global `{workflow}_agent`** > **global `default_agent`** > `codex`
 
 ### Excluded Branches
 

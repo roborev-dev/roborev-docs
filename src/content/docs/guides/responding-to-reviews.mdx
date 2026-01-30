@@ -5,7 +5,18 @@ description: Use reviews in your agent sessions and record responses and comment
 
 import { Aside } from '@astrojs/starlight/components';
 
-Reviews are designed to be fed back into your AI coding agent sessions to address findings. Copy a review into Claude Code, Codex, or another agent to fix issues directly. Review comments let you add context that appears in the TUI and is included in future review prompts, helping the review agent understand your codebase conventions and reduce false positives.
+Reviews are designed to be fed back into your AI coding agent sessions to address findings. The quickest way is `roborev fix`, which runs an agent to apply changes automatically. You can also copy reviews into an agent session manually, or add comments for context.
+
+## Auto-Fix with `roborev fix`
+
+Let an agent address findings automatically:
+
+```bash
+roborev fix                        # Fix all unaddressed reviews on this branch
+roborev fix 123                    # Fix a specific review by job ID
+```
+
+The agent reads the review, applies changes, commits, and marks the review as addressed. This is a one-shot fix — for an iterative loop with re-review, see [Auto-Fix with Refine](/guides/auto-fixing/).
 
 ## Copying Reviews
 

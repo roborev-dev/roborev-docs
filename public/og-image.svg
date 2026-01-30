@@ -52,5 +52,5 @@
 
   <!-- Text -->
   <text x="600" y="450" class="logo-text" text-anchor="middle">roborev</text>
-  <text x="600" y="510" class="tagline" text-anchor="middle">Automatic code review for AI agents</text>
+  <text x="600" y="510" class="tagline" text-anchor="middle">Code review, analysis, and auto-fix for AI agents</text>
 </svg>

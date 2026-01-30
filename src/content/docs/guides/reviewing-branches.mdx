@@ -39,7 +39,8 @@ Before creating a pull request, review your entire branch:
 ```bash
 git checkout feature-branch
 roborev review --branch --wait
-roborev tui  # Review results
+roborev fix           # Address any failed reviews
+roborev tui           # Browse results
 ```
 
 ### CI Integration

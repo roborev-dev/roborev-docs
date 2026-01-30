@@ -103,15 +103,31 @@ roborev refine --quiet           # Show elapsed time only
 
 See: [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/)
 
-## Code Analysis & Assisted Refactoring
+## Fixing Reviews
+
+```bash
+roborev fix 123                    # Fix a specific review by job ID
+roborev fix --unaddressed          # Fix all unaddressed reviews on this branch
+roborev fix 42 43 44               # Fix multiple reviews sequentially
+```
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Use specific agent |
+| `-m, --model <model>` | Model to use |
+| `--reasoning <level>` | Set reasoning depth |
+| `--quiet` | Suppress agent output |
+| `--unaddressed` | Fix all unaddressed reviews on branch |
+
+See: [Assisted Refactoring](/guides/assisted-refactoring/)
+
+## Code Analysis
 
 ```bash
 roborev analyze test-fixtures internal/*_test.go   # Run built-in analysis
 roborev analyze refactor --fix ./...               # Analyze and auto-fix
 roborev analyze complexity --per-file src/*.go      # One job per file
 roborev analyze --list                             # List analysis types
-roborev fix 1234                                   # Apply fixes for a job
-roborev fix 123 124 125                            # Fix multiple jobs
 ```
 
 | Flag | Description |

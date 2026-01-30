@@ -64,7 +64,19 @@ Per-file mode is useful when:
 - You want analysis jobs to run in parallel across the worker queue
 - You plan to fix files one at a time
 
-## Applying Fixes
+## Using Fix with Reviews
+
+`roborev fix` works with any review, not just analysis results. Use it to address commit reviews too:
+
+```bash
+roborev fix 123                    # Fix a specific review by job ID
+roborev fix --unaddressed          # Fix all unaddressed reviews on this branch
+roborev fix 42 43 44               # Fix multiple reviews sequentially
+```
+
+The agent reads the review findings, applies changes, commits, and marks the review as addressed. This is a one-shot fix — for an iterative loop with re-review, see [`roborev refine`](/guides/auto-fixing/).
+
+## Applying Fixes from Analysis
 
 There are two ways to apply fixes from analysis results.
 
@@ -197,6 +209,7 @@ max_prompt_size = 204800
 | `--model <model>` | Model for fix agent |
 | `--reasoning <level>` | Reasoning depth: `fast`, `standard`, or `thorough` |
 | `--quiet` | Suppress agent output |
+| `--unaddressed` | Fix all unaddressed reviews on the current branch |
 
 ## See Also
 

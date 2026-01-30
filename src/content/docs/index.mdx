@@ -37,7 +37,10 @@ curl -fsSL https://roborev.io/install.sh | bash
 Then from within your git repositories:
 
 ```bash
-roborev init && roborev tui
+roborev init          # Install post-commit hook
+# do some work, commit
+roborev fix           # Fixes unaddressed reviews
+roborev tui           # View reviews in interactive UI
 ```
 
 For Windows, see the [installation guide](/installation/#quick-install-recommended).

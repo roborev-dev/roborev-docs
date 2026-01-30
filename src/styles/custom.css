@@ -38,6 +38,11 @@
 
   /* Links */
   --sl-color-text-link: #00ff9f;
+
+  /* Layout - maximize content width */
+  --sl-content-width: 65rem;
+  --sl-sidebar-width: 17rem;
+  --sl-content-pad-x: 1rem;
 }
 
 /* Force dark mode */

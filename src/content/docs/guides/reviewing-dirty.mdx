@@ -60,7 +60,18 @@ For `--dirty` reviews, diffs are limited to 200KB since uncommitted changes cann
 
 For committed changes, diffs over 250KB are omitted from the prompt - the agent is given only the commit hash and can inspect changes using `git show`.
 
+## Addressing Findings
+
+After reviewing, use `roborev fix` to let an agent address any failed reviews:
+
+```bash
+roborev review --dirty --wait
+# commit your changes
+roborev fix                      # Address unaddressed reviews
+```
+
 ## See Also
 
 - [Reviewing Branches](/guides/reviewing-branches/) - Review entire feature branches
+- [Assisted Refactoring](/guides/assisted-refactoring/) - Code analysis and fix workflows
 - [Commands Reference](/commands/) - Full command list

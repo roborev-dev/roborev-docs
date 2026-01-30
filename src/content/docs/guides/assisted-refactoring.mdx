@@ -119,6 +119,22 @@ roborev fix 42 43 44
 
 When complete, the agent commits its changes and the job is marked as addressed.
 
+### Batch Analyze, Then Fix
+
+Queue multiple analysis jobs at once and let `roborev fix` work through them all:
+
+```bash
+# Queue a batch of analysis jobs
+roborev analyze test-fixtures 'internal/*_test.go'
+roborev analyze duplication internal/
+roborev analyze complexity --per-file 'cmd/*.go'
+
+# Fix all unaddressed reviews (analysis results are reviews too)
+roborev fix
+```
+
+`roborev fix` processes unaddressed reviews one at a time. As it commits fixes, the daemon automatically reviews the new commits — and if those new reviews fail, `roborev fix` picks them up and addresses them too. This means a single `roborev fix` invocation can work through a chain of analysis findings and their follow-on reviews without manual intervention.
+
 ## Stream Output
 
 When `roborev fix` or `analyze --fix` runs an agent, output is formatted as compact progress lines showing tool calls:

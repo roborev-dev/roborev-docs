@@ -40,11 +40,10 @@
 
   <!-- Agents Box -->
   <rect x="555" y="50" width="160" height="120" class="box" />
-  <text x="635" y="80" class="label">Review Agents</text>
-  <text x="635" y="100" class="label-sm">claude-code</text>
-  <text x="635" y="115" class="label-sm">codex</text>
-  <text x="635" y="130" class="label-sm">gemini</text>
-  <text x="635" y="145" class="label-sm">etc.</text>
+  <text x="635" y="85" class="label">Agents</text>
+  <text x="635" y="105" class="label-sm">codex, claude,</text>
+  <text x="635" y="120" class="label-sm">gemini, cursor,</text>
+  <text x="635" y="135" class="label-sm">copilot, ...</text>
 
   <!-- Arrow down to DB -->
   <path d="M 255 140 L 255 185" class="arrow-down" />

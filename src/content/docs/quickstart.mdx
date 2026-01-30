@@ -32,7 +32,8 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 ```bash
 cd your-repo
 roborev init          # Install post-commit hook
-git commit -m "..."   # Reviews happen automatically
+# do some work, commit
+roborev fix           # Fixes unaddressed reviews
 roborev tui           # View reviews in interactive UI
 ```
 
@@ -59,8 +60,8 @@ Check the daemon status at any time:
 The quickest way to address a review is to let an agent fix it:
 
 ```bash
+roborev fix                        # Fix all unaddressed reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
-roborev fix --unaddressed          # Fix all unaddressed reviews on this branch
 ```
 
 The agent applies changes, commits, and marks the review as addressed.

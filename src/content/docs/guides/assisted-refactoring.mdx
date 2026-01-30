@@ -69,8 +69,8 @@ Per-file mode is useful when:
 `roborev fix` works with any review, not just analysis results. Use it to address commit reviews too:
 
 ```bash
+roborev fix                        # Fix all unaddressed reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
-roborev fix --unaddressed          # Fix all unaddressed reviews on this branch
 roborev fix 42 43 44               # Fix multiple reviews sequentially
 ```
 
@@ -209,7 +209,7 @@ max_prompt_size = 204800
 | `--model <model>` | Model for fix agent |
 | `--reasoning <level>` | Reasoning depth: `fast`, `standard`, or `thorough` |
 | `--quiet` | Suppress agent output |
-| `--unaddressed` | Fix all unaddressed reviews on the current branch |
+| `--unaddressed` | Fix all unaddressed reviews on the current branch (default when no job IDs given) |
 
 ## See Also
 

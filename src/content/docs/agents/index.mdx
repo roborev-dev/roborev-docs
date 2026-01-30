@@ -13,6 +13,7 @@ roborev supports multiple AI coding agents and auto-detects which ones are insta
 | Claude Code | `claude` | `npm install -g @anthropic-ai/claude-code` |
 | Gemini | `gemini` | `npm install -g @google/gemini-cli` |
 | Copilot | `copilot` | `npm install -g @github/copilot` |
+| Cursor | `agent` | [cursor.com/cli](https://cursor.com/cli) |
 | OpenCode | `opencode` | `npm install -g opencode-ai` |
 | Droid | `droid` | [factory.ai](https://factory.ai/) |
 
@@ -24,8 +25,9 @@ roborev auto-detects installed agents and falls back in this order:
 2. Claude Code
 3. Gemini
 4. Copilot
-5. OpenCode
-6. Droid
+5. Cursor
+6. OpenCode
+7. Droid
 
 The first available agent is used unless you specify one explicitly.
 
@@ -70,6 +72,7 @@ roborev refine --model claude-sonnet-4-20250514
 | Claude Code | Anthropic model name | `claude-sonnet-4-20250514`, `claude-opus-4-20250514` |
 | Gemini | Google model name | `gemini-2.5-pro`, `gemini-2.5-flash` |
 | Copilot | OpenAI model name | `gpt-4.1` |
+| Cursor | Model name | `claude-sonnet-4-20250514`, `gpt-4.1` |
 | OpenCode | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
 | Droid | Factory model name | (see Factory.ai docs) |
 
@@ -99,6 +102,7 @@ Different agents have different levels of support for agentic mode (file edits a
 | Claude Code | Full (uses `--dangerously-skip-permissions`) |
 | Gemini | Full (uses `--yolo` and `--allowed-tools`) |
 | Copilot | Limited (requires manual approval for actions) |
+| Cursor | Full (uses `--yolo` flag) |
 | OpenCode | Full (auto-approves in non-interactive mode) |
 | Droid | Full (runs autonomously) |
 

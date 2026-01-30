@@ -54,9 +54,15 @@ roborev show                     # Show review for HEAD
 roborev show <sha>               # Show review for commit
 roborev show <job_id>            # Show review by job ID
 roborev show --job <id>          # Force interpretation as job ID
+roborev show --prompt <job_id>   # Show the prompt sent to the agent
 roborev tui                      # Interactive browser
 roborev tail <job_id>            # View live agent output
 ```
+
+| Flag | Description |
+|------|-------------|
+| `--job` | Force interpretation as job ID |
+| `--prompt` | Show the prompt sent to the agent instead of the review output |
 
 See: [Terminal UI](/integrations/tui/)
 
@@ -190,6 +196,19 @@ roborev daemon run               # Run in foreground
 roborev install-hook             # Install post-commit hook
 roborev uninstall-hook           # Remove hook
 ```
+
+## Checking Agents
+
+```bash
+roborev check-agents                # Smoke-test all installed agents
+roborev check-agents --agent codex  # Test a specific agent
+roborev check-agents --timeout 30   # Set timeout per agent (seconds)
+```
+
+| Flag | Description |
+|------|-------------|
+| `--agent <name>` | Test only this agent |
+| `--timeout <secs>` | Timeout per agent (default: 60) |
 
 ## Agent Skills
 

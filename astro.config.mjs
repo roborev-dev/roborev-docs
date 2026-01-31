@@ -114,6 +114,7 @@ export default defineConfig({
         {
           label: 'Integrations',
           items: [
+            { label: 'Review Hooks', slug: 'guides/hooks' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },
           ],

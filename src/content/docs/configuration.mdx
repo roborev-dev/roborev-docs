@@ -180,6 +180,31 @@ allow_unsafe_agents = true
 This makes all review operations potentially write to your codebase. Use with caution. It's generally safer to enable agentic mode per-job with `--agentic`.
 :::
 
+## Hooks
+
+Run shell commands when reviews complete or fail. See the [Review Hooks guide](/guides/hooks) for full details.
+
+```toml
+# In config.toml or .roborev.toml
+[[hooks]]
+event = "review.failed"          # or "review.completed", "review.*"
+command = "notify-send 'Review failed for {repo_name}'"
+
+[[hooks]]
+event = "review.failed"
+type = "beads"   # Built-in: creates a bd issue automatically
+```
+
+### Hook Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `event` | string | Event to match: `review.completed`, `review.failed`, or `review.*` |
+| `command` | string | Shell command with `{var}` template interpolation |
+| `type` | string | Built-in hook type (`beads`), or omit for custom command |
+
+Template variables: `{job_id}`, `{repo}`, `{repo_name}`, `{sha}`, `{agent}`, `{verdict}`, `{error}`
+
 ## Reasoning Levels
 
 Reasoning levels control how deeply the AI analyzes code.

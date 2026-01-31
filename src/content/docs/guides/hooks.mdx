@@ -9,7 +9,7 @@ Common use cases:
 
 - **Desktop notifications** so you know when a review is ready
 - **Issue creation** when reviews find problems (GitHub/GitLab/Jira via shell)
-- **[Beads](https://github.com/dpup/beads) integration** to auto-create tracked issues for review failures and findings (built-in, zero config)
+- **[Beads](https://github.com/steveyegge/beads) integration** to auto-create tracked issues for review failures and findings (built-in, zero config)
 - **Chat notifications** to Slack, Discord, or Teams channels
 - **Logging** review outcomes to a file or external service
 - **CI-like workflows** that run scripts when reviews pass or fail
@@ -114,7 +114,7 @@ Variables that aren't available for a given event type interpolate to an empty s
 
 ## Built-in: Beads Integration
 
-If you use [beads](https://github.com/dpup/beads) for issue tracking, roborev has a built-in hook type that creates issues automatically when reviews surface problems. This is the recommended way to track review findings without manual triage.
+If you use [beads](https://github.com/steveyegge/beads) for issue tracking, roborev has a built-in hook type that creates issues automatically when reviews surface problems. This is the recommended way to track review findings without manual triage.
 
 ```toml
 # .roborev.toml

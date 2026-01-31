@@ -132,7 +132,7 @@ What the `type = "beads"` hook does for each event:
 | Event | Verdict | Action |
 |-------|---------|--------|
 | `review.failed` | n/a | Creates a **priority-1** issue: "Review failed for \{repo\} (\{sha\}): run roborev show \{job_id\}" |
-| `review.completed` | `F` (fail) | Creates a **priority-2** issue: "Review findings for \{repo\} (\{sha\}): run roborev show \{job_id\}" |
+| `review.completed` | `F` (fail) | Creates a **priority-2** issue: "Review findings for \{repo\} (\{sha\}): roborev show \{job_id\} / one-shot fix with roborev fix \{job_id\}" |
 | `review.completed` | `P` (pass) | No action |
 
 The hook runs in the repo's working directory so `bd` finds the correct `.beads/` database. Issue titles include the `roborev show` command so you can jump straight to the full review.
@@ -241,8 +241,7 @@ command = "~/.roborev/hooks/on-review.sh {job_id} {verdict} {sha}"
 job_id=$1 verdict=$2 sha=$3
 
 if [ "$verdict" = "F" ]; then
-    # Findings -- open the review in less for quick triage
-    roborev show --job "$job_id" | less
+    roborev show --job "$job_id" >> ~/reviews/findings.log
 fi
 ```
 

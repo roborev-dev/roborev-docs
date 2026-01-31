@@ -102,6 +102,7 @@ export default defineConfig({
             { label: 'Custom Agent Tasks', slug: 'guides/custom-tasks' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
             { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
+            { label: 'Review Hooks', slug: 'guides/hooks' },
           ],
         },
                 {
@@ -114,7 +115,6 @@ export default defineConfig({
         {
           label: 'Integrations',
           items: [
-            { label: 'Review Hooks', slug: 'guides/hooks' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },
           ],

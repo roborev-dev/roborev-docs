@@ -63,8 +63,12 @@ Both fire for matching events -- per-repo hooks run in addition to global hooks,
 ```toml
 # ~/.roborev/config.toml -- fires for all repos
 [[hooks]]
-event = "review.*"
-command = "echo {repo_name} {sha} {verdict} {error} >> ~/roborev-events.log"
+event = "review.completed"
+command = "echo {repo_name} {sha} {verdict} >> ~/roborev-events.log"
+
+[[hooks]]
+event = "review.failed"
+command = "echo {repo_name} {sha} {error} >> ~/roborev-events.log"
 ```
 
 ```toml
@@ -156,12 +160,12 @@ Get notified when reviews finish so you don't have to keep checking:
 ```toml
 # macOS -- uses built-in osascript
 [[hooks]]
-event = "review.*"
+event = "review.completed"
 command = "osascript -e 'display notification \"Review {verdict} for {repo_name}\" with title \"roborev\"'"
 
 # Linux -- requires libnotify (notify-send)
 [[hooks]]
-event = "review.*"
+event = "review.completed"
 command = "notify-send -u normal roborev 'Review {verdict} for {repo_name} ({sha})'"
 ```
 
@@ -178,14 +182,21 @@ command = """curl -sf -X POST \
   $SLACK_WEBHOOK_URL"""
 ```
 
-For both failures and findings:
+For both failures and findings, use two hooks:
 
 ```toml
 [[hooks]]
-event = "review.*"
-command = """test {verdict} = F -o -n {error} && curl -sf -X POST \
+event = "review.completed"
+command = """test {verdict} = F && curl -sf -X POST \
   -H 'Content-Type: application/json' \
-  -d '{"text":"roborev: {repo_name} ({sha}) needs attention. Run `roborev show {job_id}`."}' \
+  -d '{"text":"roborev: review findings in {repo_name} ({sha}). Run `roborev show {job_id}`."}' \
+  $SLACK_WEBHOOK_URL"""
+
+[[hooks]]
+event = "review.failed"
+command = """curl -sf -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"roborev: review failed for {repo_name} ({sha}). Run `roborev show {job_id}`."}' \
   $SLACK_WEBHOOK_URL"""
 ```
 
@@ -206,8 +217,12 @@ Log all review outcomes to a file for auditing or metrics:
 ```toml
 # Global -- logs events from all repos
 [[hooks]]
-event = "review.*"
+event = "review.completed"
 command = "printf '%s %s %s %s %s\\n' $(date -Iseconds) {repo_name} {sha} {agent} {verdict} >> ~/.roborev/events.log"
+
+[[hooks]]
+event = "review.failed"
+command = "printf '%s %s %s %s %s\\n' $(date -Iseconds) {repo_name} {sha} {agent} {error} >> ~/.roborev/events.log"
 ```
 
 ### Running a Script

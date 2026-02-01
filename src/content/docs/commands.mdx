@@ -116,6 +116,8 @@ See: [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/)
 roborev fix                        # Fix all unaddressed reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
+roborev fix --batch                # Batch all unaddressed into one agent prompt
+roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
 ```
 
 | Flag | Description |
@@ -125,6 +127,7 @@ roborev fix 42 43 44               # Fix multiple reviews sequentially
 | `--reasoning <level>` | Set reasoning depth |
 | `--quiet` | Suppress agent output |
 | `--unaddressed` | Fix all unaddressed reviews on branch (default when no job IDs given) |
+| `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
 
 See: [Assisted Refactoring](/guides/assisted-refactoring/)
 

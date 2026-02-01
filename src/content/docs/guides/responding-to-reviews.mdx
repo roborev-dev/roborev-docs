@@ -14,6 +14,7 @@ Let an agent address findings automatically:
 ```bash
 roborev fix                        # Fix all unaddressed reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
+roborev fix --batch                # Batch all unaddressed into one agent prompt
 ```
 
 The agent reads the review, applies changes, commits, and marks the review as addressed. This is a one-shot fix — for an iterative loop with re-review, see [Auto-Fix with Refine](/guides/auto-fixing/).

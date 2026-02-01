@@ -71,9 +71,13 @@ Per-file mode is useful when:
 roborev fix                        # Fix all unaddressed reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
+roborev fix --batch                # Batch all unaddressed into one agent prompt
+roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
 ```
 
 The agent reads the review findings, applies changes, commits, and marks the review as addressed. This is a one-shot fix — for an iterative loop with re-review, see [`roborev refine`](/guides/auto-fixing/).
+
+Use `--batch` to concatenate multiple reviews into a single prompt so the agent sees all findings at once. This is faster and gives the agent more context to make coordinated fixes across related issues. Reviews are packed into batches respecting the configured max prompt size.
 
 ## Applying Fixes from Analysis
 
@@ -116,7 +120,13 @@ Fix multiple jobs sequentially:
 roborev fix 42 43 44
 ```
 
-When complete, the agent commits its changes and the job is marked as addressed.
+Or batch them into a single agent prompt for faster, more coordinated fixes:
+
+```bash
+roborev fix --batch 42 43 44
+```
+
+When complete, the agent commits its changes and the jobs are marked as addressed.
 
 ### Batch Analyze, Then Fix
 
@@ -130,9 +140,14 @@ roborev analyze complexity --per-file 'cmd/*.go'
 
 # Fix all unaddressed reviews (analysis results are reviews too)
 roborev fix
+
+# Or batch all unaddressed into a single agent prompt
+roborev fix --batch
 ```
 
-`roborev fix` processes unaddressed reviews one at a time. As it commits fixes, the daemon automatically reviews the new commits — and if those new reviews fail, `roborev fix` picks them up and addresses them too. This means a single `roborev fix` invocation can work through a chain of analysis findings and their follow-on reviews without manual intervention.
+Without `--batch`, `roborev fix` processes unaddressed reviews one at a time. As it commits fixes, the daemon automatically reviews the new commits — and if those new reviews fail, `roborev fix` picks them up and addresses them too. This means a single `roborev fix` invocation can work through a chain of analysis findings and their follow-on reviews without manual intervention.
+
+With `--batch`, all unaddressed reviews are concatenated into a single prompt (respecting the configured max prompt size), so the agent addresses everything in one pass. This is particularly useful after queuing several analysis jobs.
 
 ## Stream Output
 
@@ -225,6 +240,10 @@ max_prompt_size = 204800
 | `--reasoning <level>` | Reasoning depth: `fast`, `standard`, or `thorough` |
 | `--quiet` | Suppress agent output |
 | `--unaddressed` | Fix all unaddressed reviews on the current branch (default when no job IDs given) |
+| `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
+| `--branch <name>` | Filter by branch (requires `--unaddressed` or `--batch`) |
+| `--all-branches` | Include jobs from all branches (requires `--unaddressed` or `--batch`) |
+| `--newest-first` | Process jobs newest first (requires `--unaddressed` or `--batch`) |
 
 ## See Also
 

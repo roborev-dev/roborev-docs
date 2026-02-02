@@ -13,30 +13,61 @@ roborev skills install
 
 | Skill | Description |
 |-------|-------------|
-| `/roborev:address <job_id>` | Fetch a review and fix its findings |
+| `/roborev:fix [job_id...]` | Discover and fix all unaddressed review findings in one pass |
+| `/roborev:address <job_id>` | Fetch a single review and fix its findings |
 | `/roborev:respond <job_id> [message]` | Add a response to document changes |
 
 ## Usage
 
-When you receive a review notification like "Review #1019: Fail", ask your agent:
+### Fix all unaddressed reviews at once
+
+The most powerful skill is `/roborev:fix`. With no arguments it discovers all unaddressed failed reviews on recent commits and fixes them in a single pass:
+
+```
+/roborev:fix
+```
+
+You can also target specific jobs:
+
+```
+/roborev:fix 1019 1021
+```
+
+The agent:
+1. Discovers unaddressed reviews (or uses provided job IDs)
+2. Fetches all reviews and collects findings
+3. Groups findings by file and prioritizes by severity
+4. Fixes all issues across all reviews
+5. Runs tests to verify
+6. Records a comment on each addressed review
+7. Offers to commit
+
+This is the interactive equivalent of `roborev fix --batch` -- the agent sees all findings at once and can make coordinated fixes across related issues.
+
+### Fix a single review
+
+When you want to address one specific review:
 
 ```
 /roborev:address 1019
 ```
 
-The agent:
-1. Fetches the review
-2. Reads relevant files
-3. Fixes issues by priority (high severity first)
-4. Runs tests
-5. Offers to commit
+The agent fetches the review, fixes issues by priority, runs tests, and offers to commit.
 
 ## Agent-Specific Syntax
 
 | Agent | Syntax |
 |-------|--------|
-| Claude Code | `/roborev:address`, `/roborev:respond` |
-| Codex | `$roborev:address`, `$roborev:respond` |
+| Claude Code | `/roborev:fix`, `/roborev:address`, `/roborev:respond` |
+| Codex | `$roborev:fix`, `$roborev:address`, `$roborev:respond` |
+
+## Checking Skill Status
+
+See which skills are installed and whether any need updating:
+
+```bash
+roborev skills
+```
 
 ## Updating Skills
 
@@ -57,9 +88,9 @@ The skill scripts call `roborev show --job <id> --json` to fetch review data, th
 
 ## Interactive vs Automated
 
-Skills provide an **interactive** workflow - you ask your agent to address specific findings and review the changes before committing.
+Skills provide an **interactive** workflow -- your agent addresses findings and you review the changes before committing. `/roborev:fix` is the fastest interactive option since it batches all outstanding findings into one pass.
 
-For **automated** fixing, use `roborev refine` which runs in a loop until all reviews pass.
+For **fully automated** fixing, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
 
 ## See Also
 

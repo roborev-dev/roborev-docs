@@ -108,6 +108,7 @@ command = 'echo "{error}"'
 | `{sha}` | Commit SHA or git ref | Always |
 | `{agent}` | Agent that ran the review (e.g., `codex`, `claude-code`) | Always |
 | `{verdict}` | `P` (pass) or `F` (fail) | `review.completed` only |
+| `{findings}` | Full review output from the agent | `review.completed` only |
 | `{error}` | Error message describing why the job failed | `review.failed` only |
 
 Variables that aren't available for a given event type interpolate to an empty string (`''`).

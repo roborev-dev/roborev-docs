@@ -118,6 +118,7 @@ roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
 roborev fix --batch                # Batch all unaddressed into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
+roborev fix --list                 # List unaddressed reviews without fixing
 ```
 
 | Flag | Description |
@@ -128,6 +129,7 @@ roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
 | `--quiet` | Suppress agent output |
 | `--unaddressed` | Fix all unaddressed reviews on branch (default when no job IDs given) |
 | `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
+| `--list` | List unaddressed reviews with details (job ID, ref, branch, agent, verdict) without running any fixes |
 
 See: [Assisted Refactoring](/guides/assisted-refactoring/)
 

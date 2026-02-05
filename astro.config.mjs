@@ -104,6 +104,7 @@ export default defineConfig({
             { label: 'Repository Management', slug: 'guides/repository-management' },
             { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
             { label: 'Review Hooks', slug: 'guides/hooks' },
+            { label: 'Troubleshooting', slug: 'guides/troubleshooting' },
           ],
         },
                 {

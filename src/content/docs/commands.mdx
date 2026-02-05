@@ -200,8 +200,21 @@ roborev daemon restart           # Restart daemon
 roborev daemon run               # Run in foreground
 
 roborev install-hook             # Install post-commit hook
+roborev install-hook --force     # Overwrite existing hook with a fresh one
 roborev uninstall-hook           # Remove hook
 ```
+
+| Flag | Description |
+|------|-------------|
+| `--force` | Overwrite an existing post-commit hook with a fresh one |
+
+:::tip[Broken post-commit hook?]
+If your post-commit hook was corrupted during a previous upgrade (e.g. a stray `fi` or missing lines), run:
+```bash
+roborev install-hook --force
+```
+This replaces the hook entirely with a known-good version.
+:::
 
 ## Checking Agents
 

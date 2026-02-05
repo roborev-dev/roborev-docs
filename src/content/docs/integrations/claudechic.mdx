@@ -24,7 +24,7 @@ roborev skills install
 
 When a roborev daemon is running, Claude Chic displays a live sidebar panel alongside your coding session:
 
-- Shows unaddressed reviews with verdict icons (green check for pass, red X for fail)
+- Shows unaddressed reviews with verdict icons (green P for pass, red F for fail)
 - Animated spinners for in-progress reviews
 - Auto-polls every 5 seconds for new results
 - Click a review to view its detail inline
@@ -49,10 +49,10 @@ A typical review-fix cycle inside Claude Chic:
 
 1. Make changes to your code as usual in the Claude Chic session
 2. roborev reviews your commits in the background
-3. The sidebar updates — a red X appears for job `#1019`
+3. The sidebar updates — a red F appears for job `#1019`
 4. Run `/reviews 1019` to read the full review inline
 5. Run `/roborev:fix` to batch-fix all unaddressed findings
-6. The sidebar auto-updates — the verdict flips to a green check
+6. The sidebar auto-updates — the verdict flips to a green P
 
 The entire loop happens without switching windows or terminals.
 

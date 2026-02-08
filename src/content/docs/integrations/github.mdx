@@ -86,6 +86,17 @@ Under **Repository permissions**, set:
 
 Leave everything else as "No access". Click **Create GitHub App**.
 
+:::important[If app permissions are currently empty]
+If you already created the app with empty permissions:
+
+1. Open app settings and go to **Permissions & events**.
+2. Set **Pull requests** to **Read and write** and **Contents** to **Read-only**.
+3. Save the app settings.
+4. For each existing installation, open installation settings and **accept the updated permissions**.
+
+Until each installation accepts the new permissions, roborev may fail to list PR data or post PR comments.
+:::
+
 :::tip
 Set the app visibility to **Any account** if you want others to install it on their repos. This is under the app's **Advanced** settings after creation.
 :::

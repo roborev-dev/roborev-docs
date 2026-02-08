@@ -114,10 +114,10 @@ export default defineConfig({
             { label: 'Review vs Agentic Modes', slug: 'agents/modes' },
           ],
         },
+        { label: 'GitHub Integration', slug: 'integrations/github' },
         {
           label: 'Integrations',
           items: [
-            { label: 'GitHub Integration', slug: 'integrations/github' },
             { label: 'Claude Chic', slug: 'integrations/claudechic' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },

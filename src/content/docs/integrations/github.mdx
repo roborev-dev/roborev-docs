@@ -35,6 +35,8 @@ Before enabling the CI poller, you need:
    ```
    The poller matches GitHub repos to local checkouts by git remote URL. If `roborev init` hasn't been run for a repo, the poller will log `no local repo found matching "owner/repo"` and skip it.
 
+   The checkout must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
+
 3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `opencode`, `cursor`, `droid`. You can check what's available with:
    ```bash
    roborev review --agent test --help  # lists available agents

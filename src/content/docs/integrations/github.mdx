@@ -3,7 +3,7 @@ title: GitHub Integration
 description: Automatically review GitHub PRs and post results as bot comments
 ---
 
-roborev can poll GitHub for open pull requests, run code reviews on each one, and post the results as PR comments. With a GitHub App configured, comments appear as `roborev[bot]` instead of your personal account.
+roborev can poll GitHub for open pull requests, run code reviews on each one, and post the results as PR comments.
 
 ## How It Works
 
@@ -17,11 +17,26 @@ The CI poller runs inside the roborev daemon. On each interval it:
 
 For multi-agent or multi-type configurations, results from all jobs are synthesized by an LLM into a single combined PR comment. When only one job is configured, the output is posted directly (no synthesis overhead).
 
+## Choose Your Authentication Method
+
+roborev needs GitHub credentials to list PRs and post comments. There are two options:
+
+| | GitHub App (Recommended) | Personal (`gh` CLI) |
+|---|---|---|
+| **Comments appear as** | `your-app-name[bot]` | Your personal GitHub account |
+| **Setup effort** | Create an app, generate keys, install on repos | Minimal — just `gh auth login` |
+| **Best for** | Teams, shared repos, production use | Quick testing, personal projects |
+| **Permissions** | Scoped to specific repos and permissions | Whatever your account has access to |
+
+:::tip[Which should I pick?]
+**GitHub App** is the recommended approach — dedicated bot identity, scoped permissions, and clean separation from your personal account. Use **personal auth** if you just want to try roborev quickly without creating an app.
+:::
+
 ## Prerequisites
 
 Before enabling the CI poller, you need:
 
-1. **`gh` CLI** installed and authenticated:
+1. **`gh` CLI** installed and authenticated (required for both auth methods — roborev uses `gh` for PR listing and git operations):
    ```bash
    # Install: https://cli.github.com/
    gh auth login
@@ -43,7 +58,106 @@ Before enabling the CI poller, you need:
    ```
    Or set a specific agent in the `[ci]` config (see below).
 
-## Setup
+## Setup with GitHub App (Recommended)
+
+PR comments will appear as **your-app-name[bot]** with scoped permissions. This is the recommended approach.
+
+### 1. Register your local checkout
+
+```bash
+cd /path/to/myrepo
+roborev init
+```
+
+### 2. Create the GitHub App
+
+Go to **GitHub Settings > Developer settings > GitHub Apps > New GitHub App**.
+
+| Field | Value |
+|-------|-------|
+| **App name** | Any name you like, e.g. `roborev-ci` (this becomes the `[bot]` username) |
+| **Homepage URL** | Your repo URL or any URL |
+| **Webhook** | Uncheck "Active" (not needed -- roborev polls) |
+
+Under **Repository permissions**, set:
+
+- **Pull requests**: Read & write
+- **Contents**: Read-only
+
+Leave everything else as "No access". Click **Create GitHub App**.
+
+:::tip
+Set the app visibility to **Any account** if you want others to install it on their repos. This is under the app's **Advanced** settings after creation.
+:::
+
+### 3. Note the App ID
+
+After creation, the **App ID** is shown near the top of the app settings page. You'll need this for `github_app_id`.
+
+### 4. Generate a Private Key
+
+On the app settings page, scroll to **Private keys** and click **Generate a private key**. Your browser downloads a `.pem` file. Store it securely:
+
+```bash
+mv ~/Downloads/*.private-key.pem ~/.roborev/roborev.pem
+chmod 600 ~/.roborev/roborev.pem
+```
+
+### 5. Install the App on Your Repos
+
+From the app settings page, click **Install App** in the left sidebar. Choose the account or organization that owns your repos, and select which repositories to grant access to.
+
+After installing, note the **installation ID** from the URL:
+
+```
+https://github.com/settings/installations/12345678
+                                           ^^^^^^^^
+                                           this is your installation ID
+```
+
+### 6. Add CI config
+
+Add to `~/.roborev/config.toml`:
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/myrepo"]
+agent = "codex"
+review_type = "security"
+
+# GitHub App authentication
+github_app_id = 123456
+github_app_private_key = "~/.roborev/roborev.pem"
+github_app_installation_id = 12345678
+```
+
+The `github_app_private_key` field accepts:
+
+- A file path: `~/.roborev/roborev.pem` (tilde is expanded)
+- An environment variable: `${ROBOREV_APP_KEY}` (expands to a path or inline PEM content)
+- Inline PEM content (starting with `-----BEGIN`)
+
+All three `github_app_*` fields must be set for app auth to activate. If any are missing, the poller falls back to your personal `gh` auth.
+
+### 7. Start the daemon and verify
+
+```bash
+roborev daemon run
+```
+
+Look for the log line:
+
+```
+CI poller: GitHub App authentication enabled (app_id=123456)
+```
+
+PR comments will now appear as **your-app-name[bot]**.
+
+## Setup with Personal Auth
+
+If you don't want to create a GitHub App, you can use your personal `gh` CLI login instead. PR comments will appear as your GitHub account.
 
 ### 1. Register your local checkout
 
@@ -65,13 +179,17 @@ agent = "codex"              # which agent to use (or omit for auto-detect)
 review_type = "security"     # "security" or "review"
 ```
 
+No `github_app_*` fields needed — the daemon posts comments using whatever account `gh auth` is logged in as.
+
 ### 3. Start the daemon
 
 ```bash
 roborev daemon run
 ```
 
-The daemon logs to stdout. On startup you should see:
+## Verifying It Works
+
+On startup you should see:
 
 ```
 CI poller started (interval: 5m0s, repos: [myorg/myrepo])
@@ -127,7 +245,9 @@ synthesis_model = "claude-sonnet-4-5-20250929"   # Model override for synthesis
 
 If synthesis fails, roborev falls back to posting all review outputs in collapsible `<details>` blocks.
 
-### CI Options
+## CI Options Reference
+
+### Core Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -143,89 +263,6 @@ If synthesis fails, roborev falls back to posting all review outputs in collapsi
 | `synthesis_model` | string | | Model override for synthesis |
 
 When `agent` is not set and `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, opencode, cursor, droid.
-
-## GitHub App Authentication
-
-By default, PR comments are posted as your personal GitHub account (whatever `gh auth` is logged in as). To post as a bot instead, configure a GitHub App.
-
-### Step 1: Create the App
-
-Go to **GitHub Settings > Developer settings > GitHub Apps > New GitHub App**.
-
-| Field | Value |
-|-------|-------|
-| **App name** | `roborev` (this becomes the bot username) |
-| **Homepage URL** | Your repo URL or any URL |
-| **Webhook** | Uncheck "Active" (not needed -- roborev polls) |
-
-Under **Repository permissions**, set:
-
-- **Pull requests**: Read & write
-- **Contents**: Read-only
-
-Leave everything else as "No access". Click **Create GitHub App**.
-
-:::tip
-Set the app visibility to **Any account** if you want others to install it on their repos. This is under the app's **Advanced** settings after creation.
-:::
-
-### Step 2: Note the App ID
-
-After creation, the **App ID** is shown near the top of the app settings page. You'll need this for `github_app_id`.
-
-### Step 3: Generate a Private Key
-
-On the app settings page, scroll to **Private keys** and click **Generate a private key**. Your browser downloads a `.pem` file. Store it securely:
-
-```bash
-mv ~/Downloads/*.private-key.pem ~/.roborev/roborev.pem
-chmod 600 ~/.roborev/roborev.pem
-```
-
-### Step 4: Install the App
-
-From the app settings page, click **Install App** in the left sidebar. Choose the account or organization that owns your repos, and select which repositories to grant access to.
-
-After installing, note the **installation ID** from the URL:
-
-```
-https://github.com/settings/installations/12345678
-                                           ^^^^^^^^
-                                           this is your installation ID
-```
-
-### Step 5: Configure roborev
-
-Add the GitHub App fields to your `[ci]` config:
-
-```toml
-[ci]
-enabled = true
-poll_interval = "5m"
-repos = ["myorg/myrepo"]
-review_type = "security"
-agent = "codex"
-
-github_app_id = 123456
-github_app_private_key = "~/.roborev/roborev.pem"
-github_app_installation_id = 12345678
-```
-
-The `github_app_private_key` field accepts:
-
-- A file path: `~/.roborev/roborev.pem`
-- An environment variable: `${ROBOREV_APP_KEY}` (expands to a path or inline PEM content)
-- Inline PEM content (starting with `-----BEGIN`)
-
-### Step 6: Verify
-
-Restart the daemon and look for the log line:
-
-```
-CI poller: GitHub App authentication enabled (app_id=123456)
-```
-
-PR comments will now appear as **roborev[bot]**.
 
 ### GitHub App Options
 
@@ -250,6 +287,9 @@ The `gh` CLI is not installed, not authenticated, or doesn't have access to the 
 **"merge-base ... : ..."**
 The PR's base or head commit isn't available locally. This usually means `git fetch` failed. Check that the local repo has the remote configured correctly.
 
+**"GitHub App token failed, falling back to default gh auth"**
+The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to personal auth so reviews still work.
+
 **No log output at all for CI**
 Check that `[ci] enabled = true` is in `~/.roborev/config.toml` and that the daemon was restarted after adding it. The `[ci]` section requires a daemon restart to take effect.
 
@@ -258,7 +298,7 @@ Check `roborev status` to see if jobs are queued/running. The agent may be faili
 
 ## Full Examples
 
-### Single Review (Backward Compatible)
+### GitHub App -- Single Review
 
 ```toml
 [ci]
@@ -270,11 +310,11 @@ agent = "claude-code"
 model = "claude-sonnet-4-5-20250929"
 
 github_app_id = 123456
-github_app_private_key = "${ROBOREV_APP_KEY}"
+github_app_private_key = "~/.roborev/roborev.pem"
 github_app_installation_id = 12345678
 ```
 
-### Multi-Agent Matrix
+### GitHub App -- Multi-Agent Matrix
 
 ```toml
 [ci]
@@ -293,6 +333,18 @@ synthesis_model = "claude-sonnet-4-5-20250929"
 github_app_id = 123456
 github_app_private_key = "${ROBOREV_APP_KEY}"
 github_app_installation_id = 12345678
+```
+
+### Personal Auth -- Single Review
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/backend", "myorg/frontend"]
+review_type = "security"
+agent = "claude-code"
+model = "claude-sonnet-4-5-20250929"
 ```
 
 ## See Also

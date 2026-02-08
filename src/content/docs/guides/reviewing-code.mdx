@@ -1,0 +1,128 @@
+---
+title: Reviewing Code
+description: Review branches, uncommitted changes, and commit ranges
+---
+
+## Feature Branches
+
+Use `--branch` to review all commits since your branch diverged from main:
+
+```bash
+roborev review --branch              # Review branch vs auto-detected main/master
+roborev review --branch --base dev   # Review branch vs specific base
+roborev review --branch --wait       # Wait for review and show result
+```
+
+This is useful for pre-merge reviews of entire feature branches.
+
+### How It Works
+
+1. roborev detects the merge-base between your current branch and the base branch
+2. All commits from the merge-base to HEAD are queued for review
+3. Each commit is reviewed individually by the AI agent
+4. Results are stored and can be viewed in the TUI
+
+### Pre-Merge Review
+
+Before creating a pull request, review your entire branch:
+
+```bash
+git checkout feature-branch
+roborev review --branch --wait
+roborev fix           # Address any failed reviews
+roborev tui           # Browse results
+```
+
+### CI Integration
+
+```bash
+if ! roborev review --branch --wait --quiet; then
+    echo "Reviews found issues"
+    exit 1
+fi
+```
+
+### Branch Review Options
+
+| Flag | Description |
+|------|-------------|
+| `--base <branch>` | Compare against a specific base branch (default: auto-detect main/master) |
+| `--wait` | Wait for all reviews to complete |
+| `--quiet` | Suppress output |
+| `--agent <name>` | Use specific agent |
+| `--reasoning <level>` | Set reasoning depth |
+
+## Uncommitted Changes
+
+Use `--dirty` to review working tree changes before committing:
+
+```bash
+roborev review --dirty           # Queue review of uncommitted changes
+roborev review --dirty --wait    # Wait for review and show result
+```
+
+### What Gets Reviewed
+
+The `--dirty` flag includes:
+
+- Staged changes
+- Unstaged changes to tracked files
+- Untracked files
+
+### Dirty Review Options
+
+| Flag | Description |
+|------|-------------|
+| `--wait` | Wait for review to complete |
+| `--quiet` | Suppress output |
+| `--agent <name>` | Use specific agent |
+| `--reasoning <level>` | Set reasoning depth |
+
+### Exit Codes
+
+The `--wait` flag exits with:
+- Code 0 for passing reviews
+- Code 1 for failing reviews
+
+This is useful for CI or pre-commit workflows:
+
+```bash
+if ! roborev review --dirty --wait --quiet; then
+    echo "Review failed - please address findings"
+    exit 1
+fi
+```
+
+## Specific Commit Ranges
+
+Use `--since` to review commits since a specific point:
+
+```bash
+roborev review --since HEAD~5       # Review last 5 commits
+roborev review --since abc123       # Review commits since abc123 (exclusive)
+roborev review --since v1.0.0       # Review commits since a tag
+```
+
+The range is exclusive of the starting commit (like git's `..` range syntax). Unlike `--branch`, this works on any branch including main.
+
+## Large Diffs
+
+For `--dirty` reviews, diffs are limited to 200KB since uncommitted changes cannot be easily inspected by the agent. If your dirty diff exceeds this limit, commit your changes in smaller chunks.
+
+For committed changes, diffs over 250KB are omitted from the prompt - the agent is given only the commit hash and can inspect changes using `git show`.
+
+## Addressing Findings
+
+After reviewing, use `roborev fix` to let an agent address any failed reviews:
+
+```bash
+roborev review --dirty --wait
+# commit your changes
+roborev fix                      # Address unaddressed reviews
+```
+
+## See Also
+
+- [Responding to Reviews](/guides/responding-to-reviews/) - Fix findings and add comments
+- [Code Analysis & Refactoring](/guides/assisted-refactoring/) - Targeted analysis with `roborev analyze`
+- [Auto-Fix with Refine](/guides/auto-fixing/) - Automated fix loop

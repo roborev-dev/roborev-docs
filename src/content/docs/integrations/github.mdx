@@ -224,7 +224,7 @@ agents = ["codex", "gemini"]
 # This creates 4 jobs per PR (2 types x 2 agents)
 ```
 
-When the matrix is 1x1 (single review type, single agent), synthesis is skipped and the output is posted directly -- fully backward compatible with the singular `review_type` and `agent` fields.
+When the matrix is 1x1 (single review type, single agent), synthesis is skipped and the output is posted directly. The singular `review_type` and `agent` fields are shorthand for single-element arrays.
 
 ### Synthesis
 
@@ -254,9 +254,9 @@ If synthesis fails, roborev falls back to posting all review outputs in collapsi
 | `enabled` | bool | `false` | Enable the CI poller |
 | `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s, invalid values default to 5m) |
 | `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
-| `review_type` | string | `"security"` | Review type (singular, for backward compatibility) |
+| `review_type` | string | `"security"` | Review type (shorthand for single-element `review_types`) |
 | `review_types` | array | | Multiple review types (overrides `review_type`) |
-| `agent` | string | auto-detect | Agent to use (singular, for backward compatibility) |
+| `agent` | string | auto-detect | Agent to use (shorthand for single-element `agents`) |
 | `agents` | array | | Multiple agents (overrides `agent`) |
 | `model` | string | | Model override for CI reviews |
 | `synthesis_agent` | string | | Agent for combining multi-job results |

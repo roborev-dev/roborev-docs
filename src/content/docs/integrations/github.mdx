@@ -1,0 +1,233 @@
+---
+title: GitHub Integration
+description: Automatically review GitHub PRs and post results as bot comments
+---
+
+roborev can poll GitHub for open pull requests, run security reviews on each one, and post the results as PR comments. With a GitHub App configured, comments appear as `roborev[bot]` instead of your personal account.
+
+## How It Works
+
+The CI poller runs inside the roborev daemon. On each interval it:
+
+1. Lists open PRs for each configured repo via `gh pr list`
+2. Skips PRs that have already been reviewed at their current HEAD SHA
+3. Computes the merge-base range (`base..head`) and enqueues review jobs
+4. When all reviews complete, posts the result as a PR comment
+
+For multi-agent or multi-type configurations, results from all jobs are synthesized by an LLM into a single combined PR comment. When only one job is configured, the output is posted directly (no synthesis overhead).
+
+## Prerequisites
+
+- The `gh` CLI must be installed and authenticated (`gh auth login`)
+- The repos you want to poll must have a local checkout registered with roborev (`roborev init`)
+
+## Basic Setup
+
+Add to `~/.roborev/config.toml`:
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/myrepo"]
+review_type = "security"       # or "review" for general code review
+```
+
+Start (or restart) the daemon:
+
+```bash
+roborev daemon run
+```
+
+The poller will begin checking for open PRs immediately. Comments will be posted using whatever account `gh` is authenticated as.
+
+## Multi-Review Types and Agents
+
+You can configure multiple review types and agents to run in parallel for each PR. The CI poller creates a matrix of jobs (review_types x agents) and posts a single synthesized comment when all jobs complete.
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/myrepo"]
+
+# Run both security and general reviews
+review_types = ["security", "review"]
+
+# Use multiple agents
+agents = ["codex", "gemini"]
+
+# This creates 4 jobs per PR (2 types x 2 agents)
+```
+
+When the matrix is 1x1 (single review type, single agent), synthesis is skipped and the output is posted directly -- fully backward compatible with the singular `review_type` and `agent` fields.
+
+### Synthesis
+
+When multiple jobs complete, their outputs are combined by an LLM synthesis step into a single well-formatted PR comment. The synthesis agent:
+
+- Deduplicates findings reported by multiple agents
+- Organizes findings by severity
+- Preserves file and line references
+- Produces a one-line summary verdict
+
+You can customize the synthesis behavior:
+
+```toml
+[ci]
+synthesis_agent = "claude-code"                  # Agent to use for synthesis
+synthesis_model = "claude-sonnet-4-5-20250929"   # Model override for synthesis
+```
+
+If synthesis fails, roborev falls back to posting all review outputs in collapsible `<details>` blocks.
+
+### CI Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | bool | `false` | Enable the CI poller |
+| `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s) |
+| `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
+| `review_type` | string | `"security"` | Review type (singular, for backward compatibility) |
+| `review_types` | array | | Multiple review types (overrides `review_type`) |
+| `agent` | string | | Agent override (singular, for backward compatibility) |
+| `agents` | array | | Multiple agents (overrides `agent`) |
+| `model` | string | | Model override for CI reviews |
+| `synthesis_agent` | string | | Agent for combining multi-job results |
+| `synthesis_model` | string | | Model override for synthesis |
+
+## GitHub App Authentication
+
+By default, PR comments are posted as your personal GitHub account (whatever `gh auth` is logged in as). To post as a bot instead, configure a GitHub App.
+
+### Step 1: Create the App
+
+Go to **GitHub Settings > Developer settings > GitHub Apps > New GitHub App**.
+
+| Field | Value |
+|-------|-------|
+| **App name** | `roborev` (this becomes the bot username) |
+| **Homepage URL** | Your repo URL or any URL |
+| **Webhook** | Uncheck "Active" (not needed -- roborev polls) |
+
+Under **Repository permissions**, set:
+
+- **Pull requests**: Read & write
+- **Contents**: Read-only
+
+Leave everything else as "No access". Click **Create GitHub App**.
+
+:::tip
+Set the app visibility to **Any account** if you want others to install it on their repos. This is under the app's **Advanced** settings after creation.
+:::
+
+### Step 2: Note the App ID
+
+After creation, the **App ID** is shown near the top of the app settings page. You'll need this for `github_app_id`.
+
+### Step 3: Generate a Private Key
+
+On the app settings page, scroll to **Private keys** and click **Generate a private key**. Your browser downloads a `.pem` file. Store it securely:
+
+```bash
+mv ~/Downloads/*.private-key.pem ~/.roborev/roborev.pem
+chmod 600 ~/.roborev/roborev.pem
+```
+
+### Step 4: Install the App
+
+From the app settings page, click **Install App** in the left sidebar. Choose the account or organization that owns your repos, and select which repositories to grant access to.
+
+After installing, note the **installation ID** from the URL:
+
+```
+https://github.com/settings/installations/12345678
+                                           ^^^^^^^^
+                                           this is your installation ID
+```
+
+### Step 5: Configure roborev
+
+Add the GitHub App fields to your `[ci]` config:
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/myrepo"]
+review_type = "security"
+
+github_app_id = 123456
+github_app_private_key = "/path/to/.roborev/roborev.pem"
+github_app_installation_id = 12345678
+```
+
+The `github_app_private_key` field accepts:
+
+- An absolute file path: `/home/you/.roborev/roborev.pem`
+- An environment variable: `${ROBOREV_APP_KEY}` (expands to a path or inline PEM content)
+- Inline PEM content (starting with `-----BEGIN`)
+
+### Step 6: Verify
+
+Restart the daemon and look for the log line:
+
+```
+CI poller: GitHub App authentication enabled (app_id=123456)
+```
+
+PR comments will now appear as **roborev[bot]**.
+
+### GitHub App Options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `github_app_id` | int | App ID from the app settings page |
+| `github_app_private_key` | string | Path to PEM file, `${ENV_VAR}`, or inline PEM |
+| `github_app_installation_id` | int | Installation ID from the install URL |
+
+All three fields must be set for GitHub App auth to activate. If any are missing, the poller falls back to default `gh` authentication.
+
+## Full Examples
+
+### Single Review (Backward Compatible)
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/backend", "myorg/frontend"]
+review_type = "security"
+agent = "claude"
+model = "claude-sonnet-4-5-20250929"
+
+github_app_id = 123456
+github_app_private_key = "${ROBOREV_APP_KEY}"
+github_app_installation_id = 12345678
+```
+
+### Multi-Agent Matrix
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/backend"]
+
+# 2x2 matrix = 4 jobs per PR
+review_types = ["security", "review"]
+agents = ["codex", "gemini"]
+
+# Synthesis settings
+synthesis_agent = "claude-code"
+synthesis_model = "claude-sonnet-4-5-20250929"
+
+github_app_id = 123456
+github_app_private_key = "${ROBOREV_APP_KEY}"
+github_app_installation_id = 12345678
+```
+
+## See Also
+
+- [Configuration](/configuration/) - Global and per-repo settings
+- [Event Streaming](/integrations/streaming/) - Stream review events for custom integrations

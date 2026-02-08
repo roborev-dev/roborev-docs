@@ -117,6 +117,7 @@ export default defineConfig({
         {
           label: 'Integrations',
           items: [
+            { label: 'GitHub Integration', slug: 'integrations/github' },
             { label: 'Claude Chic', slug: 'integrations/claudechic' },
             { label: 'Event Streaming', slug: 'integrations/streaming' },
             { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },

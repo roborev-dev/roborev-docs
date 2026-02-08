@@ -3,7 +3,7 @@ title: GitHub Integration
 description: Automatically review GitHub PRs and post results as bot comments
 ---
 
-roborev can poll GitHub for open pull requests, run security reviews on each one, and post the results as PR comments. With a GitHub App configured, comments appear as `roborev[bot]` instead of your personal account.
+roborev can poll GitHub for open pull requests, run code reviews on each one, and post the results as PR comments. With a GitHub App configured, comments appear as `roborev[bot]` instead of your personal account.
 
 ## How It Works
 
@@ -11,17 +11,46 @@ The CI poller runs inside the roborev daemon. On each interval it:
 
 1. Lists open PRs for each configured repo via `gh pr list`
 2. Skips PRs that have already been reviewed at their current HEAD SHA
-3. Computes the merge-base range (`base..head`) and enqueues review jobs
-4. When all reviews complete, posts the result as a PR comment
+3. Fetches the PR head commit (including fork-based PRs)
+4. Computes the merge-base range (`base..head`) and enqueues review jobs
+5. When all reviews complete, posts the result as a PR comment
 
 For multi-agent or multi-type configurations, results from all jobs are synthesized by an LLM into a single combined PR comment. When only one job is configured, the output is posted directly (no synthesis overhead).
 
 ## Prerequisites
 
-- The `gh` CLI must be installed and authenticated (`gh auth login`)
-- The repos you want to poll must have a local checkout registered with roborev (`roborev init`)
+Before enabling the CI poller, you need:
 
-## Basic Setup
+1. **`gh` CLI** installed and authenticated:
+   ```bash
+   # Install: https://cli.github.com/
+   gh auth login
+   gh auth status   # verify it worked
+   ```
+
+2. **A local checkout** of each repo you want to poll, registered with roborev:
+   ```bash
+   cd /path/to/myrepo
+   roborev init
+   ```
+   The poller matches GitHub repos to local checkouts by git remote URL. If `roborev init` hasn't been run for a repo, the poller will log `no local repo found matching "owner/repo"` and skip it.
+
+3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `opencode`, `cursor`, `droid`. You can check what's available with:
+   ```bash
+   roborev review --agent test --help  # lists available agents
+   ```
+   Or set a specific agent in the `[ci]` config (see below).
+
+## Setup
+
+### 1. Register your local checkout
+
+```bash
+cd /path/to/myrepo
+roborev init
+```
+
+### 2. Add CI config
 
 Add to `~/.roborev/config.toml`:
 
@@ -30,16 +59,31 @@ Add to `~/.roborev/config.toml`:
 enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
-review_type = "security"       # or "review" for general code review
+agent = "codex"              # which agent to use (or omit for auto-detect)
+review_type = "security"     # "security" or "review"
 ```
 
-Start (or restart) the daemon:
+### 3. Start the daemon
 
 ```bash
 roborev daemon run
 ```
 
-The poller will begin checking for open PRs immediately. Comments will be posted using whatever account `gh` is authenticated as.
+The daemon logs to stdout. On startup you should see:
+
+```
+CI poller started (interval: 5m0s, repos: [myorg/myrepo])
+```
+
+The poller checks for open PRs immediately, then on each interval. When a review completes, you'll see:
+
+```
+CI poller: posted review comment on myorg/myrepo#42 (job 123, verdict=P)
+```
+
+:::note[CI reviews always use "thorough" reasoning]
+The CI poller hardcodes `reasoning = "thorough"` for all review jobs. This cannot be changed via config. Per-repo `.roborev.toml` settings for `review_reasoning`, `agent`, and `model` are **not used** by the CI poller -- only the `[ci]` section in global config applies.
+:::
 
 ## Multi-Review Types and Agents
 
@@ -86,15 +130,17 @@ If synthesis fails, roborev falls back to posting all review outputs in collapsi
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `enabled` | bool | `false` | Enable the CI poller |
-| `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s) |
+| `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s, invalid values default to 5m) |
 | `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
 | `review_type` | string | `"security"` | Review type (singular, for backward compatibility) |
 | `review_types` | array | | Multiple review types (overrides `review_type`) |
-| `agent` | string | | Agent override (singular, for backward compatibility) |
+| `agent` | string | auto-detect | Agent to use (singular, for backward compatibility) |
 | `agents` | array | | Multiple agents (overrides `agent`) |
 | `model` | string | | Model override for CI reviews |
 | `synthesis_agent` | string | | Agent for combining multi-job results |
 | `synthesis_model` | string | | Model override for synthesis |
+
+When `agent` is not set and `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, opencode, cursor, droid.
 
 ## GitHub App Authentication
 
@@ -156,15 +202,16 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 review_type = "security"
+agent = "codex"
 
 github_app_id = 123456
-github_app_private_key = "/path/to/.roborev/roborev.pem"
+github_app_private_key = "~/.roborev/roborev.pem"
 github_app_installation_id = 12345678
 ```
 
 The `github_app_private_key` field accepts:
 
-- An absolute file path: `/home/you/.roborev/roborev.pem`
+- A file path: `~/.roborev/roborev.pem`
 - An environment variable: `${ROBOREV_APP_KEY}` (expands to a path or inline PEM content)
 - Inline PEM content (starting with `-----BEGIN`)
 
@@ -182,11 +229,30 @@ PR comments will now appear as **roborev[bot]**.
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `github_app_id` | int | App ID from the app settings page |
+| `github_app_id` | integer | App ID from the app settings page |
 | `github_app_private_key` | string | Path to PEM file, `${ENV_VAR}`, or inline PEM |
-| `github_app_installation_id` | int | Installation ID from the install URL |
+| `github_app_installation_id` | integer | Installation ID from the install URL |
 
 All three fields must be set for GitHub App auth to activate. If any are missing, the poller falls back to default `gh` authentication.
+
+## Troubleshooting
+
+The daemon logs to stdout. Common issues:
+
+**"no local repo found matching..."**
+You need to run `roborev init` in a local checkout of the repo. The poller matches GitHub `owner/repo` to local repos by git remote URL.
+
+**"gh pr list: ..."**
+The `gh` CLI is not installed, not authenticated, or doesn't have access to the repo. Run `gh auth status` and `gh pr list --repo owner/repo` to debug.
+
+**"merge-base ... : ..."**
+The PR's base or head commit isn't available locally. This usually means `git fetch` failed. Check that the local repo has the remote configured correctly.
+
+**No log output at all for CI**
+Check that `[ci] enabled = true` is in `~/.roborev/config.toml` and that the daemon was restarted after adding it. The `[ci]` section requires a daemon restart to take effect.
+
+**Reviews enqueue but never complete**
+Check `roborev status` to see if jobs are queued/running. The agent may be failing -- check the daemon logs for error messages from the agent.
 
 ## Full Examples
 
@@ -198,7 +264,7 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/backend", "myorg/frontend"]
 review_type = "security"
-agent = "claude"
+agent = "claude-code"
 model = "claude-sonnet-4-5-20250929"
 
 github_app_id = 123456

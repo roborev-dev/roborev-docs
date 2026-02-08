@@ -17,6 +17,20 @@ The CI poller runs inside the roborev daemon. On each interval it:
 
 For multi-agent or multi-type configurations, results from all jobs are synthesized by an LLM into a single combined PR comment. When only one job is configured, the output is posted directly (no synthesis overhead).
 
+## What to Expect
+
+Before enabling the CI poller, understand the following:
+
+- **The poller reviews ALL open PRs on first start.** It polls immediately on startup, not after the first interval. If you have 20 open PRs, all 20 will be enqueued for review right away. Subsequent polls only review PRs with new commits (tracked by HEAD SHA in the local database).
+- **All open PRs are reviewed** — there is no filtering by draft status, labels, or author. Draft PRs, bot PRs, and stale PRs all get reviewed.
+- **CI settings are global, not per-repo.** The `agent`, `review_type`, and `model` in the `[ci]` section apply to every repo in the `repos` list. You cannot configure different agents for different repos.
+- **Reviews run with `max_workers` concurrency** (default: 4). Jobs are enqueued immediately but executed up to 4 at a time. With a multi-agent matrix, a single PR can generate multiple jobs (e.g. 2 types x 2 agents = 4 jobs).
+- **The daemon does not survive reboots.** Use `roborev daemon start` to run in the background, but you'll need a launchd agent (macOS) or systemd service (Linux) if you want it to start on boot.
+
+:::caution[First-run with many open PRs]
+If you're enabling the CI poller on a repo with many open PRs, consider temporarily setting `repos` to a test repo first, verifying it works, and then adding your real repos. This avoids an unexpected burst of review jobs and PR comments.
+:::
+
 ## Choose Your Authentication Method
 
 roborev needs GitHub credentials to list PRs and post comments. There are two options:
@@ -36,12 +50,14 @@ roborev needs GitHub credentials to list PRs and post comments. There are two op
 
 Before enabling the CI poller, you need:
 
-1. **`gh` CLI** installed and authenticated (required for both auth methods — roborev uses `gh` for PR listing and git operations):
+1. **`gh` CLI** installed and authenticated (required even with GitHub App auth — roborev uses `gh` for PR listing and git operations):
    ```bash
    # Install: https://cli.github.com/
    gh auth login
    gh auth status   # verify it worked
    ```
+
+   If your organization uses SSO, make sure your token is authorized for SSO access. The daemon runs long-lived — if your `gh` token expires while the daemon is running, the poller will log errors and skip repos until you re-authenticate.
 
 2. **A local checkout** of each repo you want to poll, registered with roborev:
    ```bash
@@ -60,16 +76,9 @@ Before enabling the CI poller, you need:
 
 ## Setup with GitHub App (Recommended)
 
-PR comments will appear as **your-app-name[bot]** with scoped permissions. This is the recommended approach.
+PR comments will appear as **your-app-name[bot]** with scoped permissions.
 
-### 1. Register your local checkout
-
-```bash
-cd /path/to/myrepo
-roborev init
-```
-
-### 2. Create the GitHub App
+### 1. Create the GitHub App
 
 Go to **GitHub Settings > Developer settings > GitHub Apps > New GitHub App**.
 
@@ -101,20 +110,21 @@ Until each installation accepts the new permissions, roborev may fail to list PR
 Set the app visibility to **Any account** if you want others to install it on their repos. This is under the app's **Advanced** settings after creation.
 :::
 
-### 3. Note the App ID
+### 2. Note the App ID
 
 After creation, the **App ID** is shown near the top of the app settings page. You'll need this for `github_app_id`.
 
-### 4. Generate a Private Key
+### 3. Generate a Private Key
 
 On the app settings page, scroll to **Private keys** and click **Generate a private key**. Your browser downloads a `.pem` file. Store it securely:
 
 ```bash
-mv ~/Downloads/*.private-key.pem ~/.roborev/roborev.pem
+# The downloaded file will be named something like your-app-name.2026-02-08.private-key.pem
+mv ~/Downloads/your-app-name.*.private-key.pem ~/.roborev/roborev.pem
 chmod 600 ~/.roborev/roborev.pem
 ```
 
-### 5. Install the App on Your Repos
+### 4. Install the App on Your Repos
 
 From the app settings page, click **Install App** in the left sidebar. Choose the account or organization that owns your repos, and select which repositories to grant access to.
 
@@ -126,7 +136,9 @@ https://github.com/settings/installations/12345678
                                            this is your installation ID
 ```
 
-### 6. Add CI config
+If you have repos across multiple organizations or user accounts, install the app on each one. Each installation gets its own installation ID — you'll need these for the [multi-installation config](#multiple-installations) below.
+
+### 5. Add CI config
 
 Add to `~/.roborev/config.toml`:
 
@@ -150,12 +162,46 @@ The `github_app_private_key` field accepts:
 - An environment variable: `${ROBOREV_APP_KEY}` (expands to a path or inline PEM content)
 - Inline PEM content (starting with `-----BEGIN`)
 
-All three `github_app_*` fields must be set for app auth to activate. If any are missing, the poller falls back to your personal `gh` auth.
+App auth requires `github_app_id`, `github_app_private_key`, and at least one installation ID (either `github_app_installation_id` or entries in `github_app_installations`). If none are configured, the poller falls back to your personal `gh` auth.
 
-### 7. Start the daemon and verify
+#### Multiple Installations
+
+If your repos span multiple GitHub organizations or user accounts, each one has its own app installation with a separate installation ID. Use the `[ci.github_app_installations]` table to map each owner to its installation ID:
+
+```toml
+[ci]
+enabled = true
+repos = ["wesm/my-project", "roborev-dev/core"]
+
+github_app_id = 123456
+github_app_private_key = "~/.roborev/roborev.pem"
+
+[ci.github_app_installations]
+wesm = 111111
+roborev-dev = 222222
+```
+
+The poller extracts the owner from each repo (the part before `/`) and looks up the matching installation ID. Owner matching is case-insensitive, so `wesm` matches repos listed as `Wesm/repo` or `WESM/repo`.
+
+You can also mix the map with the singular `github_app_installation_id` as a fallback for owners not in the map:
+
+```toml
+[ci]
+github_app_id = 123456
+github_app_private_key = "~/.roborev/roborev.pem"
+github_app_installation_id = 111111   # fallback for unlisted owners
+
+[ci.github_app_installations]
+roborev-dev = 222222                  # this org uses a different installation
+```
+
+Each installation gets its own cached access token, so there is no performance penalty for multiple installations.
+
+### 6. Start the daemon and verify
 
 ```bash
-roborev daemon run
+roborev daemon start        # background mode
+roborev daemon run          # or foreground mode to watch logs
 ```
 
 Look for the log line:
@@ -170,16 +216,9 @@ PR comments will now appear as **your-app-name[bot]**.
 
 If you don't want to create a GitHub App, you can use your personal `gh` CLI login instead. PR comments will appear as your GitHub account.
 
-### 1. Register your local checkout
+### 1. Add CI config
 
-```bash
-cd /path/to/myrepo
-roborev init
-```
-
-### 2. Add CI config
-
-Add to `~/.roborev/config.toml`:
+Add to `~/.roborev/config.toml` (make sure you've already run `roborev init` in your local checkout per [Prerequisites](#prerequisites)):
 
 ```toml
 [ci]
@@ -192,10 +231,11 @@ review_type = "security"     # "security" or "review"
 
 No `github_app_*` fields needed — the daemon posts comments using whatever account `gh auth` is logged in as.
 
-### 3. Start the daemon
+### 2. Start the daemon
 
 ```bash
-roborev daemon run
+roborev daemon start        # background mode
+roborev daemon run          # or foreground mode to watch logs
 ```
 
 ## Verifying It Works
@@ -212,9 +252,67 @@ The poller checks for open PRs immediately, then on each interval. When a review
 CI poller: posted review comment on myorg/myrepo#42 (job 123, verdict=P)
 ```
 
+Use `roborev status` to check the daemon and queue state at any time.
+
 :::note[CI reviews always use "thorough" reasoning]
 The CI poller hardcodes `reasoning = "thorough"` for all review jobs. This cannot be changed via config. Per-repo `.roborev.toml` settings for `review_reasoning`, `agent`, and `model` are **not used** by the CI poller -- only the `[ci]` section in global config applies.
 :::
+
+## Keeping the Daemon Running
+
+`roborev daemon start` runs the daemon in the background, but it won't survive a reboot. For persistent operation, set up a system service:
+
+**macOS (launchd):**
+
+```bash
+# Create a plist — adjust the path to the roborev binary
+cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.roborev.daemon</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/roborev</string>
+        <string>daemon</string>
+        <string>run</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/roborev-daemon.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/roborev-daemon.log</string>
+</dict>
+</plist>
+EOF
+
+launchctl load ~/Library/LaunchAgents/com.roborev.daemon.plist
+```
+
+**Linux (systemd):**
+
+```bash
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/roborev.service << 'EOF'
+[Unit]
+Description=roborev daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/roborev daemon run
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user enable --now roborev
+```
 
 ## Multi-Review Types and Agents
 
@@ -281,31 +379,38 @@ When `agent` is not set and `agents` is empty, the poller auto-detects the first
 |--------|------|-------------|
 | `github_app_id` | integer | App ID from the app settings page |
 | `github_app_private_key` | string | Path to PEM file, `${ENV_VAR}`, or inline PEM |
-| `github_app_installation_id` | integer | Installation ID from the install URL |
+| `github_app_installation_id` | integer | Installation ID (fallback for owners not in the installations map) |
+| `github_app_installations` | table | Map of owner name to installation ID for multi-org setups (see [Multiple Installations](#multiple-installations)) |
 
-All three fields must be set for GitHub App auth to activate. If any are missing, the poller falls back to default `gh` authentication.
+App auth requires `github_app_id`, `github_app_private_key`, and at least one installation ID (either `github_app_installation_id` or entries in `github_app_installations`). If none are configured, the poller falls back to default `gh` authentication. For repos whose owner has no matching installation ID, the poller also falls back to default `gh` auth for that repo.
 
 ## Troubleshooting
 
-The daemon logs to stdout. Common issues:
+The daemon logs to stdout (or to the log file if using a system service). Common issues:
 
 **"no local repo found matching..."**
 You need to run `roborev init` in a local checkout of the repo. The poller matches GitHub `owner/repo` to local repos by git remote URL.
 
 **"gh pr list: ..."**
-The `gh` CLI is not installed, not authenticated, or doesn't have access to the repo. Run `gh auth status` and `gh pr list --repo owner/repo` to debug.
+The `gh` CLI is not installed, not authenticated, or doesn't have access to the repo. Run `gh auth status` and `gh pr list --repo owner/repo` to debug. If your org uses SSO, re-authorize your token with `gh auth refresh`.
 
 **"merge-base ... : ..."**
 The PR's base or head commit isn't available locally. This usually means `git fetch` failed. Check that the local repo has the remote configured correctly.
 
 **"GitHub App token failed, falling back to default gh auth"**
-The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to personal auth so reviews still work.
+The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to personal auth so reviews still work, but PR comments will appear as your personal account.
+
+**"no installation ID for owner ..., using default gh auth"**
+The poller found no installation ID for this repo's owner. If you're using `[ci.github_app_installations]`, add an entry for the owner. If you're using the singular `github_app_installation_id`, make sure it's set. Owner names are matched case-insensitively, so `wesm` and `Wesm` are equivalent.
 
 **No log output at all for CI**
 Check that `[ci] enabled = true` is in `~/.roborev/config.toml` and that the daemon was restarted after adding it. The `[ci]` section requires a daemon restart to take effect.
 
 **Reviews enqueue but never complete**
 Check `roborev status` to see if jobs are queued/running. The agent may be failing -- check the daemon logs for error messages from the agent.
+
+**Unexpected review burst on first start**
+This is normal. The poller reviews all open PRs on first startup. After the initial run, only PRs with new commits (different HEAD SHA) trigger new reviews. The tracking is persistent across daemon restarts.
 
 ## Full Examples
 
@@ -344,6 +449,25 @@ synthesis_model = "claude-sonnet-4-5-20250929"
 github_app_id = 123456
 github_app_private_key = "${ROBOREV_APP_KEY}"
 github_app_installation_id = 12345678
+```
+
+### GitHub App -- Multiple Installations
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["wesm/my-project", "roborev-dev/core", "roborev-dev/docs"]
+review_type = "security"
+agent = "codex"
+
+github_app_id = 123456
+github_app_private_key = "~/.roborev/roborev.pem"
+
+# Each org/user has its own app installation
+[ci.github_app_installations]
+wesm = 111111
+roborev-dev = 222222
 ```
 
 ### Personal Auth -- Single Review

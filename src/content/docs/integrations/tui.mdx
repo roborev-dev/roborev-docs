@@ -55,6 +55,8 @@ Output is preserved after job completion, so you can review what happened.
 
 Press `f` to filter by repository, `b` to filter by branch, or `h` to hide addressed/failed/canceled reviews and focus on items needing attention.
 
+To start the TUI with addressed items already hidden, set `hide_addressed_by_default = true` in `~/.roborev/config.toml`. See [Configuration](/configuration/) for details. Pressing `h` toggles the filter for the current session without changing the config.
+
 `Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-addressed off directly.
 
 <video src="/tui-filter.webm" autoplay muted loop playsinline />

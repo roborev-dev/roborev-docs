@@ -113,6 +113,7 @@ default_model = "gpt-5.2-codex"  # Default LLM
 server_addr = "127.0.0.1:7373"
 max_workers = 4
 job_timeout = "10m"  # Per-job timeout (default: 10m)
+hide_addressed_by_default = true  # Start TUI with addressed/failed/canceled hidden
 ```
 
 ### Global Options
@@ -127,6 +128,7 @@ job_timeout = "10m"  # Per-job timeout (default: 10m)
 | `allow_unsafe_agents` | bool | false | Enable agentic mode globally | Yes |
 | `anthropic_api_key` | string | - | Anthropic API key for Claude Code | Yes |
 | `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
+| `hide_addressed_by_default` | bool | false | Start TUI with addressed/failed/canceled reviews hidden | N/A |
 
 ### Hot-Reload
 

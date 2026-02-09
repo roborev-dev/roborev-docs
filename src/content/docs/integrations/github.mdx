@@ -50,14 +50,19 @@ roborev needs GitHub credentials to list PRs and post comments. There are two op
 
 Before enabling the CI poller, you need:
 
-1. **`gh` CLI** installed and authenticated (required even with GitHub App auth — roborev uses `gh` for PR listing and git operations):
+1. **`gh` CLI** installed (roborev shells out to `gh` for PR listing and comment posting):
    ```bash
    # Install: https://cli.github.com/
+   gh --version   # verify it's installed
+   ```
+
+   If you're using **GitHub App auth**, `gh` does not need to be separately authenticated — the app token is injected automatically. If you're using **personal auth**, you also need to log in:
+   ```bash
    gh auth login
    gh auth status   # verify it worked
    ```
 
-   If your organization uses SSO, make sure your token is authorized for SSO access. The daemon runs long-lived — if your `gh` token expires while the daemon is running, the poller will log errors and skip repos until you re-authenticate.
+   If your organization uses SSO with personal auth, make sure your token is authorized for SSO access. The daemon runs long-lived — if your `gh` token expires while the daemon is running, the poller will log errors and skip repos until you re-authenticate.
 
 2. **A local checkout** of each repo you want to poll, registered with roborev:
    ```bash

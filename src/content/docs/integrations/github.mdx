@@ -232,7 +232,7 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 agents = ["codex"]              # which agents to use (or omit for auto-detect)
-review_types = ["security"]     # "security", "design", "review", or "general"
+review_types = ["security"]     # "security", "design", or "review" (default)
 ```
 
 No `github_app_*` fields needed. The daemon posts comments using whatever account `gh auth` is logged in as.
@@ -334,7 +334,7 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 
-# Run both security and general reviews
+# Run both security and standard code reviews
 review_types = ["security", "review"]
 
 # Use multiple agents
@@ -396,7 +396,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `enabled` | bool | `false` | Enable the CI poller |
 | `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s, invalid values default to 5m) |
 | `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
-| `review_types` | array | `["security"]` | Review types to run for each PR (e.g., `["security", "review"]`) |
+| `review_types` | array | `["security"]` | Review types to run for each PR: `security`, `design`, or `review` (e.g., `["security", "review"]`) |
 | `agents` | array | auto-detect | Agents to run for each PR (e.g., `["codex", "gemini"]`) |
 | `model` | string | | Model override for CI reviews |
 | `synthesis_agent` | string | | Agent for combining multi-job results |

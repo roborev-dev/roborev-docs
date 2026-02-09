@@ -232,8 +232,10 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 agents = ["codex"]              # which agents to use (or omit for auto-detect)
-review_types = ["security"]     # "security", "review", or "general"
+review_types = ["security"]     # "security", "design", or "default"
 ```
+
+> `"default"` is the standard code review (bugs, testing gaps, code quality) — the same review you get with `roborev review` without `--type`. The aliases `"review"` and `"general"` are also accepted for backward compatibility.
 
 No `github_app_*` fields needed. The daemon posts comments using whatever account `gh auth` is logged in as.
 
@@ -334,8 +336,8 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 
-# Run both security and general reviews
-review_types = ["security", "review"]
+# Run both security and standard code reviews
+review_types = ["security", "default"]
 
 # Use multiple agents
 agents = ["codex", "gemini"]
@@ -375,7 +377,7 @@ agent = "codex"   # agent for post-commit reviews (unrelated to CI)
 
 [ci]
 agents = ["gemini"]                  # override agents for CI reviews of this repo
-review_types = ["security", "review"]  # override review types
+review_types = ["security", "default"]  # override review types
 reasoning = "standard"               # override reasoning level (thorough, standard, fast)
 ```
 
@@ -396,7 +398,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `enabled` | bool | `false` | Enable the CI poller |
 | `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s, invalid values default to 5m) |
 | `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
-| `review_types` | array | `["security"]` | Review types to run for each PR (e.g., `["security", "review"]`) |
+| `review_types` | array | `["security"]` | Review types to run for each PR: `security`, `design`, or `default`. `"review"` and `"general"` are accepted as aliases for `"default"`. |
 | `agents` | array | auto-detect | Agents to run for each PR (e.g., `["codex", "gemini"]`) |
 | `model` | string | | Model override for CI reviews |
 | `synthesis_agent` | string | | Agent for combining multi-job results |
@@ -470,7 +472,7 @@ poll_interval = "5m"
 repos = ["myorg/backend"]
 
 # 2x2 matrix = 4 jobs per PR
-review_types = ["security", "review"]
+review_types = ["security", "default"]
 agents = ["codex", "gemini"]
 
 # Synthesis settings
@@ -524,7 +526,7 @@ The backend repo wants deeper reviews with multiple agents. Add a `.roborev.toml
 # myorg/backend/.roborev.toml
 
 [ci]
-review_types = ["security", "review"]
+review_types = ["security", "default"]
 agents = ["codex", "gemini"]
 reasoning = "thorough"
 ```

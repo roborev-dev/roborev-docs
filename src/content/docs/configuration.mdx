@@ -52,6 +52,14 @@ All public APIs must have documentation comments.
 | `fix_agent_<level>` | string | Agent to use for fix at specific reasoning level |
 | `fix_model` | string | Model to use for fix / analyze --fix |
 | `fix_model_<level>` | string | Model to use for fix at specific reasoning level |
+| `security_agent` | string | Agent to use for `--type security` reviews |
+| `security_agent_<level>` | string | Agent for security reviews at specific reasoning level |
+| `security_model` | string | Model for security reviews |
+| `security_model_<level>` | string | Model for security reviews at specific reasoning level |
+| `design_agent` | string | Agent to use for `--type design` reviews |
+| `design_agent_<level>` | string | Agent for design reviews at specific reasoning level |
+| `design_model` | string | Model for design reviews |
+| `design_model_<level>` | string | Model for design reviews at specific reasoning level |
 | `review_guidelines` | string | Project-specific guidelines for the reviewer |
 
 ### Review Guidelines
@@ -85,9 +93,9 @@ refine_agent_thorough = "codex"
 refine_model_thorough = "gpt-5.2-codex"
 ```
 
-Base keys (`review_model`, `refine_agent`, `fix_agent`) set the default for each workflow. Level-specific keys override for that reasoning level:
+Base keys (`review_model`, `refine_agent`, `fix_agent`, `security_agent`, `design_model`) set the default for each workflow. Level-specific keys override for that reasoning level:
 - `{workflow}_model_{level}` or `{workflow}_agent_{level}`
-- `workflow` is `review`, `refine`, or `fix`
+- `workflow` is `review`, `refine`, `fix`, `security`, or `design`
 - `level` is `thorough`, `standard`, or `fast`
 
 The fallback hierarchy for each workflow is:

@@ -9,7 +9,7 @@ Reviews are designed to be fed back into your AI coding agent sessions to addres
 
 ## Auto-Fix with `roborev fix`
 
-Let an agent address findings automatically:
+Let an agent address findings automatically. `roborev fix` runs **synchronously in the foreground**: it blocks until the agent finishes and applies changes directly to your working tree.
 
 ```bash
 roborev fix                        # Fix all unaddressed reviews on this branch
@@ -17,7 +17,7 @@ roborev fix 123                    # Fix a specific review by job ID
 roborev fix --batch                # Batch all unaddressed into one agent prompt
 ```
 
-The agent reads the review, applies changes, commits, and marks the review as addressed. This is a one-shot fix — for an iterative loop with re-review, see [Auto-Fix with Refine](/guides/auto-fixing/).
+The agent reads the review, applies changes, commits, and marks the review as addressed. This is a one-shot fix. For an iterative loop with re-review, see [Auto-Fix with Refine](/guides/auto-fixing/).
 
 ## Copying Reviews
 

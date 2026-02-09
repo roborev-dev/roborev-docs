@@ -60,7 +60,7 @@ If the agent makes no changes for a review, that review is skipped and refine mo
 | **Scope** | One-shot fix, no re-review | Iterative loop with re-review |
 | **Commit review** | Enqueues but doesn't wait | Waits and re-addresses if failed |
 | **Branch review** | No | Runs after all commits pass |
-| **Isolation** | Runs directly on your repo | Uses a temp worktree |
+| **Isolation** | Runs synchronously in the foreground, directly on your working tree | Uses a temp worktree per iteration, commits to your branch when each iteration completes |
 | **Use case** | Quick fix for a known issue | Polish a branch before merge |
 
 ## Options

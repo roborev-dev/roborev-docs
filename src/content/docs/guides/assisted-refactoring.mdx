@@ -65,6 +65,8 @@ Per-file mode is useful when:
 
 ## Using Fix with Reviews
 
+`roborev fix` runs **synchronously in the foreground**: it blocks until the agent finishes, applies changes directly to your working tree, and commits the result. It does not run in the background or queue work for the daemon.
+
 `roborev fix` works with any review, not just analysis results. Use it to address commit reviews too:
 
 ```bash
@@ -75,7 +77,7 @@ roborev fix --batch                # Batch all unaddressed into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
 ```
 
-The agent reads the review findings, applies changes, commits, and marks the review as addressed. This is a one-shot fix — for an iterative loop with re-review, see [`roborev refine`](/guides/auto-fixing/).
+The agent reads the review findings, applies changes, commits, and marks the review as addressed. This is a one-shot fix. For an iterative loop with re-review, see [`roborev refine`](/guides/auto-fixing/).
 
 Use `--batch` to concatenate multiple reviews into a single prompt so the agent sees all findings at once. This is faster and gives the agent more context to make coordinated fixes across related issues. Reviews are packed into batches respecting the configured max prompt size.
 
@@ -145,7 +147,7 @@ roborev fix
 roborev fix --batch
 ```
 
-Without `--batch`, `roborev fix` processes unaddressed reviews one at a time. As it commits fixes, the daemon automatically reviews the new commits — and if those new reviews fail, `roborev fix` picks them up and addresses them too. This means a single `roborev fix` invocation can work through a chain of analysis findings and their follow-on reviews without manual intervention.
+Without `--batch`, `roborev fix` processes unaddressed reviews one at a time. As it commits fixes, the daemon automatically reviews the new commits, and if those new reviews fail, `roborev fix` picks them up and addresses them too. This means a single `roborev fix` invocation can work through a chain of analysis findings and their follow-on reviews without manual intervention.
 
 With `--batch`, all unaddressed reviews are concatenated into a single prompt (respecting the configured max prompt size), so the agent addresses everything in one pass. This is particularly useful after queuing several analysis jobs.
 

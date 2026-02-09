@@ -23,7 +23,7 @@ Before enabling the CI poller, understand the following:
 
 - **The poller reviews ALL open PRs on first start.** It polls immediately on startup, not after the first interval. If you have 20 open PRs, all 20 will be enqueued for review right away. Subsequent polls only review PRs with new commits (tracked by HEAD SHA in the local database).
 - **All open PRs are reviewed** — there is no filtering by draft status, labels, or author. Draft PRs, bot PRs, and stale PRs all get reviewed.
-- **CI settings are global, not per-repo.** The `agent`, `review_type`, and `model` in the `[ci]` section apply to every repo in the `repos` list. You cannot configure different agents for different repos.
+- **CI settings are global by default, with per-repo overrides.** The `agents`, `review_types`, and `model` in the global `[ci]` section apply to every repo unless overridden. Individual repos can override agents, review types, and reasoning level via the `[ci]` section in their `.roborev.toml` (see [Per-Repo Overrides](#per-repo-overrides)).
 - **Reviews run with `max_workers` concurrency** (default: 4). Jobs are enqueued immediately but executed up to 4 at a time. With a multi-agent matrix, a single PR can generate multiple jobs (e.g. 2 types x 2 agents = 4 jobs).
 - **The daemon does not survive reboots.** Use `roborev daemon start` to run in the background, but you'll need a launchd agent (macOS) or systemd service (Linux) if you want it to start on boot.
 
@@ -152,8 +152,8 @@ Add to `~/.roborev/config.toml`:
 enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
-agent = "codex"
-review_type = "security"
+agents = ["codex"]
+review_types = ["security"]
 
 # GitHub App authentication
 github_app_id = 123456
@@ -230,8 +230,8 @@ Add to `~/.roborev/config.toml` (make sure you've already run `roborev init` in 
 enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
-agent = "codex"              # which agent to use (or omit for auto-detect)
-review_type = "security"     # "security", "review", or "general"
+agents = ["codex"]              # which agents to use (or omit for auto-detect)
+review_types = ["security"]     # "security", "review", or "general"
 ```
 
 No `github_app_*` fields needed — the daemon posts comments using whatever account `gh auth` is logged in as.
@@ -259,8 +259,8 @@ CI poller: posted review comment on myorg/myrepo#42 (job 123, verdict=P)
 
 Use `roborev status` to check the daemon and queue state at any time.
 
-:::note[CI reviews always use "thorough" reasoning]
-The CI poller hardcodes `reasoning = "thorough"` for all review jobs. This cannot be changed via config. Per-repo `.roborev.toml` settings for `review_reasoning`, `agent`, and `model` are **not used** by the CI poller -- only the `[ci]` section in global config applies.
+:::note[CI reasoning level]
+The CI poller defaults to `reasoning = "thorough"` for all review jobs. You can override this per-repo with a `[ci]` section in the repo's `.roborev.toml` (see [Per-Repo Overrides](#per-repo-overrides)).
 :::
 
 ## Keeping the Daemon Running
@@ -338,7 +338,7 @@ agents = ["codex", "gemini"]
 # This creates 4 jobs per PR (2 types x 2 agents)
 ```
 
-When the matrix is 1x1 (single review type, single agent), synthesis is skipped and the output is posted directly. The singular `review_type` and `agent` fields are shorthand for single-element arrays.
+When the matrix is 1x1 (single review type, single agent), synthesis is skipped and the output is posted directly.
 
 ### Synthesis
 
@@ -359,6 +359,29 @@ synthesis_model = "claude-sonnet-4-5-20250929"   # Model override for synthesis
 
 If synthesis fails, roborev falls back to posting all review outputs in collapsible `<details>` blocks.
 
+## Per-Repo Overrides
+
+Individual repos can override the global CI settings by adding a `[ci]` section to their `.roborev.toml` file. This lets you run different agents, review types, or reasoning levels for different repos.
+
+```toml
+# .roborev.toml (in repo root)
+
+agent = "codex"   # agent for post-commit reviews (unrelated to CI)
+
+[ci]
+agents = ["gemini"]                  # override agents for CI reviews of this repo
+review_types = ["security", "review"]  # override review types
+reasoning = "standard"               # override reasoning level (thorough, standard, fast)
+```
+
+Per-repo overrides take priority over the global `[ci]` config. Any field not set in the repo's `[ci]` section falls back to the global config.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `agents` | array | global `agents` | Agents for CI reviews of this repo |
+| `review_types` | array | global `review_types` | Review types for CI reviews of this repo |
+| `reasoning` | string | `"thorough"` | Reasoning level: `thorough`, `standard`, or `fast` |
+
 ## CI Options Reference
 
 ### Core Options
@@ -368,15 +391,13 @@ If synthesis fails, roborev falls back to posting all review outputs in collapsi
 | `enabled` | bool | `false` | Enable the CI poller |
 | `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s, invalid values default to 5m) |
 | `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
-| `review_type` | string | `"security"` | Review type (shorthand for single-element `review_types`) |
-| `review_types` | array | | Multiple review types (overrides `review_type`) |
-| `agent` | string | auto-detect | Agent to use (shorthand for single-element `agents`) |
-| `agents` | array | | Multiple agents (overrides `agent`) |
+| `review_types` | array | `["security"]` | Review types to run for each PR (e.g., `["security", "review"]`) |
+| `agents` | array | auto-detect | Agents to run for each PR (e.g., `["codex", "gemini"]`) |
 | `model` | string | | Model override for CI reviews |
 | `synthesis_agent` | string | | Agent for combining multi-job results |
 | `synthesis_model` | string | | Model override for synthesis |
 
-When `agent` is not set and `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, opencode, cursor, droid.
+When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, opencode, cursor, droid.
 
 ### GitHub App Options
 
@@ -426,8 +447,8 @@ This is normal. The poller reviews all open PRs on first startup. After the init
 enabled = true
 poll_interval = "5m"
 repos = ["myorg/backend", "myorg/frontend"]
-review_type = "security"
-agent = "claude-code"
+review_types = ["security"]
+agents = ["claude-code"]
 model = "claude-sonnet-4-5-20250929"
 
 github_app_id = 123456
@@ -463,8 +484,8 @@ github_app_installation_id = 12345678
 enabled = true
 poll_interval = "5m"
 repos = ["wesm/my-project", "roborev-dev/core", "roborev-dev/docs"]
-review_type = "security"
-agent = "codex"
+review_types = ["security"]
+agents = ["codex"]
 
 github_app_id = 123456
 github_app_private_key = "~/.roborev/roborev.pem"
@@ -482,8 +503,8 @@ roborev-dev = 222222
 enabled = true
 poll_interval = "5m"
 repos = ["myorg/backend", "myorg/frontend"]
-review_type = "security"
-agent = "claude-code"
+review_types = ["security"]
+agents = ["claude-code"]
 model = "claude-sonnet-4-5-20250929"
 ```
 

@@ -67,7 +67,8 @@ Before enabling the CI poller, you need:
 2. **A local checkout** of each repo you want to poll, registered with roborev:
    ```bash
    cd /path/to/myrepo
-   roborev init
+   roborev init              # starts daemon automatically
+   roborev init --no-daemon  # if using systemd/launchd to manage the daemon
    ```
    The poller matches GitHub repos to local checkouts by git remote URL. If `roborev init` hasn't been run for a repo, the poller will log `no local repo found matching "owner/repo"` and skip it.
 
@@ -265,7 +266,11 @@ The CI poller defaults to `reasoning = "thorough"` for all review jobs. You can 
 
 ## Keeping the Daemon Running
 
-`roborev daemon start` runs the daemon in the background, but it won't survive a reboot. For persistent operation, set up a system service:
+`roborev daemon start` runs the daemon in the background, but it won't survive a reboot. For persistent operation, set up a system service.
+
+:::caution[Use `--no-daemon` with system services]
+If you manage the daemon with systemd or launchd, use `roborev init --no-daemon` when registering repos. Otherwise, `roborev init` auto-starts a background daemon that conflicts with the service-managed one.
+:::
 
 **macOS (launchd):**
 

@@ -29,6 +29,7 @@ export default defineConfig({
       },
       social: {
         github: 'https://github.com/roborev-dev/roborev',
+        discord: 'https://discord.gg/fDnmxB8Wkq',
       },
       head: [
         // Open Graph / Social preview

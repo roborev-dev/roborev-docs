@@ -115,13 +115,13 @@ Agents run in one of two modes depending on the task.
 
 ### Review Mode
 
-**Review mode** is read-only — agents can inspect code but cannot make changes. This is the safe default for automatic reviews triggered by post-commit hooks.
+**Review mode** is read-only. Agents can inspect code but cannot make changes. This is the safe default for automatic reviews triggered by post-commit hooks.
 
-The agent can read files, search for patterns, and analyze code structure. It cannot edit files, create files, or run commands.
+The agent can read files, search for patterns, and analyze code structure. It cannot edit files, create files, or run commands. **No background or async operation (reviews, enqueue, or `roborev run` without `--agentic`) ever modifies your working tree.**
 
 ### Agentic Mode
 
-**Agentic mode** allows agents to edit files and run commands. Enable it in three ways:
+**Agentic mode** allows agents to edit files and run commands. If you pass `--agentic` and the agent makes changes to your working tree, that's an explicit opt-in. roborev will never do this on its own. Enable it in three ways:
 
 **Per-job:**
 
@@ -130,7 +130,7 @@ roborev run --agentic "Refactor the error handling"
 roborev run --yolo "Add input validation"   # --yolo is an alias
 ```
 
-**Per-command** — the `refine` command automatically enables agentic mode:
+**Per-command:** the `refine` command automatically enables agentic mode:
 
 ```bash
 roborev refine   # Always runs in agentic mode

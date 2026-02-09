@@ -22,7 +22,7 @@ For multi-agent or multi-type configurations, results from all jobs are synthesi
 Before enabling the CI poller, understand the following:
 
 - **The poller reviews ALL open PRs on first start.** It polls immediately on startup, not after the first interval. If you have 20 open PRs, all 20 will be enqueued for review right away. Subsequent polls only review PRs with new commits (tracked by HEAD SHA in the local database).
-- **All open PRs are reviewed** — there is no filtering by draft status, labels, or author. Draft PRs, bot PRs, and stale PRs all get reviewed.
+- **All open PRs are reviewed.** There is no filtering by draft status, labels, or author. Draft PRs, bot PRs, and stale PRs all get reviewed.
 - **CI settings are global by default, with per-repo overrides.** The `agents`, `review_types`, and `model` in the global `[ci]` section apply to every repo unless overridden. Individual repos can override agents, review types, and reasoning level via the `[ci]` section in their `.roborev.toml` (see [Per-Repo Overrides](#per-repo-overrides)).
 - **Reviews run with `max_workers` concurrency** (default: 4). Jobs are enqueued immediately but executed up to 4 at a time. With a multi-agent matrix, a single PR can generate multiple jobs (e.g. 2 types x 2 agents = 4 jobs).
 - **The daemon does not survive reboots.** Use `roborev daemon start` to run in the background, but you'll need a launchd agent (macOS) or systemd service (Linux) if you want it to start on boot.
@@ -38,12 +38,12 @@ roborev needs GitHub credentials to list PRs and post comments. There are two op
 | | GitHub App (Recommended) | Personal (`gh` CLI) |
 |---|---|---|
 | **Comments appear as** | `your-app-name[bot]` | Your personal GitHub account |
-| **Setup effort** | Create an app, generate keys, install on repos | Minimal — just `gh auth login` |
+| **Setup effort** | Create an app, generate keys, install on repos | Minimal: just `gh auth login` |
 | **Best for** | Teams, shared repos, production use | Quick testing, personal projects |
 | **Permissions** | Scoped to specific repos and permissions | Whatever your account has access to |
 
 :::tip[Which should I pick?]
-**GitHub App** is the recommended approach — dedicated bot identity, scoped permissions, and clean separation from your personal account. Use **personal auth** if you just want to try roborev quickly without creating an app.
+**GitHub App** is the recommended approach: dedicated bot identity, scoped permissions, and clean separation from your personal account. Use **personal auth** if you just want to try roborev quickly without creating an app.
 :::
 
 ## Prerequisites
@@ -56,13 +56,13 @@ Before enabling the CI poller, you need:
    gh --version   # verify it's installed
    ```
 
-   If you're using **GitHub App auth**, `gh` does not need to be separately authenticated — the app token is injected automatically. If you're using **personal auth**, you also need to log in:
+   If you're using **GitHub App auth**, `gh` does not need to be separately authenticated. The app token is injected automatically. If you're using **personal auth**, you also need to log in:
    ```bash
    gh auth login
    gh auth status   # verify it worked
    ```
 
-   If your organization uses SSO with personal auth, make sure your token is authorized for SSO access. The daemon runs long-lived — if your `gh` token expires while the daemon is running, the poller will log errors and skip repos until you re-authenticate.
+   If your organization uses SSO with personal auth, make sure your token is authorized for SSO access. The daemon runs long-lived. If your `gh` token expires while the daemon is running, the poller will log errors and skip repos until you re-authenticate.
 
 2. **A local checkout** of each repo you want to poll, registered with roborev:
    ```bash
@@ -142,7 +142,7 @@ https://github.com/settings/installations/12345678
                                            this is your installation ID
 ```
 
-If you have repos across multiple organizations or user accounts, install the app on each one. Each installation gets its own installation ID — you'll need these for the [multi-installation config](#multiple-installations) below.
+If you have repos across multiple organizations or user accounts, install the app on each one. Each installation gets its own installation ID. You'll need these for the [multi-installation config](#multiple-installations) below.
 
 ### 5. Add CI config
 
@@ -235,7 +235,7 @@ agents = ["codex"]              # which agents to use (or omit for auto-detect)
 review_types = ["security"]     # "security", "review", or "general"
 ```
 
-No `github_app_*` fields needed — the daemon posts comments using whatever account `gh auth` is logged in as.
+No `github_app_*` fields needed. The daemon posts comments using whatever account `gh auth` is logged in as.
 
 ### 2. Start the daemon
 
@@ -275,7 +275,7 @@ If you manage the daemon with systemd or launchd, use `roborev init --no-daemon`
 **macOS (launchd):**
 
 ```bash
-# Create a plist — adjust the path to the roborev binary
+# Create a plist - adjust the path to the roborev binary
 cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -429,7 +429,7 @@ The `gh` CLI is not installed, not authenticated, or doesn't have access to the 
 The PR's base or head commit isn't available locally. This usually means `git fetch` failed. Check that the local repo has the remote configured correctly.
 
 **"GitHub App token failed, falling back to default gh auth"**
-The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to your `gh` CLI auth — if you're also logged in via `gh auth login`, PR operations will still work but comments will appear as your personal account. If you're not logged in, `gh` commands will fail.
+The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to your `gh` CLI auth. If you're also logged in via `gh auth login`, PR operations will still work but comments will appear as your personal account. If you're not logged in, `gh` commands will fail.
 
 **"no installation ID for owner ..., using default gh auth"**
 The poller found no installation ID for this repo's owner. If you're using `[ci.github_app_installations]`, add an entry for the owner. If you're using the singular `github_app_installation_id`, make sure it's set. Owner names are matched case-insensitively, so `wesm` and `Wesm` are equivalent.

@@ -231,7 +231,7 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 agent = "codex"              # which agent to use (or omit for auto-detect)
-review_type = "security"     # "security" or "review"
+review_type = "security"     # "security", "review", or "general"
 ```
 
 No `github_app_*` fields needed — the daemon posts comments using whatever account `gh auth` is logged in as.
@@ -403,7 +403,7 @@ The `gh` CLI is not installed, not authenticated, or doesn't have access to the 
 The PR's base or head commit isn't available locally. This usually means `git fetch` failed. Check that the local repo has the remote configured correctly.
 
 **"GitHub App token failed, falling back to default gh auth"**
-The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to personal auth so reviews still work, but PR comments will appear as your personal account.
+The GitHub App authentication failed. Check that your PEM file path is correct, the app is installed on the repo, and the installation ID matches. The daemon falls back to your `gh` CLI auth — if you're also logged in via `gh auth login`, PR operations will still work but comments will appear as your personal account. If you're not logged in, `gh` commands will fail.
 
 **"no installation ID for owner ..., using default gh auth"**
 The poller found no installation ID for this repo's owner. If you're using `[ci.github_app_installations]`, add an entry for the owner. If you're using the singular `github_app_installation_id`, make sure it's set. Owner names are matched case-insensitively, so `wesm` and `Wesm` are equivalent.

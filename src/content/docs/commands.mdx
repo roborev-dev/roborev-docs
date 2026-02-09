@@ -35,6 +35,10 @@ roborev review --branch --base develop  # Against specific base
 # Uncommitted changes
 roborev review --dirty           # Review working tree
 roborev review --dirty --wait    # Wait for result
+
+# Review types
+roborev review --type security   # Security-focused review
+roborev review --type design     # Design-focused review
 ```
 
 | Flag | Description |
@@ -43,6 +47,7 @@ roborev review --dirty --wait    # Wait for result
 | `--quiet` | Only show progress/elapsed time |
 | `--agent <name>` | Use specific agent for review |
 | `-m, --model <model>` | Model to use (format varies by agent) |
+| `--type <type>` | Review type (`security`, `design`) — changes system prompt |
 | `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
 | `--fast` | Shorthand for `--reasoning fast` |
 | `--repo <path>` | Specify repository path |

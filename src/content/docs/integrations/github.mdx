@@ -232,7 +232,7 @@ enabled = true
 poll_interval = "5m"
 repos = ["myorg/myrepo"]
 agents = ["codex"]              # which agents to use (or omit for auto-detect)
-review_types = ["security"]     # "security", "review", or "general"
+review_types = ["security"]     # "security", "design", "review", or "general"
 ```
 
 No `github_app_*` fields needed. The daemon posts comments using whatever account `gh auth` is logged in as.

@@ -496,6 +496,47 @@ wesm = 111111
 roborev-dev = 222222
 ```
 
+### Per-Repo Overrides
+
+Global config (`~/.roborev/config.toml`) sets defaults for all repos:
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/backend", "myorg/frontend"]
+review_types = ["security"]
+agents = ["codex"]
+
+github_app_id = 123456
+github_app_private_key = "~/.roborev/roborev.pem"
+github_app_installation_id = 12345678
+```
+
+The backend repo wants deeper reviews with multiple agents. Add a `.roborev.toml` in the backend repo root:
+
+```toml
+# myorg/backend/.roborev.toml
+
+[ci]
+review_types = ["security", "review"]
+agents = ["codex", "gemini"]
+reasoning = "thorough"
+```
+
+The frontend repo is lower-risk and only needs a fast security scan:
+
+```toml
+# myorg/frontend/.roborev.toml
+
+[ci]
+review_types = ["security"]
+agents = ["codex"]
+reasoning = "fast"
+```
+
+Result: `backend` PRs get a 2x2 matrix (4 jobs) with thorough reasoning, while `frontend` PRs get a single fast security review. Repos without a `.roborev.toml` `[ci]` section use the global defaults.
+
 ### Personal Auth -- Single Review
 
 ```toml

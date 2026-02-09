@@ -1,6 +1,6 @@
 ---
-title: Custom Agent Tasks
-description: Run custom AI tasks beyond automatic code review
+title: Custom Tasks & Agentic Mode
+description: Run custom AI tasks and understand review vs agentic modes
 ---
 
 Use `roborev run` to execute custom tasks with AI agents. While automatic reviews focus on commits, `run` lets you target specific files, ask questions, or perform targeted analysis.
@@ -89,15 +89,6 @@ cat review-checklist.txt | roborev run --wait
 | `--yolo` | Alias for `--agentic` |
 | `--quiet` | Suppress output (just enqueue) |
 
-## Review vs Agentic Mode
-
-By default, tasks run in **review mode** (read-only). Use `--agentic` to enable write operations.
-
-| Mode | Tools Available | Use Case |
-|------|-----------------|----------|
-| Review (default) | Read, Glob, Grep | Analysis, explanations, finding issues |
-| Agentic | Read, Glob, Grep, Edit, Write, Bash | Refactoring, implementing features, fixes |
-
 ## Repository Context
 
 By default, tasks include context about the repository:
@@ -113,9 +104,79 @@ Use `--no-context` for raw prompts without this context.
 - Combine with `roborev tui` to review task results later
 - Tasks appear in the TUI alongside commit reviews
 
+## Review vs Agentic Modes
+
+Agents run in one of two modes depending on the task.
+
+| Mode | Tools Available | Used By |
+|------|-----------------|---------|
+| **Review** (default) | Read, Glob, Grep | `roborev review`, `roborev run` |
+| **Agentic** | Read, Glob, Grep, Edit, Write, Bash | `roborev refine`, `roborev run --agentic` |
+
+### Review Mode
+
+**Review mode** is read-only — agents can inspect code but cannot make changes. This is the safe default for automatic reviews triggered by post-commit hooks.
+
+The agent can read files, search for patterns, and analyze code structure. It cannot edit files, create files, or run commands.
+
+### Agentic Mode
+
+**Agentic mode** allows agents to edit files and run commands. Enable it in three ways:
+
+**Per-job:**
+
+```bash
+roborev run --agentic "Refactor the error handling"
+roborev run --yolo "Add input validation"   # --yolo is an alias
+```
+
+**Per-command** — the `refine` command automatically enables agentic mode:
+
+```bash
+roborev refine   # Always runs in agentic mode
+```
+
+**Globally:**
+
+```toml
+# ~/.roborev/config.toml
+allow_unsafe_agents = true
+```
+
+Then restart the daemon:
+
+```bash
+roborev daemon restart
+```
+
+:::caution
+Global agentic mode means all operations can potentially write to your codebase. Use with caution.
+:::
+
+### Agent-Specific Flags
+
+| Agent | Review Mode | Agentic Mode |
+|-------|-------------|--------------|
+| Codex | `--sandbox-cmd-allowlist ""` | `--dangerously-bypass-approvals-and-sandbox` |
+| Claude Code | Default behavior | `--dangerously-skip-permissions` |
+| Gemini | Default behavior | `--yolo --allowed-tools` |
+| Copilot | Default behavior | Manual approval required |
+| Cursor | Default behavior | `--yolo` |
+| OpenCode | Default behavior | Auto-approves in non-interactive mode |
+
+### Security Considerations
+
+When using agentic mode:
+
+- The agent can run arbitrary commands on your machine
+- This includes installing dependencies, running builds, etc.
+- Safe for your own code on trusted branches
+- Use isolation for untrusted code (containers, VMs)
+
+See [Auto-Fix Agentic Loop Security](/guides/auto-fixing/#security-considerations) for detailed guidance.
+
 ## See Also
 
-- [Agent Modes](/agents/modes/) - Details on review vs agentic modes
 - [Assisted Refactoring](/guides/assisted-refactoring/) - Built-in analysis types with `roborev analyze` and `roborev fix`
-- [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/) - Automated issue resolution
+- [Auto-Fix with Refine](/guides/auto-fixing/) - Automated issue resolution
 - [Terminal UI](/integrations/tui/) - View task results

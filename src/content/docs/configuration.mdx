@@ -93,7 +93,7 @@ refine_agent_thorough = "codex"
 refine_model_thorough = "gpt-5.2-codex"
 ```
 
-Base keys (`review_model`, `refine_agent`, `fix_agent`) set the default for each workflow. Level-specific keys override for that reasoning level:
+Base keys (`review_model`, `refine_agent`, `fix_agent`, `security_agent`, `design_model`) set the default for each workflow. Level-specific keys override for that reasoning level:
 - `{workflow}_model_{level}` or `{workflow}_agent_{level}`
 - `workflow` is `review`, `refine`, `fix`, `security`, or `design`
 - `level` is `thorough`, `standard`, or `fast`

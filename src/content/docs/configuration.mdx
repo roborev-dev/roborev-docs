@@ -122,6 +122,7 @@ server_addr = "127.0.0.1:7373"
 max_workers = 4
 job_timeout = "10m"  # Per-job timeout (default: 10m)
 hide_addressed_by_default = true  # Start TUI with addressed/failed/canceled hidden
+auto_filter_repo = true           # Auto-filter TUI to current repo on startup
 ```
 
 ### Global Options
@@ -137,6 +138,7 @@ hide_addressed_by_default = true  # Start TUI with addressed/failed/canceled hid
 | `anthropic_api_key` | string | - | Anthropic API key for Claude Code | Yes |
 | `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
 | `hide_addressed_by_default` | bool | false | Start TUI with addressed/failed/canceled reviews hidden | N/A |
+| `auto_filter_repo` | bool | false | Auto-filter TUI to the current repo on startup | N/A |
 
 ### Hot-Reload
 

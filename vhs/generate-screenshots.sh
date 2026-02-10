@@ -5,6 +5,7 @@ set -euo pipefail
 OUTPUT_DIR="${1:-/output}"
 FREEZE_CFG="/tapes/freeze.json"
 SESSION="rr"
+CAPTURED=0
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -12,6 +13,7 @@ mkdir -p "$OUTPUT_DIR"
 capture() {
     local name="$1"
     tmux capture-pane -pet "$SESSION" | freeze -o "$OUTPUT_DIR/${name}.svg" --language ansi -c "$FREEZE_CFG"
+    CAPTURED=$((CAPTURED + 1))
     echo "  captured $name.svg"
 }
 
@@ -36,7 +38,7 @@ wait_until() {
 }
 
 # --- Start tmux session ---
-tmux new-session -d -s "$SESSION" -x 120 -y 40
+tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 40
 tmux set-option -g default-terminal "tmux-256color"
 tmux set-option -ga terminal-overrides ",*:Tc"
 tmux send-keys -t "$SESSION" "export COLORTERM=truecolor" Enter
@@ -47,9 +49,14 @@ sleep 0.3
 # =====================
 echo "==> TUI screenshots"
 
-# Start the daemon in the background
+# Start the daemon in the background and wait for it to be ready
 send "roborev daemon run &" Enter
-sleep 2
+for i in $(seq 1 30); do
+    if roborev status 2>/dev/null | grep -q "running"; then
+        break
+    fi
+    sleep 0.5
+done
 
 send "roborev tui" Enter
 wait_until "Queue"
@@ -92,4 +99,4 @@ capture "cli-status"
 tmux kill-session -t "$SESSION" 2>/dev/null || true
 
 echo ""
-echo "Done! Generated $(ls "$OUTPUT_DIR"/*.svg 2>/dev/null | wc -l) SVG files in $OUTPUT_DIR"
+echo "Done! Generated $CAPTURED SVG files in $OUTPUT_DIR"

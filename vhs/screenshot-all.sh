@@ -14,7 +14,7 @@ Usage: $(basename "$0") [OPTIONS]
 Generate roborev SVG screenshots using freeze + tmux.
 
 Options:
-  --repo PATH     Path to roborev source repo (default: \$ROBOREV_REPO or sibling ../roborev)
+  --repo PATH     Path to roborev source repo (requires explicit path)
   --local         Use sibling ../roborev directory
   --skip-data     Skip demo data preparation
   --skip-build    Skip Docker image build
@@ -29,7 +29,7 @@ USE_LOCAL=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --repo)       REPO="$2"; shift 2 ;;
+        --repo)       [[ $# -ge 2 ]] || { echo "ERROR: --repo requires a path"; exit 1; }; REPO="$2"; shift 2 ;;
         --local)      USE_LOCAL=true; shift ;;
         --skip-data)  SKIP_DATA=true; shift ;;
         --skip-build) SKIP_BUILD=true; shift ;;

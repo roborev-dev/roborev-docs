@@ -36,7 +36,8 @@ RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "aarch64" ]; then FREEZE_ARCH="arm64"; else FREEZE_ARCH="x86_64"; fi && \
     wget -qO- "https://github.com/charmbracelet/freeze/releases/download/v0.2.2/freeze_0.2.2_Linux_${FREEZE_ARCH}.tar.gz" | tar xz -C /tmp && \
     mv /tmp/freeze_*/freeze /usr/local/bin/freeze && \
-    rm -rf /tmp/freeze_*
+    rm -rf /tmp/freeze_* && \
+    freeze --version
 
 COPY --from=builder /roborev /usr/local/bin/roborev
 

@@ -56,7 +56,9 @@ Output is preserved after job completion, so you can review what happened.
 
 Press `f` to filter by repository, `b` to filter by branch, or `h` to hide addressed/failed/canceled reviews and focus on items needing attention.
 
-To start the TUI with addressed items already hidden, set `hide_addressed_by_default = true` in `~/.roborev/config.toml`. See [Configuration](/configuration/) for details. Pressing `h` toggles the filter for the current session without changing the config.
+To start the TUI with addressed items already hidden, set `hide_addressed_by_default = true` in `~/.roborev/config.toml`. To auto-filter to the current repository on startup, set `auto_filter_repo = true`. See [Configuration](/configuration/) for details.
+
+Pressing `h` toggles the hide-addressed filter for the current session without changing the config.
 
 `Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-addressed off directly.
 
@@ -73,7 +75,7 @@ Press `Enter` on a job to view its review.
 | Key | Action |
 |-----|--------|
 | `Up`/`k`, `Down`/`j` | Scroll content |
-| `Left`/`h`, `Right`/`l` | Previous/next review |
+| `Left`/`h`, `Right`/`l` | Previous/next review (loads more if at end) |
 | `PgUp`, `PgDn` | Page through content |
 | `a` | Toggle addressed |
 | `c` | Add comment |
@@ -82,6 +84,21 @@ Press `Enter` on a job to view its review.
 | `m` | View commit message |
 | `?` | Show keyboard shortcuts |
 | `Esc`, `q` | Back to queue |
+
+## Prompt View
+
+Press `p` from the queue view or review view to see the prompt that was sent to the agent, along with the command line used to invoke it.
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Scroll content |
+| `Left`/`h`, `Right`/`l` | Previous/next prompt |
+| `PgUp`, `PgDn` | Page through content |
+| `p` | Switch between prompt/review |
+| `?` | Show keyboard shortcuts |
+| `Esc`, `q` | Back to queue |
+
+The prompt header shows the job ID, git ref, and agent. Below the header, the command line used to run the agent is displayed (truncated to terminal width if needed).
 
 ## Copying Reviews
 

@@ -13,8 +13,8 @@ RUN go build -ldflags="-X github.com/roborev-dev/roborev/internal/version.Versio
 
 FROM alpine:3.19
 
-# Install dependencies for roborev and VHS
-RUN apk add --no-cache ca-certificates git bash ttyd ffmpeg chromium fontconfig
+# Install dependencies for roborev, VHS, and freeze screenshots
+RUN apk add --no-cache ca-certificates git bash ttyd ffmpeg chromium fontconfig tmux font-liberation
 
 # Install MesloLGS Nerd Font (works well with VHS)
 RUN mkdir -p /usr/share/fonts/truetype && \
@@ -30,6 +30,13 @@ RUN ARCH=$(uname -m) && \
     wget -qO- "https://github.com/charmbracelet/vhs/releases/download/v0.8.0/vhs_0.8.0_Linux_${VHS_ARCH}.tar.gz" | tar xz -C /tmp && \
     mv /tmp/vhs_*/vhs /usr/local/bin/vhs && \
     rm -rf /tmp/vhs_*
+
+# Install freeze for SVG screenshots (detect architecture)
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "aarch64" ]; then FREEZE_ARCH="arm64"; else FREEZE_ARCH="x86_64"; fi && \
+    wget -qO- "https://github.com/charmbracelet/freeze/releases/download/v0.2.2/freeze_0.2.2_Linux_${FREEZE_ARCH}.tar.gz" | tar xz -C /tmp && \
+    mv /tmp/freeze_*/freeze /usr/local/bin/freeze && \
+    rm -rf /tmp/freeze_*
 
 COPY --from=builder /roborev /usr/local/bin/roborev
 

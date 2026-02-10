@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-IMAGE_NAME="roborev-screenshots"
+IMAGE_NAME="roborev-vhs"
 DEMO_DATA_DIR="$SCRIPT_DIR/demo-data"
 OUTPUT_DIR="$SCRIPT_DIR/../public"
 ROBOREV_DOCS_REPO="$SCRIPT_DIR/.."
@@ -73,7 +73,7 @@ fi
 # --- Step 2: Build Docker image ---
 if [[ "$SKIP_BUILD" == false ]]; then
     echo "==> Building Docker image: $IMAGE_NAME"
-    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f "$SCRIPT_DIR/Dockerfile.screenshots" "$REPO"
+    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f "$SCRIPT_DIR/Dockerfile" "$REPO"
     echo ""
 fi
 

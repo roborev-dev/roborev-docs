@@ -46,9 +46,7 @@ This creates `demo-data/reviews.db` with only roborev-related reviews extracted 
 ### Workflow Demos (require git repo setup)
 | Tape | Description | Output |
 |------|-------------|--------|
-| `quickstart-demo.tape` | Fresh install, init, first review | `public/quickstart-demo.webm` |
 | `branch-review.tape` | Reviewing feature branches | `public/branch-review.webm` |
-| `refine-loop.tape` | Auto-fix cycle demo | `public/refine-loop.webm` |
 
 ## Generate Screenshots
 

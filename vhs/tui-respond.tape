@@ -28,6 +28,18 @@ Sleep 500ms
 Enter
 Sleep 2s
 
+# Page down to the bottom of the review so the comment is visible
+PageDown
+Sleep 500ms
+PageDown
+Sleep 500ms
+PageDown
+Sleep 500ms
+PageDown
+Sleep 500ms
+PageDown
+Sleep 1s
+
 # Open respond modal with 'c'
 Type "c"
 Sleep 1s

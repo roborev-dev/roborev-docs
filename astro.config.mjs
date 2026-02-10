@@ -57,6 +57,11 @@ export default defineConfig({
           tag: 'meta',
           attrs: { name: 'twitter:image', content: 'https://roborev.io/og-image.png' },
         },
+        // Lightbox for screenshot zoom
+        {
+          tag: 'script',
+          attrs: { src: '/lightbox.js', defer: true },
+        },
         // Mermaid for diagrams (client-side)
         {
           tag: 'script',

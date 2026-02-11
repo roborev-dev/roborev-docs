@@ -1,9 +1,9 @@
 ---
 title: Agent Skills
-description: Install slash commands that let AI agents fix review findings directly
+description: Install slash commands that let AI agents request reviews and fix findings
 ---
 
-Install slash commands that let AI agents fix review findings directly:
+Install slash commands that let AI agents request reviews and fix findings directly:
 
 ```bash
 roborev skills install
@@ -13,11 +13,61 @@ roborev skills install
 
 | Skill | Description |
 |-------|-------------|
+| `/roborev:review [commit] [--type ...]` | Request a code review for a commit |
+| `/roborev:review-branch [--base ...] [--type ...]` | Review all commits on the current branch |
+| `/roborev:design-review [commit]` | Request a design review for a commit |
+| `/roborev:design-review-branch [--base ...]` | Design review all commits on the current branch |
 | `/roborev:fix [job_id...]` | Discover and fix all unaddressed review findings in one pass |
 | `/roborev:address <job_id>` | Fetch a single review and fix its findings |
 | `/roborev:respond <job_id> [message]` | Add a response to document changes |
 
 ## Usage
+
+### Review a commit
+
+Request a code review without leaving your agent session:
+
+```
+/roborev:review
+/roborev:review abc123
+/roborev:review --type security
+```
+
+The review runs in the background via `roborev review --wait`, so you can keep working. When it completes, the agent presents the findings and offers to address them with `/roborev:address`.
+
+### Review a branch
+
+Review all commits since the current branch diverged from main:
+
+```
+/roborev:review-branch
+/roborev:review-branch --base develop
+/roborev:review-branch --type security
+```
+
+This runs `roborev review --branch --wait` in the background. Same workflow: results are presented when ready, with an offer to address findings.
+
+### Design review
+
+Request a design-focused review that evaluates completeness, feasibility, and task scoping:
+
+```
+/roborev:design-review
+/roborev:design-review abc123
+```
+
+This is a shorthand for `roborev review --wait --type design`. It runs in the background and follows the same pattern as the other review skills.
+
+### Design review a branch
+
+Review all commits on the current branch with a design-focused lens:
+
+```
+/roborev:design-review-branch
+/roborev:design-review-branch --base develop
+```
+
+This is the branch equivalent of `/roborev:design-review`, running `roborev review --branch --wait --type design` in the background.
 
 ### Fix all unaddressed reviews at once
 
@@ -58,8 +108,8 @@ The agent fetches the review, fixes issues by priority, runs tests, and offers t
 
 | Agent | Syntax |
 |-------|--------|
-| Claude Code | `/roborev:fix`, `/roborev:address`, `/roborev:respond` |
-| Codex | `$roborev:fix`, `$roborev:address`, `$roborev:respond` |
+| Claude Code | `/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`, `/roborev:fix`, `/roborev:address`, `/roborev:respond` |
+| Codex | `$roborev:review`, `$roborev:review-branch`, `$roborev:design-review`, `$roborev:design-review-branch`, `$roborev:fix`, `$roborev:address`, `$roborev:respond` |
 
 ## Checking Skill Status
 
@@ -84,11 +134,11 @@ Skills are installed as agent-specific configuration:
 - **Claude Code**: Custom slash commands in `~/.claude/`
 - **Codex**: Custom agent skills directory
 
-The skill scripts call `roborev show --job <id> --json` to fetch review data, then parse and present findings to the agent in a structured format.
+The review skills call `roborev review --wait` to enqueue reviews and wait for results. The fix skills call `roborev show --job <id> --json` to fetch review data, then parse and present findings to the agent in a structured format.
 
 ## Interactive vs Automated
 
-Skills provide an **interactive** workflow -- your agent addresses findings and you review the changes before committing. `/roborev:fix` is the fastest interactive option since it batches all outstanding findings into one pass.
+Skills provide an **interactive** workflow. The review skills (`/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`) let you request reviews from within your agent session and see results inline. The fix skills (`/roborev:fix`, `/roborev:address`) let your agent address findings while you review the changes before committing.
 
 For **fully automated** fixing, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
 

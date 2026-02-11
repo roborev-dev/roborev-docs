@@ -146,6 +146,24 @@ Reviews display a **Verdict** (Pass/Fail) parsed from the AI response:
 - **Pass** (green): Code review passed with no issues
 - **Fail** (red): Issues found that need attention
 
+## Rich Markdown Rendering
+
+Reviews and prompts are rendered with full Markdown formatting directly in the terminal. Code blocks display with syntax highlighting, and headings, lists, bold, italic, and inline code all render with appropriate styling.
+
+Code blocks are displayed without word-wrapping — long lines are truncated to the terminal width so diffs and code snippets stay readable. Prose text outside code blocks is word-wrapped naturally.
+
+### Tab Width
+
+Tabs in code blocks are expanded to spaces for consistent display. The default width is 2 spaces. To change it, set `tab_width` in `~/.roborev/config.toml`:
+
+```toml
+tab_width = 4  # Expand tabs to 4 spaces (default: 2, range: 1-16)
+```
+
+### Terminal Escape Sanitization
+
+Review content from AI agents is sanitized before display. Color and style codes (SGR) are preserved, but potentially harmful escape sequences (cursor movement, terminal title changes, screen clearing) are stripped. This prevents untrusted content from interfering with your terminal.
+
 ## Adaptive Colors
 
 The TUI automatically adapts to light and dark terminals. Colors are selected based on your terminal's background to ensure readability in both environments.

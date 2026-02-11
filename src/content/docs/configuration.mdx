@@ -123,6 +123,7 @@ max_workers = 4
 job_timeout = "10m"  # Per-job timeout (default: 10m)
 hide_addressed_by_default = true  # Start TUI with addressed/failed/canceled hidden
 auto_filter_repo = true           # Auto-filter TUI to current repo on startup
+tab_width = 4                     # Tab expansion width for code blocks in TUI (default: 2)
 ```
 
 ### Global Options
@@ -139,6 +140,7 @@ auto_filter_repo = true           # Auto-filter TUI to current repo on startup
 | `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
 | `hide_addressed_by_default` | bool | false | Start TUI with addressed/failed/canceled reviews hidden | N/A |
 | `auto_filter_repo` | bool | false | Auto-filter TUI to the current repo on startup | N/A |
+| `tab_width` | int | 2 | Tab expansion width for code blocks in TUI (1-16) | N/A |
 
 ### Hot-Reload
 

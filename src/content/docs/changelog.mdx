@@ -1,0 +1,554 @@
+---
+title: Changelog
+description: Release history for roborev
+---
+
+All notable changes to roborev, grouped by minor release.
+
+## 0.31
+<small>2026-02-11</small>
+
+**New features**
+
+- `roborev config` subcommands (`get`, `set`, `list`) for viewing and managing configuration from the CLI.
+- `--branch <name>` flag on `roborev analyze` and explicit branch names in `roborev review --branch`.
+
+**Improvements**
+
+- Refreshed built-in Claude and Codex skill guides for review/refine/respond/fix workflows.
+- Updated `flake.nix` metadata for smoother Nix packaging.
+
+---
+
+## 0.30
+<small>2026-02-11</small>
+
+**New features**
+
+- TUI renders Markdown in review output for clearer formatting.
+
+**Improvements**
+
+- TUI output is sanitized and escaped to prevent control sequences from breaking terminal rendering.
+
+---
+
+## 0.29
+<small>2026-02-10</small>
+
+**New features**
+
+- `review` and `review-branch` skills for Codex and Claude to run code reviews from agent skills.
+- `design-review-branch` skills for Codex and Claude.
+
+**Improvements**
+
+- Normalized skill invocation patterns for more consistent matching.
+- Improved Codex stream handling with stronger merge guarding.
+
+**Bug fixes**
+
+- Fixed cases where the Codex agent produces no visible CLI output.
+- Fixed range reviews that fail when the start point is the repository root commit.
+
+---
+
+## 0.28
+<small>2026-02-10</small>
+
+**New features**
+
+- Server-side filtering for review/job lists.
+- Automatic TUI filtering to narrow visible reviews and jobs.
+- Filter metrics to show what filtering matches.
+
+**Improvements**
+
+- Clearer TUI command display and improved prompt navigation.
+
+**Bug fixes**
+
+- Prevented the daemon from inheriting `GIT_DIR` from Git hook environments.
+
+---
+
+## 0.27
+<small>2026-02-09</small>
+
+**New features**
+
+- `--type` flag for `design` and `security` reviews from the CLI.
+- Jump-to-top shortcut (`g`) in the TUI.
+- Built-in design review skill templates for Codex and Claude.
+
+**Bug fixes**
+
+- Fixed review-type consistency so selected modes are applied reliably across commands.
+
+---
+
+## 0.26
+<small>2026-02-08</small>
+
+**New features**
+
+- CI poller that detects GitHub pull requests and queues reviews automatically.
+- GitHub App integration for authenticated PR review workflows.
+- Persistent CI review tracking that survives daemon restarts.
+- `hide_addressed_by_default` config option for the TUI.
+
+**Improvements**
+
+- Expanded configuration to support CI polling and GitHub App settings.
+- Default Gemini model set so Gemini works without explicit model configuration.
+- Hardened agent integrations for improved reliability.
+
+---
+
+## 0.25
+<small>2026-02-04</small>
+
+**New features**
+
+- `roborev list` command for viewing stored reviews.
+- `--json` flag on `roborev show` for machine-readable output.
+- Color-coded Addressed column in the TUI.
+
+**Improvements**
+
+- TUI queue view displays `JobID` instead of `ID` for clearer identification.
+
+**Bug fixes**
+
+- Fixed verdict detection for `Severity: Level` format.
+- Fixed hook v1 to v2 upgrade by stripping `&` and documenting `install-hook --force`.
+
+---
+
+## 0.24
+<small>2026-02-03</small>
+
+**Improvements**
+
+- Show available fixes in the `roborev fix` list.
+- Fail fast when task jobs are missing a prompt.
+
+**Bug fixes**
+
+- Prevented wrong agent selection and duplicate reviews from the post-commit hook.
+
+---
+
+## 0.23
+<small>2026-02-02</small>
+
+**New features**
+
+- `/roborev:fix` skill to address multiple review findings in one pass.
+- `{findings}` template variable for hook commands.
+
+**Improvements**
+
+- Show skill status in `roborev skills` output.
+- Upgrade post-commit hook on init to keep tooling up to date.
+
+**Bug fixes**
+
+- Fixed post-commit hook backgrounding to avoid blocking or hangups.
+
+---
+
+## 0.22
+<small>2026-01-31</small>
+
+**New features**
+
+- Review hooks system to run shell commands when reviews complete or fail.
+- `--batch` flag on `roborev fix` for batch operation.
+
+**Improvements**
+
+- Rewritten README documenting the coding agent workflow.
+
+**Bug fixes**
+
+- Fixed hook tests for portability across environments.
+
+---
+
+## 0.21
+<small>2026-01-30</small>
+
+**New features**
+
+- Cursor agent support.
+- `check-agents` command to list and smoke-test available agents.
+- `--unaddressed` flag on `fix` for batch fixing.
+- `show --prompt` to display the prompt sent to the agent.
+
+**Improvements**
+
+- Improved daemon resilience and overall UX.
+- Include current UTC date in review prompts for temporal context.
+
+**Bug fixes**
+
+- Fixed shell wildcard expansion in `analyze` when run from subdirectories.
+- Prevented duplicate review jobs when enqueueing.
+- Fixed branchless jobs not included when running fix.
+
+---
+
+## 0.20
+<small>2026-01-29</small>
+
+**New features**
+
+- `roborev analyze` for built-in code analysis workflows.
+- `roborev fix` to apply guided fixes from analysis results.
+
+**Bug fixes**
+
+- Fixed cosmetic issues in repo stats display.
+- Fixed zero "Created" date in `roborev repo show`.
+
+---
+
+## 0.19
+<small>2026-01-27</small>
+
+**New features**
+
+- Workflow-specific configuration keys and `--fast` shorthand flag.
+- Branch column in the TUI with filtering support.
+- `--local` flag to run reviews without starting the daemon.
+
+**Improvements**
+
+- Improved TUI row selection styling.
+
+**Bug fixes**
+
+- Fixed branch filter returning no results when fetch is limited.
+- Fixed false negative verdicts when severity labels are present.
+- Fixed `make install` to avoid using `go install`.
+
+---
+
+## 0.18
+<small>2026-01-26</small>
+
+**New features**
+
+- `tail` command to view streaming agent output.
+- Support for multiple clones running concurrently.
+- Automatic terminal color adaptation for light/dark themes.
+
+**Improvements**
+
+- Show model name and reorganized Review screen layout.
+
+**Bug fixes**
+
+- Fixed `address` API and CLI to use `job_id` correctly.
+
+---
+
+## 0.17
+<small>2026-01-25</small>
+
+**New features**
+
+- Configurable model selection for all agents.
+- Gemini-specific preamble support for run tasks.
+- TUI commit viewer, help modal, and clearer navigation feedback.
+
+---
+
+## 0.16
+<small>2026-01-24</small>
+
+**New features**
+
+- Layered Escape key behavior to clear filters one level at a time.
+- Gemini-specific review template with upfront summary requirement.
+
+**Improvements**
+
+- Renamed `prompt` command to `run` for clearer CLI usage.
+- Improved daemon lifecycle management for safer start/stop.
+
+**Bug fixes**
+
+- Fixed TUI flickering when the queue is empty with filters applied.
+- Fixed edge cases in daemon shutdown.
+
+---
+
+## 0.15
+<small>2026-01-23</small>
+
+**New features**
+
+- Config hot-reload for the daemon.
+- Factory Droid agent support.
+- `y` hotkey to copy review content to the clipboard.
+- Review metadata header in clipboard yank content.
+- PowerShell installer and ARM64 builds for Windows.
+
+**Improvements**
+
+- Flash notifications for incomplete jobs in the TUI.
+- Homebrew tap integration for easier installation.
+
+**Bug fixes**
+
+- Fixed multi-byte character handling in TUI text input.
+- Fixed Codex agent stdin handling on Windows.
+
+---
+
+## 0.14
+<small>2026-01-21</small>
+
+**New features**
+
+- TUI respond modal to capture review responses and include them in future prompts.
+
+**Bug fixes**
+
+- Fixed TUI rendering artifacts when scrolling with page up/down.
+
+---
+
+## 0.13
+<small>2026-01-20</small>
+
+**New features**
+
+- PostgreSQL sync to share reviews across multiple machines.
+
+**Improvements**
+
+- Simplified `install.sh` and moved docs screenshots to roborev-docs repo.
+- Instruct reviewers to skip commit message review.
+
+**Bug fixes**
+
+- Fixed race condition that caused addressed items to briefly reappear.
+- Fixed markdown formatting in verdict parsing.
+- Fixed `sync now` to connect automatically when the daemon is not yet connected.
+
+---
+
+## 0.12
+<small>2026-01-19</small>
+
+**New features**
+
+- `--since` option on `roborev review` to scope reviews to recent changes.
+- Gemini support for `roborev refine`.
+- Copilot and OpenCode agent support.
+
+**Improvements**
+
+- Default `allow_unsafe_agents` to true for refine when using Claude.
+- Improved TUI rendering and presentation.
+
+**Bug fixes**
+
+- Fixed TUI rendering glitches and layout issues.
+
+---
+
+## 0.11
+<small>2026-01-18</small>
+
+**New features**
+
+- `roborev prompt` command for custom agent tasks.
+- `roborev repo` command for managing tracked repositories.
+- Nix flake app entry for roborev.
+
+**Improvements**
+
+- Claude Code compatibility for `roborev refine`.
+- Expanded daemon API to support repo and prompt operations.
+
+---
+
+## 0.10
+<small>2026-01-16</small>
+
+**New features**
+
+- `roborev skills install` command to install bundled agent skills.
+- Bundled skills for Claude Code and Codex (address/respond workflows).
+
+---
+
+## 0.9
+<small>2026-01-14</small>
+
+**New features**
+
+- `refine` command for automated review fixing.
+
+**Improvements**
+
+- Allow `roborev refine` on main with `--since`, waiting for in-progress reviews.
+- Use configured `display_name` in the filter modal.
+
+**Bug fixes**
+
+- Fixed queue cursor behavior when hide-addressed is active and addressing from the review screen.
+
+---
+
+## 0.8
+<small>2026-01-13</small>
+
+**New features**
+
+- Renamed `enqueue` to `review` with a cleaner CLI interface.
+- `--dirty` flag to review uncommitted changes.
+- `--wait` flag to keep the CLI open until review completes.
+
+---
+
+## 0.7
+<small>2026-01-11</small>
+
+**New features**
+
+- `r` hotkey to rerun failed/canceled jobs or start a new review.
+- `roborev stream` command for JSONL event streaming.
+- `excluded_branches` and `display_name` config options.
+- Nix flake for building and development.
+
+**Improvements**
+
+- Full commit message bodies included in review prompts.
+- Clearer new release notifications.
+
+**Bug fixes**
+
+- Fixed git worktrees being treated as separate repositories.
+- Fixed false positive "failed" reviews.
+
+---
+
+## 0.6
+<small>2026-01-10</small>
+
+**New features**
+
+- `h` hotkey to hide addressed reviews.
+- Branch display in the TUI review view.
+- Distinct `[ADDRESSED]` color styling in review view.
+
+**Improvements**
+
+- Improved verdict parsing.
+- Improved TUI height sizing and review ID display.
+
+**Bug fixes**
+
+- Fixed TUI height sizing display issues.
+
+---
+
+## 0.5
+<small>2026-01-09</small>
+
+**New features**
+
+- Filter-by-repo modal in the TUI.
+- `ROBOREV_DATA_DIR` env var to override the data directory.
+- Configurable job timeout.
+- TUI pagination for large review lists.
+- Keyboard navigation between reviews without returning to the list.
+- P/F (Pass/Fail) verdict column in the TUI queue.
+
+**Improvements**
+
+- TUI views fit terminal width dynamically.
+- More robust executable path handling for hooks.
+
+---
+
+## 0.4
+<small>2026-01-08</small>
+
+**New features**
+
+- `roborev update` command to check for and install updates.
+- TUI notification when a new version is available.
+- Husky git hook manager support.
+
+**Improvements**
+
+- Automatic `.git/hooks` directory creation.
+- Respect `core.hooksPath` for git operations.
+- Refactored post-commit hook for improved security and silent operation.
+- Detect rebase state and skip reviews during rebase.
+
+**Bug fixes**
+
+- Fixed version comparison for dev builds.
+- Fixed Windows path detection for hook locations.
+
+---
+
+## 0.3
+<small>2026-01-07</small>
+
+**New features**
+
+- Job cancellation with `x` key in the TUI (terminates agent subprocess).
+- `uninstall-hook` command.
+
+**Bug fixes**
+
+- Fixed TUI selection highlight to cover the full line.
+- Fixed job cancellation persistence and race conditions.
+- Fixed migration handling for foreign keys and ALTER TABLE ordering.
+
+---
+
+## 0.2
+<small>2026-01-06</small>
+
+**New features**
+
+- Project-specific review guidelines in `.roborev.toml`.
+- Addressed status tracking with Addr'd column and toggle.
+- Prompt inspection in the TUI.
+- Page up/down navigation in the TUI.
+- Daemon version tracking with auto-restart on upgrade.
+- Gemini CLI and Copilot CLI agent support.
+- OpenCode agent support.
+- Automatic retry for failed reviews (up to 3 attempts).
+
+**Improvements**
+
+- Optimistic updates for addressed toggle.
+- Compact timestamp format in the TUI queue.
+- Daemon version displayed in the TUI and CLI.
+
+**Bug fixes**
+
+- Fixed TUI queue edge cases for empty queues and navigation.
+- Fixed daemon stop behavior and restart reliability.
+- Fixed SQLite datetime parsing for TUI timestamps.
+- Fixed retry job atomicity.
+
+---
+
+## 0.1
+<small>2026-01-05</small>
+
+Initial release.
+
+- Pure-Go SQLite driver for static binaries.
+- `--addr` normalization to add `http://` prefix if missing.

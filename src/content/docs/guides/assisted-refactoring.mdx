@@ -48,6 +48,27 @@ roborev analyze architecture internal/storage/
 
 Results appear in the TUI as jobs labeled with their analysis type (e.g. `test-fixtures`, `duplication`). Use `roborev show <job_id>` or the TUI to read findings. You can then use the job IDs to address findings at your discretion with `roborev fix <job_id>`.
 
+## Branch Mode
+
+Use `--branch` to automatically analyze files changed on the current branch since diverging from the base:
+
+```bash
+roborev analyze refactor --branch                  # Analyze current branch
+roborev analyze complexity --branch --per-file     # Per-file analysis of branch changes
+roborev analyze refactor --branch --base develop   # Compare against develop
+```
+
+To analyze a different branch without switching to it, specify the branch name with `=`:
+
+```bash
+roborev analyze refactor --branch=feature-xyz
+roborev analyze duplication --branch=feature-xyz --per-file
+```
+
+Note: use `--branch=name` (with `=`), not `--branch name`. The space-separated form treats `name` as a positional file argument.
+
+Branch mode automatically discovers changed files and filters out non-code files (`.md`, `.yml`, `.yaml`, `.json`, `.toml`, `.html`, `.css`, `.scss`). File contents are read from the git tree, not the working directory, so uncommitted edits are not included.
+
 ## Per-File Mode
 
 By default, all files are bundled into a single analysis job. Use `--per-file` to create a separate job for each file:
@@ -223,6 +244,8 @@ max_prompt_size = 204800
 | `--agent <name>` | Agent to use for analysis (default: from config) |
 | `--model <model>` | Model for analysis agent |
 | `--reasoning <level>` | Reasoning depth: `fast`, `standard`, or `thorough` |
+| `--branch [name]` | Analyze files changed on branch (optionally specify branch name with `--branch=name`) |
+| `--base <branch>` | Base branch for `--branch` comparison (default: auto-detect) |
 | `--wait` | Wait for job to complete and show result |
 | `--quiet` | Suppress output (just enqueue) |
 | `--per-file` | Create one job per file |

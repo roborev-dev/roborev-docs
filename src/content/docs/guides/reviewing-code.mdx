@@ -9,16 +9,28 @@ Use `--branch` to review all commits since your branch diverged from main:
 
 ```bash
 roborev review --branch              # Review branch vs auto-detected main/master
+roborev review --branch=feature-xyz  # Review a specific branch by name
 roborev review --branch --base dev   # Review branch vs specific base
 roborev review --branch --wait       # Wait for review and show result
 ```
 
 This is useful for pre-merge reviews of entire feature branches.
 
+### Reviewing a Different Branch
+
+By default `--branch` reviews the current branch. You can specify a branch name to review a different branch without switching to it:
+
+```bash
+roborev review --branch=feature-xyz
+roborev review --branch=feature-xyz --base develop
+```
+
+Note: use `--branch=name` (with `=`), not `--branch name`. The space-separated form treats `name` as a positional commit argument.
+
 ### How It Works
 
-1. roborev detects the merge-base between your current branch and the base branch
-2. All commits from the merge-base to HEAD are queued for review
+1. roborev detects the merge-base between the target branch and the base branch
+2. All commits from the merge-base to the branch tip are queued for review
 3. Each commit is reviewed individually by the AI agent
 4. Results are stored and can be viewed in the TUI
 
@@ -46,6 +58,7 @@ fi
 
 | Flag | Description |
 |------|-------------|
+| `--branch [name]` | Review all commits on the branch since base. Optionally specify a branch name with `--branch=name`. |
 | `--base <branch>` | Compare against a specific base branch (default: auto-detect main/master) |
 | `--wait` | Wait for all reviews to complete |
 | `--quiet` | Suppress output |

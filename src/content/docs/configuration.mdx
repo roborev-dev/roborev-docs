@@ -10,6 +10,67 @@ roborev uses a layered configuration system. Settings are resolved in this order
 3. **Global** `~/.roborev/config.toml`
 4. **Defaults** (auto-detect agent, thorough reasoning for reviews)
 
+## The `config` Command
+
+The `roborev config` command lets you inspect and modify configuration from the command line, similar to `git config`. It works with both global and per-repo config files.
+
+### Get a value
+
+```bash
+roborev config get default_agent              # merged: tries local, then global
+roborev config get default_agent --global     # global config only
+roborev config get review_agent --local       # repo config only
+roborev config get sync.enabled               # nested keys use dot notation
+```
+
+Without `--global` or `--local`, `get` uses merged scope: it checks the repo config first, then falls back to global. The raw value is printed to stdout for easy piping.
+
+### Set a value
+
+```bash
+roborev config set default_agent codex --global
+roborev config set max_workers 8 --global
+roborev config set review_agent claude-code    # defaults to --local
+roborev config set sync.enabled true --global
+roborev config set ci.repos "org/repo1,org/repo2" --global
+```
+
+Without `--global` or `--local`, `set` defaults to writing the repo config (`.roborev.toml`). You must be inside a git repository for local writes.
+
+Values are automatically coerced to the correct type:
+
+| Config type | Input format | Example |
+|-------------|-------------|---------|
+| string | as-is | `codex` |
+| integer | decimal number | `8` |
+| boolean | true/false, yes/no, 1/0 | `true` |
+| string array | comma-separated | `"org/repo1,org/repo2"` |
+
+Writes are atomic (temp file + rename) and preserve file permissions: `0600` for global config (which may contain secrets) and `0644` for repo config.
+
+:::note
+Some keys are scoped to one file. For example, `server_addr` is global-only and cannot be set with `--local`. The command will tell you if a key doesn't belong in the scope you chose.
+:::
+
+### List all values
+
+```bash
+roborev config list                    # merged config (effective values)
+roborev config list --global           # global config only
+roborev config list --local            # repo config only
+roborev config list --show-origin      # show where each value comes from
+```
+
+The `--show-origin` flag adds a column showing whether each value comes from `global`, `local`, or `default`:
+
+```
+global  default_agent   codex
+local   review_agent    claude-code
+default max_workers     4
+```
+
+Sensitive values (API keys, database URLs) are automatically masked in list output, showing only the last 4 characters.
+
 ## Per-Repository Configuration
 
 Create `.roborev.toml` in your repository root to customize behavior for that project.

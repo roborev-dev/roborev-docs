@@ -30,6 +30,7 @@ roborev review --since HEAD~5    # Review last 5 commits
 
 # Branch reviews
 roborev review --branch          # All commits since diverged from main
+roborev review --branch=feature-xyz     # Review a specific branch
 roborev review --branch --base develop  # Against specific base
 
 # Uncommitted changes
@@ -45,6 +46,8 @@ roborev review --type design     # Design-focused review
 |------|-------------|
 | `--wait` | Wait for review to complete and display result |
 | `--quiet` | Only show progress/elapsed time |
+| `--branch [name]` | Review all commits on branch since base (optionally specify branch name) |
+| `--base <branch>` | Base branch for `--branch` comparison (default: auto-detect) |
 | `--agent <name>` | Use specific agent for review |
 | `-m, --model <model>` | Model to use (format varies by agent) |
 | `--type <type>` | Review type (`security`, `design`) — changes system prompt |
@@ -145,6 +148,8 @@ See: [Assisted Refactoring](/guides/assisted-refactoring/)
 roborev analyze test-fixtures internal/*_test.go   # Run built-in analysis
 roborev analyze refactor --fix ./...               # Analyze and auto-fix
 roborev analyze complexity --per-file src/*.go      # One job per file
+roborev analyze refactor --branch                  # Analyze changed files on branch
+roborev analyze refactor --branch=feature-xyz      # Analyze a specific branch
 roborev analyze --list                             # List analysis types
 ```
 
@@ -155,6 +160,8 @@ roborev analyze --list                             # List analysis types
 | `--reasoning <level>` | Set reasoning depth |
 | `--wait` | Wait for completion and display result |
 | `--quiet` | Suppress output |
+| `--branch [name]` | Analyze files changed on branch (optionally specify branch name) |
+| `--base <branch>` | Base branch for `--branch` comparison (default: auto-detect) |
 | `--per-file` | One analysis job per file |
 | `--fix` | Analyze then apply fixes automatically |
 | `--fix-agent <name>` | Agent for fix step |
@@ -184,6 +191,28 @@ cat review-checklist.txt | roborev run --wait
 | `--no-context` | Don't include repository context |
 
 See: [Custom Agent Tasks](/guides/custom-tasks/)
+
+## Configuration
+
+```bash
+roborev config get <key>             # Get value (merged: local then global)
+roborev config get <key> --global    # Get from global config only
+roborev config get <key> --local     # Get from repo config only
+
+roborev config set <key> <value>     # Set in repo config (default)
+roborev config set <key> <value> --global  # Set in global config
+
+roborev config list                  # List merged config
+roborev config list --show-origin    # Show where each value comes from
+```
+
+| Flag | Description |
+|------|-------------|
+| `--global` | Use global config (`~/.roborev/config.toml`) |
+| `--local` | Use repo config (`.roborev.toml`) |
+| `--show-origin` | Show origin column (global/local/default) in list output |
+
+See: [Configuration](/configuration/)
 
 ## Repository Management
 

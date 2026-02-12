@@ -123,6 +123,7 @@ export default defineConfig({
         { label: 'Review Hooks', slug: 'guides/hooks' },
         { label: 'Troubleshooting', slug: 'guides/troubleshooting' },
         { label: 'Development', slug: 'development' },
+        { label: 'Changelog', slug: 'changelog' },
       ],
     }),
   ],

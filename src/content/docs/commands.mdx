@@ -185,6 +185,28 @@ cat review-checklist.txt | roborev run --wait
 
 See: [Custom Agent Tasks](/guides/custom-tasks/)
 
+## Configuration
+
+```bash
+roborev config get <key>             # Get value (merged: local then global)
+roborev config get <key> --global    # Get from global config only
+roborev config get <key> --local     # Get from repo config only
+
+roborev config set <key> <value>     # Set in repo config (default)
+roborev config set <key> <value> --global  # Set in global config
+
+roborev config list                  # List merged config
+roborev config list --show-origin    # Show where each value comes from
+```
+
+| Flag | Description |
+|------|-------------|
+| `--global` | Use global config (`~/.roborev/config.toml`) |
+| `--local` | Use repo config (`.roborev.toml`) |
+| `--show-origin` | Show origin column (global/local/default) in list output |
+
+See: [Configuration](/configuration/)
+
 ## Repository Management
 
 ```bash

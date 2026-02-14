@@ -43,7 +43,7 @@ Values are automatically coerced to the correct type:
 |-------------|-------------|---------|
 | string | as-is | `codex` |
 | integer | decimal number | `8` |
-| boolean | true/false, yes/no, 1/0 | `true` |
+| boolean | true/false, 1/0 | `true` |
 | string array | comma-separated | `"org/repo1,org/repo2"` |
 
 Writes are atomic (temp file + rename) and preserve file permissions: `0600` for global config (which may contain secrets) and `0644` for repo config.
@@ -154,7 +154,7 @@ refine_agent_thorough = "codex"
 refine_model_thorough = "gpt-5.2-codex"
 ```
 
-Base keys (`review_model`, `refine_agent`, `fix_agent`, `security_agent`, `design_model`) set the default for each workflow. Level-specific keys override for that reasoning level:
+Base keys use the pattern `{workflow}_agent` and `{workflow}_model` (e.g. `review_model`, `refine_agent`, `fix_agent`, `security_agent`, `design_model`) to set the default for each workflow. Level-specific keys override for a given reasoning level:
 - `{workflow}_model_{level}` or `{workflow}_agent_{level}`
 - `workflow` is `review`, `refine`, `fix`, `security`, or `design`
 - `level` is `thorough`, `standard`, or `fast`

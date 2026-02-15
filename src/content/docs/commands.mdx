@@ -57,6 +57,27 @@ roborev review --type design     # Design-focused review
 
 See: [Reviewing Code](/guides/reviewing-code/)
 
+## Waiting for Reviews
+
+```bash
+roborev wait                     # Wait for most recent job for HEAD
+roborev wait abc123              # Wait for most recent job for commit
+roborev wait 42                  # Job ID (if "42" is not a valid git ref)
+roborev wait --job 42            # Force as job ID
+roborev wait --sha HEAD~1        # Wait for job matching HEAD~1
+roborev wait --quiet             # Suppress output (for hooks/agents)
+```
+
+| Flag | Description |
+|------|-------------|
+| `--sha <ref>` | Git ref to find the most recent job for |
+| `--job` | Force argument to be treated as job ID |
+| `-q, --quiet` | Suppress output (exit code only) |
+
+Unlike `roborev review --wait`, this does not enqueue a new review. It waits for an already-running job, making it useful when a post-commit hook has already triggered the review.
+
+See: [Reviewing Code](/guides/reviewing-code/)
+
 ## Viewing Reviews
 
 ```bash

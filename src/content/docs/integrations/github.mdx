@@ -74,9 +74,10 @@ Before enabling the CI poller, you need:
 
    The checkout must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
 
-3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `opencode`, `cursor`, `droid`. You can check what's available with:
+3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`. You can check what's available with:
    ```bash
-   roborev review --agent test --help  # lists available agents
+   roborev check-agents             # smoke-test all installed agents
+   roborev check-agents --agent codex  # test a specific agent
    ```
    Or set a specific agent in the `[ci]` config (see below).
 
@@ -90,7 +91,7 @@ Go to **GitHub Settings > Developer settings > GitHub Apps > New GitHub App**.
 
 | Field | Value |
 |-------|-------|
-| **App name** | Any name you like, e.g. `roborev-ci` (this becomes the `[bot]` username) |
+| **App name** | A globally unique name, e.g. `roborev-myorg` (this becomes the `[bot]` username) |
 | **Homepage URL** | Your repo URL or any URL |
 | **Webhook** | Uncheck "Active" (not needed -- roborev polls) |
 
@@ -125,6 +126,7 @@ After creation, the **App ID** is shown near the top of the app settings page. Y
 On the app settings page, scroll to **Private keys** and click **Generate a private key**. Your browser downloads a `.pem` file. Store it securely:
 
 ```bash
+mkdir -p ~/.roborev
 # The downloaded file will be named something like your-app-name.2026-02-08.private-key.pem
 mv ~/Downloads/your-app-name.*.private-key.pem ~/.roborev/roborev.pem
 chmod 600 ~/.roborev/roborev.pem
@@ -167,6 +169,10 @@ The `github_app_private_key` field accepts:
 - A file path: `~/.roborev/roborev.pem` (tilde is expanded)
 - An environment variable: `${ROBOREV_APP_KEY}` (expands to a path or inline PEM content)
 - Inline PEM content (starting with `-----BEGIN`)
+
+:::caution[Avoid inline PEM in config files]
+Prefer a file path or `${ENV_VAR}` reference over inline PEM content. Inline keys are easy to commit to version control accidentally. Make sure your config file is excluded from VCS (the global config at `~/.roborev/config.toml` is outside your repo by default).
+:::
 
 App auth requires `github_app_id`, `github_app_private_key`, and at least one installation ID (either `github_app_installation_id` or entries in `github_app_installations`). If none are configured, the poller falls back to your personal `gh` auth.
 
@@ -235,7 +241,7 @@ agents = ["codex"]              # which agents to use (or omit for auto-detect)
 review_types = ["security"]     # "security", "design", or "default"
 ```
 
-> `"default"` is the standard code review (bugs, testing gaps, code quality) — the same review you get with `roborev review` without `--type`. The aliases `"review"` and `"general"` are also accepted for backward compatibility.
+> `"default"` runs the standard code review (bugs, security, testing gaps, regressions, code quality), the same as `roborev review` without `--type`. The aliases `"review"` and `"general"` are also accepted. Note that the CI config defaults to `["security"]` if `review_types` is not set.
 
 No `github_app_*` fields needed. The daemon posts comments using whatever account `gh auth` is logged in as.
 
@@ -277,7 +283,8 @@ If you manage the daemon with systemd or launchd, use `roborev init --no-daemon`
 **macOS (launchd):**
 
 ```bash
-# Create a plist - adjust the path to the roborev binary
+# Create log directory and plist (adjust the path to the roborev binary)
+mkdir -p ~/Library/Logs/roborev
 cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -296,9 +303,9 @@ cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << 'EOF'
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/tmp/roborev-daemon.log</string>
+    <string>/Users/YOU/Library/Logs/roborev/daemon.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/roborev-daemon.log</string>
+    <string>/Users/YOU/Library/Logs/roborev/daemon.log</string>
 </dict>
 </plist>
 EOF
@@ -306,17 +313,22 @@ EOF
 launchctl load ~/Library/LaunchAgents/com.roborev.daemon.plist
 ```
 
+Replace `/Users/YOU` with your home directory. Launchd does not expand `~` in plist values.
+
 **Linux (systemd):**
 
 ```bash
+# Resolve the actual binary path for ExecStart
+ROBOREV_BIN="$(command -v roborev)"
+
 mkdir -p ~/.config/systemd/user
-cat > ~/.config/systemd/user/roborev.service << 'EOF'
+cat > ~/.config/systemd/user/roborev.service << EOF
 [Unit]
 Description=roborev daemon
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/roborev daemon run
+ExecStart=${ROBOREV_BIN} daemon run
 Restart=on-failure
 
 [Install]
@@ -404,7 +416,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `synthesis_agent` | string | | Agent for combining multi-job results |
 | `synthesis_model` | string | | Model override for synthesis |
 
-When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, opencode, cursor, droid.
+When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid.
 
 ### GitHub App Options
 
@@ -558,5 +570,5 @@ model = "claude-sonnet-4-5-20250929"
 
 ## See Also
 
-- [Configuration](/configuration/) - Global and per-repo settings
-- [Event Streaming](/integrations/streaming/) - Stream review events for custom integrations
+- [Configuration](/configuration/): Global and per-repo settings
+- [Event Streaming](/integrations/streaming/): Stream review events for custom integrations

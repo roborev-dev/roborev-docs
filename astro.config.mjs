@@ -5,6 +5,9 @@ export default defineConfig({
   site: 'https://roborev.io',
   redirects: {
     '/integrations/postgres-sync/': '/guides/postgres-sync/',
+    '/agents/modes/': '/guides/custom-tasks/',
+    '/guides/reviewing-branches/': '/guides/reviewing-code/',
+    '/guides/reviewing-dirty/': '/guides/reviewing-code/',
   },
   integrations: [
     starlight({

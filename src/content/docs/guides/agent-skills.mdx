@@ -23,6 +23,10 @@ roborev skills install
 
 ## Usage
 
+:::note[Codex users]
+Replace the leading `/` with `$` in all examples below. For example, use `$roborev:review` instead of `/roborev:review`. See the [syntax table](#agent-specific-syntax) for details.
+:::
+
 ### Review a commit
 
 Request a code review without leaving your agent session:
@@ -56,7 +60,7 @@ Request a design-focused review that evaluates completeness, feasibility, and ta
 /roborev:design-review abc123
 ```
 
-This is a shorthand for `roborev review --wait --type design`. It runs in the background and follows the same pattern as the other review skills.
+Runs `roborev review --wait --type design` in the background, following the same pattern as the other review skills.
 
 ### Design review a branch
 
@@ -144,5 +148,5 @@ For **fully automated** fixing, use `roborev fix --batch` (headless, no agent in
 
 ## See Also
 
-- [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/) - Automated fix loop
-- [Commands Reference](/commands/) - Full command list
+- [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/): Automated fix loop
+- [Commands Reference](/commands/): Full command list

@@ -51,12 +51,18 @@ echo "==> TUI screenshots"
 
 # Start the daemon in the background and wait for it to be ready
 send "roborev daemon run &" Enter
+daemon_ready=false
 for i in $(seq 1 30); do
-    if roborev status 2>/dev/null | grep -q "running"; then
+    if roborev status 2>/dev/null | grep -qE '^Daemon:\s+running\b'; then
+        daemon_ready=true
         break
     fi
     sleep 0.5
 done
+if [[ "$daemon_ready" != "true" ]]; then
+    echo "ERROR: daemon did not become ready within 15s"
+    exit 1
+fi
 
 send "roborev tui" Enter
 wait_until "Queue"

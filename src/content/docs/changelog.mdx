@@ -5,28 +5,6 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
-## 0.32
-<small>2026-02-14</small>
-
-**New features**
-
-- Unified tree-style filter in TUI replacing separate repo and branch modals. Repos are expandable nodes with branches lazy-loaded on demand.
-- Search in filter view matches branch names across all repos, triggering background lazy loads for unloaded branches.
-- `b` key shortcut opens filter with branches auto-expanded for the current repo.
-- Current working directory repo and branch sort to top of the filter tree.
-
-**Improvements**
-
-- Left-arrow collapse works during active search, overriding search auto-expansion.
-- Search-triggered branch loads do not permanently expand repos; only user-initiated expansion persists.
-- Branch fetch errors surface through connection tracking and reconnect logic instead of being silently dropped.
-
-**Internal**
-
-- Slow tests moved behind `//go:build integration` tag; shared RSA key generation via `sync.Once`.
-
----
-
 ## 0.31
 <small>2026-02-11</small>
 

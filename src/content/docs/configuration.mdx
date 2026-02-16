@@ -43,7 +43,7 @@ Values are automatically coerced to the correct type:
 |-------------|-------------|---------|
 | string | as-is | `codex` |
 | integer | decimal number | `8` |
-| boolean | true/false, yes/no, 1/0 | `true` |
+| boolean | true/false, 1/0 | `true` |
 | string array | comma-separated | `"org/repo1,org/repo2"` |
 
 Writes are atomic (temp file + rename) and preserve file permissions: `0600` for global config (which may contain secrets) and `0644` for repo config.
@@ -126,16 +126,32 @@ All public APIs must have documentation comments.
 ### Review Guidelines
 
 Use `review_guidelines` to give the AI reviewer project-specific
-context: suppress irrelevant warnings, enforce conventions, or add
-domain-specific criteria:
+context: suppress irrelevant warnings, enforce conventions, or
+describe trust boundaries and architecture so the reviewer doesn't
+flag non-issues:
 
 ```toml
 review_guidelines = """
-This is a CLI tool - no web security concerns.
+This is a local CLI tool. The daemon runs on localhost and all
+displayed data originates from the user's own filesystem and git
+repos. Do not flag injection or sanitization for data that never
+crosses a trust boundary.
+
 Performance is critical - flag any O(n^2) or worse algorithms.
 All error messages must be user-friendly.
 """
 ```
+
+Guidelines are included in the review prompt, so they shape what the
+reviewer flags and what it ignores. Common uses:
+
+- **Trust boundaries**: Describe where untrusted data enters the
+  system so the reviewer doesn't flag sanitization for trusted paths.
+- **Architecture constraints**: Note that the daemon and client evolve
+  in lockstep, that backward compatibility isn't required, etc.
+- **Suppress noise**: Tell the reviewer to skip narrow-terminal
+  overflow, localhost rate-limiting, or other non-issues for your
+  project.
 
 ### Workflow-Specific Agent and Model
 
@@ -154,7 +170,7 @@ refine_agent_thorough = "codex"
 refine_model_thorough = "gpt-5.2-codex"
 ```
 
-Base keys (`review_model`, `refine_agent`, `fix_agent`, `security_agent`, `design_model`) set the default for each workflow. Level-specific keys override for that reasoning level:
+Base keys use the pattern `{workflow}_agent` and `{workflow}_model` (e.g. `review_model`, `refine_agent`, `fix_agent`, `security_agent`, `design_model`) to set the default for each workflow. Level-specific keys override for a given reasoning level:
 - `{workflow}_model_{level}` or `{workflow}_agent_{level}`
 - `workflow` is `review`, `refine`, `fix`, `security`, or `design`
 - `level` is `thorough`, `standard`, or `fast`

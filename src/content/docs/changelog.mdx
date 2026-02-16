@@ -5,6 +5,30 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.32
+<small>2026-02-16</small>
+
+**New features**
+
+- `roborev wait` command to block until a review job completes, improving scripting and CI flows.
+- Refine targeting flags so you can run `roborev refine` against specific findings.
+- Unified TUI tree filter with lazy branch loading, search, and current-directory prioritization.
+
+**Improvements**
+
+- Improved TUI hint bar to make available actions clearer.
+- Removed the hardcoded OpenCode model so model selection follows your configuration.
+- Updated `flake.nix` to `v0.31.1` for Nix-based setups.
+
+**Bug fixes**
+
+- Fixed TUI Cursor cancel behavior and corrected addressed-stats display.
+- Fixed agent prompt handling on Windows to avoid the 32KB command-line limit.
+- Fixed refine loops so git hook failures no longer break execution.
+- Stripped `CLAUDECODE` when spawning the `claude-code` agent to prevent environment leakage.
+
+---
+
 ## 0.31
 <small>2026-02-11</small>
 

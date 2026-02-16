@@ -1,6 +1,7 @@
-# VHS tape for TUI branch filter modal
+# VHS tape for TUI tree filter with branches expanded
 # Run with: vhs tui-branch-filter.tape
-# Shows pressing 'b' to open the branch filter modal
+# Shows pressing 'b' to open the filter with branches pre-expanded,
+# then using search to find a branch.
 
 Output ./output/tui-branch-filter.webm
 
@@ -22,15 +23,15 @@ Sleep 1s
 Show
 Sleep 2s
 
-# Press 'b' to open the branch filter modal
+# Press 'b' to open the filter with branches expanded
 Type "b"
+Sleep 1.5s
+
+# Type a search query to filter branches
+Type "feat"
 Sleep 2s
 
-# Navigate through branches
-Down
-Sleep 500ms
-Down
-Sleep 500ms
+# Navigate search results
 Down
 Sleep 500ms
 Down
@@ -38,9 +39,13 @@ Sleep 500ms
 Up
 Sleep 1s
 
-# Select a branch
+# Select the matching branch
 Enter
-Sleep 8s
+Sleep 2s
+
+# Clear the filter with Esc
+Escape
+Sleep 1.5s
 
 # Quit
 Type "q"

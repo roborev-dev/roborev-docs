@@ -26,11 +26,11 @@ roborev tui
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
-| `f` | Filter by repository |
-| `b` | Filter by branch |
+| `f` | Open filter (repo/branch tree) |
+| `b` | Open filter with branches expanded |
 | `h` | Toggle hide addressed/failed/canceled |
 | `g` | Jump to top of queue |
-| `?` | Show keyboard shortcuts |
+| `?` | Show all commands |
 | `Esc` | Clear filters (one layer at a time) |
 | `q` | Quit |
 
@@ -54,17 +54,27 @@ Output is preserved after job completion, so you can review what happened.
 
 ## Filtering
 
-Press `f` to filter by repository, `b` to filter by branch, or `h` to hide addressed/failed/canceled reviews and focus on items needing attention.
+Press `f` to open the unified filter view, which shows repos as a tree with expandable branch children. Press `b` to open the filter with branches already expanded for the most relevant repo (active filter > current directory > first repo).
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Navigate tree |
+| `Right` | Expand repo to show branches |
+| `Left` | Collapse repo (works during search too) |
+| `Enter` | Apply selected filter |
+| Type text | Search repos and branches |
+| `Backspace` | Delete search character |
+| `Esc` | Close filter |
+
+Branches are lazy-loaded: they fetch from the daemon when you expand a repo or type a search. Searching triggers background branch loads for all repos so matches include branches you haven't expanded yet.
+
+The current working directory's repo sorts to the top of the tree, and its current branch sorts to the top of that repo's branch list.
 
 To start the TUI with addressed items already hidden, set `hide_addressed_by_default = true` in `~/.roborev/config.toml`. To auto-filter to the current repository on startup, set `auto_filter_repo = true`. See [Configuration](/configuration/) for details.
 
 Pressing `h` toggles the hide-addressed filter for the current session without changing the config.
 
 `Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-addressed off directly.
-
-<video src="/tui-filter.webm" autoplay muted loop playsinline />
-
-<video src="/tui-branch-filter.webm" autoplay muted loop playsinline />
 
 ## Review View
 
@@ -80,9 +90,12 @@ Press `Enter` on a job to view its review.
 | `a` | Toggle addressed |
 | `c` | Add comment |
 | `y` | Copy review to clipboard |
+| `x` | Cancel running/queued job |
+| `r` | Rerun completed/failed/canceled job |
+| `t` | View live agent output |
 | `p` | Switch between review/prompt |
 | `m` | View commit message |
-| `?` | Show keyboard shortcuts |
+| `?` | Show all commands |
 | `Esc`, `q` | Back to queue |
 
 ## Prompt View
@@ -95,7 +108,7 @@ Press `p` from the queue view or review view to see the prompt that was sent to 
 | `Left`/`h`, `Right`/`l` | Previous/next prompt |
 | `PgUp`, `PgDn` | Page through content |
 | `p` | Switch between prompt/review |
-| `?` | Show keyboard shortcuts |
+| `?` | Show all commands |
 | `Esc`, `q` | Back to queue |
 
 The prompt header shows the job ID, git ref, and agent. Below the header, the command line used to run the agent is displayed (truncated to terminal width if needed).
@@ -119,9 +132,9 @@ A "Copied to clipboard" message confirms the action. The primary use case is pas
 
 Press `m` from either the queue view or review detail view to see the full commit message for the selected job. This is useful for understanding the context of the changes being reviewed.
 
-## Keyboard Help
+## Keyboard Commands
 
-Press `?` at any time to toggle the keyboard shortcuts help overlay. This displays all available shortcuts for the current view.
+Press `?` at any time to toggle the commands overlay. This displays all available shortcuts for the current view.
 
 <video src="/tui-help.webm" autoplay muted loop playsinline />
 
@@ -183,6 +196,6 @@ If the TUI binary version differs from the running daemon version, a persistent 
 
 ## See Also
 
-- [Commands Reference](/commands/) - Full command list
-- [Responding to Reviews](/guides/responding-to-reviews/) - Add comments to reviews
-- [Event Streaming](/integrations/streaming/) - Programmatic access to events
+- [Commands Reference](/commands/): Full command list
+- [Responding to Reviews](/guides/responding-to-reviews/): Add comments to reviews
+- [Event Streaming](/integrations/streaming/): Programmatic access to events

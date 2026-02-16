@@ -23,6 +23,10 @@ roborev skills install
 
 ## Usage
 
+:::note[Codex users]
+Replace the leading `/` with `$` in all examples below. For example, use `$roborev:review` instead of `/roborev:review`. See the [syntax table](#agent-specific-syntax) for details.
+:::
+
 ### Review a commit
 
 Request a code review without leaving your agent session:
@@ -56,7 +60,7 @@ Request a design-focused review that evaluates completeness, feasibility, and ta
 /roborev:design-review abc123
 ```
 
-This is a shorthand for `roborev review --wait --type design`. It runs in the background and follows the same pattern as the other review skills.
+Runs `roborev review --wait --type design` in the background, following the same pattern as the other review skills.
 
 ### Design review a branch
 
@@ -136,6 +140,21 @@ Skills are installed as agent-specific configuration:
 
 The review skills call `roborev review --wait` to enqueue reviews and wait for results. The fix skills call `roborev show --job <id> --json` to fetch review data, then parse and present findings to the agent in a structured format.
 
+## Waiting for Hook-Triggered Reviews
+
+When a post-commit hook already enqueues reviews, agents don't need
+`roborev review --wait` (which would create a duplicate job). Use
+`roborev wait` instead:
+
+```bash
+git commit -m "Fix auth validation"   # Hook triggers review
+roborev wait --quiet                  # Block until verdict (exit 0=pass, 1=fail)
+```
+
+This is more token-efficient than polling `roborev list` or
+`roborev show` because the agent makes a single blocking call and
+reads the exit code. See [Waiting for a Review Without Enqueuing](/guides/reviewing-code/#waiting-for-a-review-without-enqueuing) for the full flag reference.
+
 ## Interactive vs Automated
 
 Skills provide an **interactive** workflow. The review skills (`/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`) let you request reviews from within your agent session and see results inline. The fix skills (`/roborev:fix`, `/roborev:address`) let your agent address findings while you review the changes before committing.
@@ -144,5 +163,5 @@ For **fully automated** fixing, use `roborev fix --batch` (headless, no agent in
 
 ## See Also
 
-- [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/) - Automated fix loop
-- [Commands Reference](/commands/) - Full command list
+- [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/): Automated fix loop
+- [Commands Reference](/commands/): Full command list

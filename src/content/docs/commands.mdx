@@ -57,6 +57,27 @@ roborev review --type design     # Design-focused review
 
 See: [Reviewing Code](/guides/reviewing-code/)
 
+## Waiting for Reviews
+
+```bash
+roborev wait                     # Wait for most recent job for HEAD
+roborev wait abc123              # Wait for most recent job for commit
+roborev wait 42                  # Job ID (if "42" is not a valid git ref)
+roborev wait --job 42            # Force as job ID
+roborev wait --sha HEAD~1        # Wait for job matching HEAD~1
+roborev wait --quiet             # Suppress output (for hooks/agents)
+```
+
+| Flag | Description |
+|------|-------------|
+| `--sha <ref>` | Git ref to find the most recent job for |
+| `--job` | Force argument to be treated as job ID |
+| `-q, --quiet` | Suppress output (exit code only) |
+
+Unlike `roborev review --wait`, this does not enqueue a new review. It waits for an already-running job, making it useful when a post-commit hook has already triggered the review.
+
+See: [Reviewing Code](/guides/reviewing-code/)
+
 ## Viewing Reviews
 
 ```bash
@@ -104,6 +125,9 @@ roborev refine                   # Fix failed reviews on branch
 roborev refine --max-iterations 5
 roborev refine --since HEAD~3    # Refine specific range
 roborev refine --quiet           # Show elapsed time only
+roborev refine --list            # Preview what would be refined
+roborev refine --all-branches    # Refine all branches with failures
+roborev refine --branch feature  # Validate branch before refining
 ```
 
 | Flag | Description |
@@ -112,8 +136,12 @@ roborev refine --quiet           # Show elapsed time only
 | `-m, --model <model>` | Model to use (format varies by agent) |
 | `--reasoning <level>` | Set reasoning depth |
 | `--fast` | Shorthand for `--reasoning fast` |
-| `--max-iterations <n>` | Limit fix attempts (default: 3) |
+| `--max-iterations <n>` | Limit fix attempts (default: 10) |
 | `--since <commit>` | Refine commits since specific commit |
+| `--branch <name>` | Validate current branch before refining |
+| `--all-branches` | Discover and refine all branches with failed reviews |
+| `--list` | List failed reviews that would be refined without running |
+| `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--quiet` | Only show progress/elapsed time |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
 

@@ -15,6 +15,9 @@ roborev refine --quiet               # Show elapsed time instead of agent output
 roborev refine --reasoning thorough  # Thorough reasoning (slower, more accurate)
 roborev refine --since abc123        # Refine commits since a specific commit
 roborev refine --since HEAD~3        # Refine the last 3 commits
+roborev refine --list                # Preview which reviews would be refined
+roborev refine --all-branches        # Refine all branches with failed reviews
+roborev refine --branch feature-xyz  # Validate branch before refining
 ```
 
 ## How It Works
@@ -74,7 +77,57 @@ If the agent makes no changes for a review, that review is skipped and refine mo
 | `--reasoning <level>` | Reasoning depth: fast, standard, thorough |
 | `--fast` | Shorthand for `--reasoning fast` |
 | `--since <commit>` | Refine commits since a specific commit |
+| `--branch <name>` | Validate the current branch before refining (guardrail, does not switch branches) |
+| `--all-branches` | Discover all branches with failed reviews and refine each one in sequence |
+| `--list` | List failed reviews that would be refined, without running |
+| `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
+
+Some flags are mutually exclusive: `--all-branches` cannot be combined with `--branch` or `--since`, and `--list` cannot be combined with `--since`.
+
+## Targeting
+
+### Single Branch (default)
+
+By default, refine operates on the current feature branch, comparing against the default branch to find the merge-base.
+
+### Specific Range
+
+Use `--since` to refine commits since a specific point on any branch, including main:
+
+```bash
+roborev refine --since HEAD~3
+roborev refine --since v1.0.0
+```
+
+### All Branches
+
+Use `--all-branches` to discover every branch with unaddressed failed reviews and refine them in sequence. Refine checks out each branch, runs the loop, then restores the original branch when finished:
+
+```bash
+roborev refine --all-branches
+roborev refine --all-branches --newest-first
+```
+
+### Preview
+
+Use `--list` to see which reviews would be refined without running any agents:
+
+```bash
+roborev refine --list                    # Current branch
+roborev refine --list --all-branches     # All branches
+roborev refine --list --newest-first     # Newest first
+```
+
+### Branch Validation
+
+Use `--branch` as a guardrail to confirm you're on the expected branch before a long-running refine:
+
+```bash
+roborev refine --branch feature-xyz
+```
+
+This errors if the current branch doesn't match, preventing accidental refinement of the wrong branch.
 
 ## Requirements
 
@@ -104,6 +157,6 @@ The risk is equivalent to running `claude --dangerously-skip-permissions` or `co
 
 ## See Also
 
-- [Assisted Refactoring](/guides/assisted-refactoring/) - One-shot fix and analysis workflows
-- [Custom Tasks & Agentic Mode](/guides/custom-tasks/) - Review vs agentic mode details
-- [Agent Skills](/guides/agent-skills/) - Fix findings interactively
+- [Assisted Refactoring](/guides/assisted-refactoring/): One-shot fix and analysis workflows
+- [Custom Tasks & Agentic Mode](/guides/custom-tasks/): Review vs agentic mode details
+- [Agent Skills](/guides/agent-skills/): Fix findings interactively

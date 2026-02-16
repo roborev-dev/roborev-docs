@@ -145,6 +145,43 @@ For `--dirty` reviews, diffs are limited to 200KB since uncommitted changes cann
 
 For committed changes, diffs over 250KB are omitted from the prompt - the agent is given only the commit hash and can inspect changes using `git show`.
 
+## Waiting for a Review Without Enqueuing
+
+When a post-commit hook already triggers `roborev review`, you don't
+need `review --wait` (which enqueues a duplicate job). Use
+`roborev wait` to block until the existing job completes:
+
+```bash
+roborev wait                     # Wait for most recent job for HEAD
+roborev wait abc123              # Wait for job matching a specific commit
+roborev wait --sha HEAD~1        # Explicit git ref
+roborev wait --job 42            # Wait for a specific job ID
+roborev wait --quiet             # Suppress output (exit code only)
+```
+
+Exit codes: 0 for PASS, 1 for FAIL or no job found.
+
+### Argument Resolution
+
+A positional argument is resolved as a git ref first (so numeric SHAs
+like `123456` are handled correctly), then as a numeric job ID. Use
+`--sha` or `--job` to disambiguate when needed.
+
+### Agent Review-Fix Loops
+
+`roborev wait` is designed for coding agents running review-fix
+refinement loops. The agent commits, the hook enqueues the review,
+and the agent calls `wait` to block until the verdict is ready. This
+avoids wasting tokens on repeated `roborev list` or `roborev show`
+invocations.
+
+```bash
+# Typical agent loop
+git commit -m "Fix auth validation"   # Hook triggers review
+roborev wait --quiet                  # Block until verdict
+# Exit code 0 = pass, 1 = fail
+```
+
 ## Addressing Findings
 
 After reviewing, use `roborev fix` to let an agent address any failed reviews:
@@ -157,6 +194,7 @@ roborev fix                      # Address unaddressed reviews
 
 ## See Also
 
-- [Responding to Reviews](/guides/responding-to-reviews/) - Fix findings and add comments
-- [Code Analysis & Refactoring](/guides/assisted-refactoring/) - Targeted analysis with `roborev analyze`
-- [Auto-Fix with Refine](/guides/auto-fixing/) - Automated fix loop
+- [Responding to Reviews](/guides/responding-to-reviews/): Fix findings and add comments
+- [Code Analysis & Refactoring](/guides/assisted-refactoring/): Targeted analysis with `roborev analyze`
+- [Auto-Fix with Refine](/guides/auto-fixing/): Automated fix loop
+- [Agent Skills](/guides/agent-skills/): Review and fix from within an agent session

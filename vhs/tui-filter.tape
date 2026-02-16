@@ -1,6 +1,7 @@
-# VHS tape for TUI repo filter modal
+# VHS tape for TUI unified tree filter
 # Run with: vhs tui-filter.tape
-# Shows pressing 'f' to open the repository filter modal
+# Shows pressing 'f' to open the tree filter, expanding a repo,
+# navigating branches, and selecting a filter.
 
 Output ./output/tui-filter.webm
 
@@ -22,11 +23,19 @@ Sleep 1s
 Show
 Sleep 2s
 
-# Press 'f' to open the repo filter modal
+# Press 'f' to open the unified tree filter
 Type "f"
-Sleep 2s
+Sleep 1.5s
 
-# Navigate through repos
+# Navigate repos
+Down
+Sleep 500ms
+
+# Expand repo to show branches
+Right
+Sleep 1.5s
+
+# Navigate branches
 Down
 Sleep 500ms
 Down
@@ -34,7 +43,7 @@ Sleep 500ms
 Up
 Sleep 1s
 
-# Select a repo
+# Select a branch filter
 Enter
 Sleep 2s
 

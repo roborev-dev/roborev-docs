@@ -125,6 +125,9 @@ roborev refine                   # Fix failed reviews on branch
 roborev refine --max-iterations 5
 roborev refine --since HEAD~3    # Refine specific range
 roborev refine --quiet           # Show elapsed time only
+roborev refine --list            # Preview what would be refined
+roborev refine --all-branches    # Refine all branches with failures
+roborev refine --branch feature  # Validate branch before refining
 ```
 
 | Flag | Description |
@@ -133,8 +136,12 @@ roborev refine --quiet           # Show elapsed time only
 | `-m, --model <model>` | Model to use (format varies by agent) |
 | `--reasoning <level>` | Set reasoning depth |
 | `--fast` | Shorthand for `--reasoning fast` |
-| `--max-iterations <n>` | Limit fix attempts (default: 3) |
+| `--max-iterations <n>` | Limit fix attempts (default: 10) |
 | `--since <commit>` | Refine commits since specific commit |
+| `--branch <name>` | Validate current branch before refining |
+| `--all-branches` | Discover and refine all branches with failed reviews |
+| `--list` | List failed reviews that would be refined without running |
+| `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--quiet` | Only show progress/elapsed time |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
 

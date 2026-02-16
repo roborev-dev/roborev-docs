@@ -5,6 +5,29 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.32
+<small>2026-02-16</small>
+
+**New features**
+
+- `roborev wait` command to block until a review job completes without enqueuing a new one, designed for agent review-fix loops where a post-commit hook already triggers the review.
+- `--branch`, `--all-branches`, `--list`, and `--newest-first` flags on `roborev refine` for targeting specific branches, discovering all branches with failures, and previewing what would be refined.
+
+**Improvements**
+
+- Unified TUI tree filter with search, lazy branch loading, and current-directory prioritization.
+- TUI review view shows action hints (prompt, comment, cancel, rerun, tail, commit message) and renames "help" to "commands" across all views.
+- OpenCode agent respects configured model settings instead of using a hardcoded default.
+- Updated `flake.nix` to v0.31.1.
+
+**Bug fixes**
+
+- Fixed Windows 32KB command-line limit for agent prompts by writing to temp files.
+- Fixed refine-loop interruptions caused by git hook failures during automated commits.
+- Tightened hook failure classification to require installed hooks, preventing false positives from unrelated commit errors (e.g. GPG signing).
+
+---
+
 ## 0.31
 <small>2026-02-11</small>
 

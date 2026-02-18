@@ -11,7 +11,20 @@ All notable changes to roborev, grouped by minor release.
 **New features**
 
 - `roborev compact` command to verify and consolidate unaddressed review findings, reducing false positives and merging related findings from multiple reviews into a single consolidated review.
+- Backup-agent failover: automatically retry failed jobs with a secondary agent when the primary fails (e.g. fall back to Claude Code when Codex rate-limits).
+- GitHub commit status checks: the CI poller posts pending/success/failure statuses on PR commits when GitHub App auth is configured.
+- Ref-aware configuration: the CI poller reads `.roborev.toml` from the PR branch's git ref, so configuration can vary by branch.
 - `--label` flag on `roborev run` for custom labels displayed in the TUI.
+
+**Improvements**
+
+- Consolidated review guidelines for more consistent review output across commands.
+- Hardened CI and hook workflows for more reliable automated runs.
+
+**Bug fixes**
+
+- Post-rewrite hook preserves review history across rebases by remapping commit SHAs when patch content is unchanged.
+- Skip hook upgrade checks in CI mode to avoid CI interruptions.
 
 ---
 

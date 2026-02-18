@@ -271,6 +271,24 @@ command = "test {verdict} = P && ~/hooks/on-pass.sh {job_id} || ~/hooks/on-fail.
 - Hooks pick up config changes via **hot-reload** -- no daemon restart needed
 - Multiple hooks can match the same event; they all fire independently
 
+## Git Hooks
+
+In addition to review event hooks, roborev installs git hooks to integrate with your development workflow. These are managed automatically by `roborev init`.
+
+### Post-Rewrite Hook
+
+The `post-rewrite` hook preserves review history when you rebase or amend commits. Without it, rebasing would orphan your reviews because the commit SHAs change.
+
+When git runs `rebase` or `commit --amend`, the hook receives the old and new SHA pairs and calls `roborev remap`. For each pair, roborev:
+
+1. Computes the patch ID for both the old and new commits
+2. If the patch content is identical (only the SHA changed), updates the review record to point to the new SHA
+3. If the patch content differs (the rebase modified the commit), leaves the review untouched
+
+This means reviews survive clean rebases automatically. If you rebase and resolve conflicts that change a commit's diff, the review for that commit is not remapped (since the code it reviewed no longer matches).
+
+The hook runs silently. If `roborev` is not on `PATH` or the daemon is not running, the hook exits without error and does not block git operations.
+
 ## Debugging
 
 Hook output and errors appear in the daemon log. To watch hooks fire in real time:

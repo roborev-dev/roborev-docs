@@ -272,6 +272,30 @@ Use `roborev status` to check the daemon and queue state at any time.
 The CI poller defaults to `reasoning = "thorough"` for all review jobs. You can override this per-repo with a `[ci]` section in the repo's `.roborev.toml` (see [Per-Repo Overrides](#per-repo-overrides)).
 :::
 
+## Commit Status Checks
+
+When GitHub App authentication is configured, the CI poller posts commit status checks on each PR's head commit. These appear as check entries on the PR and in the commit status list on GitHub.
+
+The status context is `roborev` and progresses through these states:
+
+| State | When |
+|-------|------|
+| `pending` | Review jobs are queued or running |
+| `success` | All reviews passed |
+| `failure` | One or more reviews found issues or failed |
+
+Status checks require the **Commit statuses: Read and write** permission on your GitHub App. If you created the app following the setup guide above, add this permission:
+
+1. Open your GitHub App settings and go to **Permissions & events**
+2. Under **Repository permissions**, set **Commit statuses** to **Read and write**
+3. Save and accept the updated permissions on each installation
+
+If no GitHub App is configured, or the app lacks the commit statuses permission, status checks are silently skipped. PR comments are still posted regardless.
+
+:::note
+Status checks are posted per-commit, not per-job. When a multi-agent matrix produces several jobs for the same PR, the status reflects the aggregate result: `success` only if all jobs pass.
+:::
+
 ## Keeping the Daemon Running
 
 `roborev daemon start` runs the daemon in the background, but it won't survive a reboot. For persistent operation, set up a system service.

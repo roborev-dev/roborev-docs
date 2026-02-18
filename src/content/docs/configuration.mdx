@@ -121,6 +121,12 @@ All public APIs must have documentation comments.
 | `design_agent_<level>` | string | Agent for design reviews at specific reasoning level |
 | `design_model` | string | Model for design reviews |
 | `design_model_<level>` | string | Model for design reviews at specific reasoning level |
+| `backup_agent` | string | Fallback agent if primary fails |
+| `review_backup_agent` | string | Fallback agent for reviews |
+| `refine_backup_agent` | string | Fallback agent for refine |
+| `fix_backup_agent` | string | Fallback agent for fix |
+| `security_backup_agent` | string | Fallback agent for security reviews |
+| `design_backup_agent` | string | Fallback agent for design reviews |
 | `review_guidelines` | string | Project-specific guidelines for the reviewer |
 
 ### Review Guidelines
@@ -178,6 +184,42 @@ Base keys use the pattern `{workflow}_agent` and `{workflow}_model` (e.g. `revie
 The fallback hierarchy for each workflow is:
 - **CLI flag** > **repo `{workflow}_agent_{level}`** > **repo `{workflow}_agent`** > **repo `agent`** > **global `{workflow}_agent_{level}`** > **global `{workflow}_agent`** > **global `default_agent`** > `codex`
 
+### Backup Agents
+
+If the primary agent fails (rate limits, network errors, crashes), roborev can automatically retry the job with a backup agent. This is useful when your primary agent has usage caps. For example, Codex plans often hit rate limits during heavy review sessions, so falling back to Claude Code keeps reviews flowing.
+
+```toml
+# ~/.roborev/config.toml
+default_agent = "codex"
+default_backup_agent = "claude-code"  # Fallback for any workflow
+```
+
+You can also set backup agents per workflow:
+
+```toml
+# ~/.roborev/config.toml
+review_backup_agent = "claude-code"   # Fallback for reviews
+refine_backup_agent = "codex"         # Fallback for refine
+fix_backup_agent = "claude-code"      # Fallback for fix
+```
+
+Per-repo overrides work the same way in `.roborev.toml`:
+
+```toml
+# .roborev.toml
+backup_agent = "claude-code"          # Repo-level fallback
+review_backup_agent = "gemini"        # Workflow-specific override
+```
+
+When a job fails with an agent error (not a review finding), roborev resolves the backup agent in this order:
+
+1. Repo-level workflow-specific backup (e.g. `review_backup_agent` in `.roborev.toml`)
+2. Repo-level generic `backup_agent`
+3. Global workflow-specific backup (e.g. `review_backup_agent` in `config.toml`)
+4. Global `default_backup_agent`
+
+If a backup agent is found and installed, the job is retried with that agent. The failover is logged in the daemon output. If no backup is configured or the backup agent isn't installed, the job fails normally.
+
 ### Excluded Branches
 
 Skip automatic reviews on work-in-progress branches:
@@ -208,6 +250,7 @@ tab_width = 4                     # Tab expansion width for code blocks in TUI (
 | Option | Type | Default | Description | Hot-Reload |
 |--------|------|---------|-------------|------------|
 | `default_agent` | string | auto-detect | Default AI agent to use | Yes |
+| `default_backup_agent` | string | - | Fallback agent when the primary fails | Yes |
 | `default_model` | string | agent default | Model to use (format varies by agent) | Yes |
 | `server_addr` | string | 127.0.0.1:7373 | Daemon listen address | No |
 | `max_workers` | int | 4 | Number of parallel review workers | No |

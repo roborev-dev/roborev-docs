@@ -53,6 +53,7 @@ roborev review --type design     # Design-focused review
 | `--type <type>` | Review type (`security`, `design`) — changes system prompt |
 | `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
 | `--fast` | Shorthand for `--reasoning fast` |
+| `--local` | Run review locally without the daemon (streams output to console) |
 | `--repo <path>` | Specify repository path |
 
 See: [Reviewing Code](/guides/reviewing-code/)
@@ -94,6 +95,7 @@ roborev tail <job_id>            # View live agent output
 |------|-------------|
 | `--job` | Force interpretation as job ID |
 | `--prompt` | Show the prompt sent to the agent instead of the review output |
+| `--json` | Output as JSON for machine-readable workflows |
 
 See: [Terminal UI](/integrations/tui/)
 
@@ -170,6 +172,38 @@ roborev fix --list                 # List unaddressed reviews without fixing
 
 See: [Assisted Refactoring](/guides/assisted-refactoring/)
 
+## Consolidating Reviews
+
+```bash
+roborev compact                              # Enqueue consolidation (background)
+roborev compact --wait                       # Wait for completion
+roborev compact --branch main                # Compact jobs on main branch
+roborev compact --all-branches               # Compact jobs across all branches
+roborev compact --dry-run                    # Show what would be done
+roborev compact --limit 10                   # Process at most 10 jobs
+roborev compact --agent claude-code          # Use specific agent for verification
+roborev compact --reasoning thorough         # Use thorough reasoning level
+```
+
+| Flag | Description |
+|------|-------------|
+| `--wait` | Block until consolidation completes |
+| `--branch <name>` | Filter by branch (default: current branch) |
+| `--all-branches` | Compact jobs across all branches |
+| `--dry-run` | Preview what would be done without running |
+| `--limit <n>` | Maximum number of jobs to process (default: 20) |
+| `--agent <name>` | Agent for verification |
+| `-m, --model <model>` | Model to use |
+| `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
+| `--timeout <duration>` | Timeout for `--wait` mode (default: 10m) |
+| `--quiet` | Suppress progress output |
+
+Compact discovers unaddressed completed reviews, sends them to an agent for verification against the current codebase, and consolidates related findings into a single review job. Original jobs are automatically marked as addressed when consolidation finishes. This adds a quality layer between `review` and `fix` to reduce false positives.
+
+:::note
+Avoid running multiple compact commands concurrently on the same branch. The operation is not atomic and concurrent runs can produce inconsistent state.
+:::
+
 ## Code Analysis
 
 ```bash
@@ -217,6 +251,7 @@ cat review-checklist.txt | roborev run --wait
 | `--reasoning <level>` | Set reasoning depth |
 | `--agentic, --yolo` | Enable agentic mode (can modify files) |
 | `--no-context` | Don't include repository context |
+| `--label <string>` | Custom label displayed in TUI (default: `run`) |
 
 See: [Custom Agent Tasks](/guides/custom-tasks/)
 

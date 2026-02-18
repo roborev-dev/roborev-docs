@@ -211,7 +211,7 @@ nav a[aria-current="page"] {
 
 #quick-start ~ .expressive-code pre code,
 #quick-start + .expressive-code pre code {
-  font-size: 1.1rem !important;
+  font-size: inherit !important;
 }
 
 #quick-start ~ .expressive-code .copy,
@@ -264,7 +264,7 @@ nav a[aria-current="page"] {
 
   #quick-start ~ .expressive-code pre code,
   #quick-start + .expressive-code pre code {
-    font-size: 0.875rem !important;
+    font-size: inherit !important;
   }
 
   #quick-start ~ .expressive-code pre,

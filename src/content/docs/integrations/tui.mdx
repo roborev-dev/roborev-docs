@@ -26,6 +26,8 @@ roborev tui
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
+| `F` | Launch fix job (completed reviews) |
+| `T` | Switch to Tasks view |
 | `f` | Open filter (repo/branch tree) |
 | `b` | Open filter with branches expanded |
 | `h` | Toggle hide addressed/failed/canceled |
@@ -97,6 +99,36 @@ Press `Enter` on a job to view its review.
 | `m` | View commit message |
 | `?` | Show all commands |
 | `Esc`, `q` | Back to queue |
+
+## Fix Jobs
+
+Press `F` on a completed review to launch a background fix job. A prompt modal opens where you can optionally provide custom instructions for the fix agent.
+
+The fix runs in an isolated git worktree checked out at the reviewed commit (not HEAD), so the patch is always generated against the correct revision. This prevents conflicts when the working tree has moved on since the review.
+
+Results appear in the Tasks view (`T`). While the fix runs, you can continue browsing reviews normally.
+
+## Tasks View
+
+Press `T` from the queue view to switch to the Tasks view, which shows all fix jobs and their status.
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Navigate tasks |
+| `Enter` / `t` | View output (live for running, result for done, error for failed) |
+| `p` | View patch diff |
+| `A` | Apply patch to working tree |
+| `R` | Re-run fix against current HEAD (rebase) |
+| `x` | Cancel queued/running job |
+| `r` | Refresh task list |
+| `T` / `Esc` | Return to queue |
+| `?` | Toggle help |
+
+## Applying and Rebasing Patches
+
+Press `A` on a completed fix job to apply the generated patch and commit it to your working tree. The parent review is automatically marked as addressed when the patch is applied.
+
+If the patch conflicts with the current state of your working tree (e.g. because new commits landed after the review), roborev offers to re-run the fix against current HEAD. Press `R` to trigger a rebase: the agent receives the original patch as context and produces a new patch targeting the current code.
 
 ## Prompt View
 

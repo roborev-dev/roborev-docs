@@ -64,15 +64,15 @@ Before enabling the CI poller, you need:
 
    If your organization uses SSO with personal auth, make sure your token is authorized for SSO access. The daemon runs long-lived. If your `gh` token expires while the daemon is running, the poller will log errors and skip repos until you re-authenticate.
 
-2. **A local checkout** of each repo you want to poll, registered with roborev:
+2. **A local checkout** of each repo you want to poll (optional for CI-only setups):
    ```bash
    cd /path/to/myrepo
    roborev init              # starts daemon automatically
    roborev init --no-daemon  # if using systemd/launchd to manage the daemon
    ```
-   The poller matches GitHub repos to local checkouts by git remote URL. If `roborev init` hasn't been run for a repo, the poller will log `no local repo found matching "owner/repo"` and skip it.
+   The poller matches GitHub repos to local checkouts by git remote URL. If no local checkout is found, the poller automatically clones the repo to `~/.roborev/clones/{owner}/{repo}` and uses that clone for reviews. A missing git origin remote is treated as a confirmed mismatch (triggering auto-clone) rather than a transient error.
 
-   The checkout must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
+   If you do provide a local checkout, it must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
 
 3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`. You can check what's available with:
    ```bash
@@ -424,6 +424,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `agents` | array | global `agents` | Agents for CI reviews of this repo |
 | `review_types` | array | global `review_types` | Review types for CI reviews of this repo |
 | `reasoning` | string | `"thorough"` | Reasoning level: `thorough`, `standard`, or `fast` |
+| `min_severity` | string | `"low"` | Minimum severity to include: `low`, `medium`, `high`, or `critical` |
 
 ## CI Options Reference
 
@@ -437,6 +438,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `review_types` | array | `["security"]` | Review types to run for each PR: `security`, `design`, or `default`. `"review"` and `"general"` are accepted as aliases for `"default"`. |
 | `agents` | array | auto-detect | Agents to run for each PR (e.g., `["codex", "gemini"]`) |
 | `model` | string | | Model override for CI reviews |
+| `min_severity` | string | `"low"` | Minimum severity to include in output: `low`, `medium`, `high`, or `critical` |
 | `synthesis_agent` | string | | Agent for combining multi-job results |
 | `synthesis_model` | string | | Model override for synthesis |
 
@@ -591,6 +593,123 @@ review_types = ["security"]
 agents = ["claude-code"]
 model = "claude-sonnet-4-5-20250929"
 ```
+
+## Quota Handling
+
+When an agent hits a hard rate or quota limit, roborev puts that agent into a timed cooldown instead of failing the review immediately.
+
+| Setting | Default | Range |
+|---------|---------|-------|
+| Cooldown duration | 30 minutes | 1 minute to 24 hours |
+
+During cooldown:
+
+- The agent is skipped for new jobs. CI comments show "skipped (quota)" for that agent instead of "failed".
+- If a backup agent is configured (see [Backup Agents](/configuration/#backup-agents)) and is not also in cooldown, the job is retried with the backup agent automatically.
+- Commit status is set to `success` when all agents in a batch were skipped due to quota. This prevents quota exhaustion from blocking PRs.
+- The cooldown timer resets each time the agent hits a quota error, so persistent overuse keeps the agent paused.
+
+No configuration is needed. Quota detection and cooldown are automatic. The daemon logs cooldown start and end events so you can monitor agent availability.
+
+## CI Review (GitHub Actions)
+
+The CI poller described above runs inside the roborev daemon as a background service. For teams that prefer a stateless, daemon-free approach, `roborev ci review` runs reviews directly inside a GitHub Actions workflow.
+
+### When to Use Each Approach
+
+| | Daemon CI Poller | `ci review` in GitHub Actions |
+|---|---|---|
+| **Runs on** | Your machine or server (daemon) | GitHub-hosted runners |
+| **State** | SQLite database tracks reviewed SHAs | Stateless; runs on every trigger |
+| **Setup** | `~/.roborev/config.toml` with `[ci]` | GitHub Actions workflow file |
+| **Best for** | Continuous polling, centralized review | Per-PR checks, no infrastructure |
+
+### Quickstart with `init gh-action`
+
+The fastest way to set up CI reviews is with the workflow generator:
+
+```bash
+cd your-repo
+roborev init gh-action --agent claude-code
+```
+
+This creates `.github/workflows/roborev.yml`. Commit and push it, then add your agent's API key as a repository secret.
+
+### Required Repository Secrets
+
+Each agent needs its API key as a repository secret:
+
+| Agent | Secret Name |
+|-------|-------------|
+| Claude Code | `ANTHROPIC_API_KEY` |
+| Codex | `OPENAI_API_KEY` |
+| Gemini | `GOOGLE_API_KEY` |
+
+Add secrets in your repository's **Settings > Secrets and variables > Actions**.
+
+### How the Generated Workflow Works
+
+The generated workflow triggers on `pull_request` events and:
+
+1. Checks out the PR branch with full history
+2. Downloads the pinned roborev binary and verifies its SHA256 checksum
+3. Runs `roborev ci review --comment` with the configured agents
+4. Posts review results as a PR comment
+
+In GitHub Actions, `ci review` reads `GITHUB_REPOSITORY`, `GITHUB_REF`, and `GITHUB_EVENT_PATH` automatically, so no flags are needed beyond `--comment`.
+
+### Customizing via `.roborev.toml`
+
+The `ci review` command reads the repo's `.roborev.toml` for CI-specific settings:
+
+```toml
+# .roborev.toml
+[ci]
+review_types = ["security", "default"]
+reasoning = "thorough"
+min_severity = "medium"
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `review_types` | array | `["security"]` | Review types to run |
+| `reasoning` | string | `"thorough"` | Reasoning level |
+| `min_severity` | string | `"low"` | Minimum severity to include in output |
+
+### Manual Workflow Setup
+
+If you prefer full control over the workflow, create `.github/workflows/roborev.yml` manually:
+
+```yaml
+name: roborev
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install roborev
+        run: |
+          curl -fsSL https://roborev.dev/install.sh | bash
+          echo "$HOME/.roborev/bin" >> "$GITHUB_PATH"
+
+      - name: Run review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: roborev ci review --comment --agent claude-code
+```
+
+Adjust the agent and secrets to match your setup. For multi-agent reviews, pass `--agent` multiple times or use `--review-types` to run different review types.
 
 ## See Also
 

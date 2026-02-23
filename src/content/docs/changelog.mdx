@@ -15,12 +15,18 @@ All notable changes to roborev, grouped by minor release.
 - TUI fix jobs: press `F` on a completed review to launch a background fix in an isolated worktree. New Tasks view (`T`) for managing fix jobs and applying patches.
 - CI poller auto-clone: repos in `ci.repos` no longer require a local `roborev init` checkout. The poller clones them automatically to `~/.roborev/clones/`.
 - Quota-aware agent cooldown: agents that hit hard quota limits enter a timed cooldown (default 30 min) with automatic failover to backup agents. CI comments show "skipped (quota)" instead of "failed".
+- Daemon activity logging for better operational visibility.
+
+**Improvements**
+
+- Review verdicts are stored for reuse in later review workflows.
 
 **Bug fixes**
 
 - Fix jobs now create worktrees at the reviewed commit instead of HEAD, preventing patches against the wrong revision.
 - Database migration no longer crashes on databases with quoted table names from prior ALTER TABLE migrations.
 - Missing git origin remote treated as confirmed mismatch for auto-clone instead of a transient error.
+- Fixed a data race between `WorkerPool.Start` and `WorkerPool.Stop`.
 
 ---
 

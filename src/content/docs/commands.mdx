@@ -88,7 +88,7 @@ roborev show <job_id>            # Show review by job ID
 roborev show --job <id>          # Force interpretation as job ID
 roborev show --prompt <job_id>   # Show the prompt sent to the agent
 roborev tui                      # Interactive browser
-roborev tail <job_id>            # View live agent output
+roborev log <job_id>             # View job log
 ```
 
 | Flag | Description |
@@ -100,8 +100,28 @@ roborev tail <job_id>            # View live agent output
 See: [Terminal UI](/integrations/tui/)
 
 :::tip
-Press `t` in the TUI on a running job to view live agent output, similar to `tail -f`.
+Press `l` in the TUI to open the log viewer for any job (running or completed).
 :::
+
+## Job Logs
+
+```bash
+roborev log <job-id>             # Human-friendly rendered output
+roborev log --raw <job-id>       # Raw NDJSON bytes
+roborev log --path <job-id>      # Print the log file path
+
+roborev log clean                # Remove logs older than 7 days
+roborev log clean --days 3       # Remove logs older than 3 days
+```
+
+| Flag | Description |
+|------|-------------|
+| `--raw` | Print raw NDJSON without formatting |
+| `--path` | Print the log file path instead of contents |
+
+Job logs are persisted to `~/.roborev/logs/jobs/` so agent output remains available after daemon restarts. By default, `roborev log` renders NDJSON into compact, human-readable progress lines showing tool calls and agent text. Use `--raw` for the original NDJSON when scripting or debugging.
+
+The `clean` subcommand removes log files older than the specified number of days (default: 7).
 
 ## Commenting on Reviews
 

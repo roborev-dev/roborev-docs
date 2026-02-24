@@ -18,7 +18,7 @@ roborev tui
 | `Up`/`k`, `Down`/`j` | Navigate jobs |
 | `PgUp`, `PgDn` | Page through list |
 | `Enter` | View review |
-| `t` | View live agent output (running jobs) |
+| `l` | View job log |
 | `p` | View prompt |
 | `m` | View commit message |
 | `a` | Toggle addressed |
@@ -36,23 +36,29 @@ roborev tui
 | `Esc` | Clear filters (one layer at a time) |
 | `q` | Quit |
 
-## Tail View (Live Agent Output)
+## Log View
 
-Press `t` on a running job to view live agent output in real-time, similar to `tail -f`.
+Press `l` from the queue view, review view, or prompt view to open the log viewer. For running jobs, the view streams live output as it arrives. Logs are persisted to disk, so they remain available after the job completes and across daemon restarts.
 
 | Key | Action |
 |-----|--------|
 | `Up`/`k`, `Down`/`j` | Scroll output |
 | `PgUp`, `PgDn` | Page through output |
-| `g` | Toggle follow mode / jump to top/bottom |
-| `Esc`, `q` | Back to queue |
+| `Home` | Jump to top |
+| `End` | Jump to bottom (enables follow mode) |
+| `g` | Toggle between top and bottom |
+| `Left`, `Right` | Previous/next job log |
+| `x` | Cancel running job |
+| `?` | Show all commands |
+| `Esc`, `q` | Back to previous view |
 
-The tail view features:
-- **Follow mode**: Auto-scrolls to show new output as it arrives (toggle with `g`)
-- **Memory-bounded**: Output is buffered with per-job and global limits
-- **Agent normalization**: Output from different agents is normalized to a consistent format
+The log view features:
 
-Output is preserved after job completion, so you can review what happened.
+- **Follow mode**: When a job is still running, the view polls for new output and auto-scrolls to the bottom. Scrolling up disables follow mode; pressing `End` or `g` re-enables it.
+- **Incremental fetching**: Only new bytes since the last fetch are downloaded, keeping the view responsive for long-running jobs.
+- **Formatted output**: NDJSON agent output is rendered as compact progress lines showing tool calls (file reads, edits, bash commands) with a gutter prefix for visual grouping.
+
+Logs are stored in `~/.roborev/logs/jobs/` and can also be viewed from the CLI with `roborev log <job-id>`. Use `roborev log clean` to remove old log files.
 
 ## Filtering
 
@@ -94,7 +100,7 @@ Press `Enter` on a job to view its review.
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
-| `t` | View live agent output |
+| `l` | View job log |
 | `p` | Switch between review/prompt |
 | `m` | View commit message |
 | `?` | Show all commands |
@@ -115,7 +121,7 @@ Press `T` from the queue view to switch to the Tasks view, which shows all fix j
 | Key | Action |
 |-----|--------|
 | `Up`/`k`, `Down`/`j` | Navigate tasks |
-| `Enter` / `t` | View output (live for running, result for done, error for failed) |
+| `Enter` / `l` | View output (live for running, result for done, error for failed) |
 | `p` | View patch diff |
 | `A` | Apply patch to working tree |
 | `R` | Re-run fix against current HEAD (rebase) |

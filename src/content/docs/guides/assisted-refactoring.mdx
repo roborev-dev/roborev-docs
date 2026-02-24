@@ -26,7 +26,7 @@ Seven built-in analysis types target common refactoring concerns:
 | `dead-code` | Find unused exports and unreachable code |
 | `architecture` | Review architectural patterns and structure |
 
-List available types with `roborev analyze --list`, or preview a prompt template with `roborev analyze --show-prompt <type>`.
+List available types with `roborev analyze --list`, or preview a prompt template with `roborev analyze --show-prompt <type>`. If you have shell completions enabled, `roborev analyze <TAB>` will suggest analysis types with descriptions.
 
 ## Basic Usage
 
@@ -174,15 +174,17 @@ With `--batch`, all unaddressed reviews are concatenated into a single prompt (r
 
 ## Stream Output
 
-When `roborev fix` or `analyze --fix` runs an agent, output is formatted as compact progress lines showing tool calls:
+When `roborev fix` or `analyze --fix` runs an agent, output is formatted as compact progress lines showing tool calls grouped with a gutter prefix:
 
 ```
-Read   internal/gmail/ratelimit_test.go
-Edit   internal/gmail/ratelimit_test.go
-Bash   go test ./internal/gmail/ -run TestRateLimiter
-Edit   internal/gmail/ratelimit_test.go
-Grep   TODO  internal/
+│ Read   internal/gmail/ratelimit_test.go
+│ Edit   internal/gmail/ratelimit_test.go
+│ Bash   go test ./internal/gmail/ -run TestRateLimiter
+│ Edit   internal/gmail/ratelimit_test.go
+│ Grep   TODO  internal/
 ```
+
+Agent text between tool calls is rendered as wrapped Markdown, adapting to your terminal width and light/dark background.
 
 When piped (non-TTY), raw JSON is passed through for logging or scripting:
 

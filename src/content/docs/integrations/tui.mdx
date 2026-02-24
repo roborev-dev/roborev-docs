@@ -18,6 +18,7 @@ roborev tui
 | `Up`/`k`, `Down`/`j` | Navigate jobs |
 | `PgUp`, `PgDn` | Page through list |
 | `Enter` | View review |
+| `l` | View job log (persisted output) |
 | `t` | View live agent output (running jobs) |
 | `p` | View prompt |
 | `m` | View commit message |
@@ -53,6 +54,30 @@ The tail view features:
 - **Agent normalization**: Output from different agents is normalized to a consistent format
 
 Output is preserved after job completion, so you can review what happened.
+
+## Log View (Persisted Output)
+
+Press `l` from the queue view, review view, or prompt view to open the log viewer. Unlike the tail view (which streams from the daemon's in-memory buffer), the log view reads from persisted log files on disk, so it works for any job whose logs have been saved, even after a daemon restart.
+
+| Key | Action |
+|-----|--------|
+| `Up`/`k`, `Down`/`j` | Scroll output |
+| `PgUp`, `PgDn` | Page through output |
+| `Home` | Jump to top |
+| `End` | Jump to bottom (enables follow mode) |
+| `g` | Toggle between top and bottom |
+| `Left`, `Right` | Previous/next job log |
+| `x` | Cancel running job |
+| `?` | Show all commands |
+| `Esc`, `q` | Back to previous view |
+
+The log view features:
+
+- **Follow mode**: When a job is still running, the view polls for new output and auto-scrolls to the bottom. Scrolling up disables follow mode; pressing `End` or `g` re-enables it.
+- **Incremental fetching**: Only new bytes since the last fetch are downloaded, keeping the view responsive for long-running jobs.
+- **Formatted output**: NDJSON agent output is rendered as compact progress lines showing tool calls (file reads, edits, bash commands) with a gutter prefix for visual grouping.
+
+Logs are stored in `~/.roborev/logs/jobs/` and can also be viewed from the CLI with `roborev log <job-id>`. Use `roborev log clean` to remove old log files.
 
 ## Filtering
 
@@ -94,6 +119,7 @@ Press `Enter` on a job to view its review.
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
+| `l` | View job log (persisted output) |
 | `t` | View live agent output |
 | `p` | Switch between review/prompt |
 | `m` | View commit message |

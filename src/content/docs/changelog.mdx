@@ -5,6 +5,27 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.35
+<small>2026-02-23</small>
+
+**New features**
+
+- Shell completion for `roborev analyze` command types: tab-complete analysis type names (e.g. `roborev analyze <TAB>` suggests `refactor`, `complexity`, etc.).
+- Persistent job logs: agent output is written to `~/.roborev/logs/jobs/` as NDJSON so review activity survives daemon restarts.
+- Unified log viewer: `roborev log <job-id>` renders stored job output on the CLI, and pressing `l` in the TUI opens a scrollable log viewer with live polling for running jobs. `roborev log clean` removes old log files.
+
+**Improvements**
+
+- Test and production runtime data are isolated so `go test` runs do not pollute `~/.roborev/` logs or interfere with the production daemon.
+- CLI and TUI streaming output uses gutter-grouped tool calls, markdown text wrapping, and Codex reasoning item rendering for clearer review progress.
+- Updated Nix flake packaging metadata.
+
+**Bug fixes**
+
+- Handle empty Git refs when fixing compact review jobs to prevent fix-flow failures. The server resolves a usable ref from the parent job's branch or falls back to HEAD, and the TUI shows a confirmation modal when no ref is available.
+
+---
+
 ## 0.34
 <small>2026-02-22</small>
 

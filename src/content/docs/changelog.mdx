@@ -5,6 +5,30 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.36
+<small>2026-02-24</small>
+
+**New features**
+
+- `roborev tui --repo` and `--branch` flags to launch the TUI pre-filtered to a specific repository or branch. Without a value, each flag resolves to the current repo/branch. With `=` syntax (e.g. `--repo=/path/to/repo`, `--branch=feature-x`), the value is used directly. When set via flags, the filter is locked and cannot be changed in the TUI.
+- Inline fix panel in the TUI review view: press `F` while viewing a review to open a fix prompt at the bottom of the screen instead of a full-screen modal. `Tab` toggles focus between the review content and the fix input. `Enter` submits, `Esc` cancels.
+- Shell completions for `--agent` and `--reasoning` flags across all commands that accept them (`init`, `review`, `run`, `fix`, `analyze`, `refine`).
+- OpenCode JSON stream support: the OpenCode agent now uses `--format json` for structured JSONL output, integrated into the unified stream formatter for consistent progress rendering.
+- CI repository matching with wildcard patterns and exclusion lists. `ci.repos` entries now support glob patterns (e.g. `"myorg/*"`, `"myorg/api-*"`) using `path.Match` syntax. New `exclude_repos` field filters out matching repos, and `max_repos` (default: 100) caps the total expanded count. Wildcard results are cached for one hour.
+
+**Improvements**
+
+- TUI help bar uses table-based rendering for consistent column alignment across all views.
+- Refreshed project dependencies and Nix flake packaging updates.
+
+**Bug fixes**
+
+- `--all-branches` now implies `--unaddressed` on `roborev fix` and `roborev refine`, removing the need to pass both flags.
+- Patch application in git worktrees resolves the correct worktree path via `git worktree list`, fixing failures when the branch is checked out in a non-default worktree location.
+- Temporary command execution uses explicit file sync and retry with exponential backoff to prevent intermittent `text file busy` (ETXTBSY) races on Linux.
+
+---
+
 ## 0.35
 <small>2026-02-23</small>
 

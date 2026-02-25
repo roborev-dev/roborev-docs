@@ -13,6 +13,8 @@ roborev init [--agent <name>]    # Initialize repo + daemon + hook
 roborev fix                      # Address unaddressed reviews
 roborev status                   # Check daemon and queue
 roborev tui                      # Interactive terminal UI
+                                 # --repo: pre-filter to repo
+                                 # --branch: pre-filter to branch
 roborev version                  # Show version
 ```
 
@@ -88,6 +90,7 @@ roborev show <job_id>            # Show review by job ID
 roborev show --job <id>          # Force interpretation as job ID
 roborev show --prompt <job_id>   # Show the prompt sent to the agent
 roborev tui                      # Interactive browser
+roborev tui --repo --branch      # Pre-filtered to current repo+branch
 roborev log <job_id>             # View job log
 ```
 
@@ -161,7 +164,7 @@ roborev refine --branch feature  # Validate branch before refining
 | `--max-iterations <n>` | Limit fix attempts (default: 10) |
 | `--since <commit>` | Refine commits since specific commit |
 | `--branch <name>` | Validate current branch before refining |
-| `--all-branches` | Discover and refine all branches with failed reviews |
+| `--all-branches` | Discover and refine all branches with failed reviews (implies `--unaddressed`) |
 | `--list` | List failed reviews that would be refined without running |
 | `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--quiet` | Only show progress/elapsed time |
@@ -177,6 +180,7 @@ roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
 roborev fix --batch                # Batch all unaddressed into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
+roborev fix --all-branches         # Fix all unaddressed across all branches
 roborev fix --list                 # List unaddressed reviews without fixing
 ```
 
@@ -187,6 +191,7 @@ roborev fix --list                 # List unaddressed reviews without fixing
 | `--reasoning <level>` | Set reasoning depth |
 | `--quiet` | Suppress agent output |
 | `--unaddressed` | Fix all unaddressed reviews on branch (default when no job IDs given) |
+| `--all-branches` | Include unaddressed jobs from all branches (implies `--unaddressed`) |
 | `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
 | `--list` | List unaddressed reviews with details (job ID, ref, branch, agent, verdict) without running any fixes |
 

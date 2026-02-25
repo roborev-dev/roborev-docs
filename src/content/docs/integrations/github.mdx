@@ -362,6 +362,32 @@ EOF
 systemctl --user enable --now roborev
 ```
 
+## Wildcard Repository Patterns
+
+Instead of listing every repository individually, you can use glob patterns in `ci.repos` to match multiple repos under an owner. The owner part (before the `/`) must be literal.
+
+```toml
+[ci]
+enabled = true
+repos = [
+  "myorg/*",           # All repos under myorg
+  "myorg/api-*",       # Only repos starting with "api-"
+  "other/specific",    # Exact repo still works
+]
+
+# Exclude repos matching these patterns
+exclude_repos = ["myorg/archived-*", "myorg/internal-*"]
+
+# Safety cap on total expanded repos (default: 100)
+max_repos = 50
+```
+
+Patterns use Go's `path.Match` syntax (`*` matches any sequence of characters, `?` matches a single character, `[...]` matches character classes). Matching is case-insensitive.
+
+Wildcard expansion calls the GitHub API (`gh repo list`) and caches results for one hour. Archived repos are automatically excluded from the API results. Explicit (non-wildcard) repos always take priority when `max_repos` is reached.
+
+Exclusion patterns in `exclude_repos` apply to both exact entries and wildcard-expanded entries.
+
 ## Multi-Review Types and Agents
 
 You can configure multiple review types and agents to run in parallel for each PR. The CI poller creates a matrix of jobs (review_types x agents) and posts a single synthesized comment when all jobs complete.
@@ -434,7 +460,9 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 |--------|------|---------|-------------|
 | `enabled` | bool | `false` | Enable the CI poller |
 | `poll_interval` | string | `"5m"` | How often to check for PRs (minimum 30s, invalid values default to 5m) |
-| `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format |
+| `repos` | array | `[]` | GitHub repos to poll in `"owner/repo"` format. Supports glob patterns (e.g. `"myorg/*"`, `"myorg/api-*"`). |
+| `exclude_repos` | array | `[]` | Glob patterns to exclude from the resolved repo list |
+| `max_repos` | int | `100` | Safety cap on total expanded repos (explicit repos have priority over wildcard-expanded ones) |
 | `review_types` | array | `["security"]` | Review types to run for each PR: `security`, `design`, or `default`. `"review"` and `"general"` are accepted as aliases for `"default"`. |
 | `agents` | array | auto-detect | Agents to run for each PR (e.g., `["codex", "gemini"]`) |
 | `model` | string | | Model override for CI reviews |
@@ -581,6 +609,23 @@ reasoning = "fast"
 ```
 
 Result: `backend` PRs get a 2x2 matrix (4 jobs) with thorough reasoning, while `frontend` PRs get a single fast security review. Repos without a `.roborev.toml` `[ci]` section use the global defaults.
+
+### Wildcard Repos with Exclusions
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/*"]
+exclude_repos = ["myorg/archived-*", "myorg/docs"]
+max_repos = 50
+review_types = ["security"]
+agents = ["codex"]
+
+github_app_id = 123456
+github_app_private_key = "~/.roborev/roborev.pem"
+github_app_installation_id = 12345678
+```
 
 ### Personal Auth -- Single Review
 

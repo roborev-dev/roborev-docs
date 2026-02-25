@@ -6,8 +6,19 @@ description: Interactive terminal interface for viewing and managing reviews
 The interactive terminal UI (`roborev tui`) provides a real-time view of the review queue.
 
 ```bash
-roborev tui
+roborev tui                         # Open TUI
+roborev tui --repo                  # Pre-filter to current repo
+roborev tui --repo --branch         # Pre-filter to current repo + branch
+roborev tui --repo=/path/to/repo    # Pre-filter to specific repo
+roborev tui --branch=feature-x      # Pre-filter to specific branch
 ```
+
+| Flag | Description |
+|------|-------------|
+| `--repo [path]` | Lock filter to a repo. Without a value, resolves to the current repo. |
+| `--branch [name]` | Lock filter to a branch. Without a value, resolves to the current branch. |
+
+When set via flags, the filter is locked and cannot be changed in the TUI. This is useful for side-by-side working when you want to focus on a specific repo or branch.
 
 ## Queue View
 
@@ -100,6 +111,7 @@ Press `Enter` on a job to view its review.
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
+| `F` | Open inline fix panel |
 | `l` | View job log |
 | `p` | Switch between review/prompt |
 | `m` | View commit message |
@@ -108,7 +120,11 @@ Press `Enter` on a job to view its review.
 
 ## Fix Jobs
 
-Press `F` on a completed review to launch a background fix job. A prompt modal opens where you can optionally provide custom instructions for the fix agent.
+Press `F` on a completed review to open the inline fix panel at the bottom of the review view. You can optionally type custom instructions for the fix agent, or leave it blank for defaults. Press `Enter` to submit, `Esc` to cancel.
+
+While the fix panel is open, `Tab` toggles focus between the review content (for scrolling) and the fix input. The panel border is magenta when focused and gray when inactive.
+
+From the queue view, pressing `F` fetches the review and opens the fix panel in one step.
 
 The fix runs in an isolated git worktree checked out at the reviewed commit (not HEAD), so the patch is always generated against the correct revision. This prevents conflicts when the working tree has moved on since the review.
 

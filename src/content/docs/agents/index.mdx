@@ -16,6 +16,7 @@ roborev supports multiple AI coding agents and auto-detects which ones are insta
 | Cursor | `agent` | See [cursor.com/cli](https://cursor.com/cli) |
 | OpenCode | `opencode` | `npm install -g opencode-ai` |
 | Droid | `droid` | See [factory.ai](https://factory.ai/) |
+| Kilo | `kilo` | `npm install -g @kilocode/cli` |
 
 ## Auto-Detection
 
@@ -28,6 +29,7 @@ roborev auto-detects installed agents and falls back in this order:
 5. Cursor
 6. OpenCode
 7. Droid
+8. Kilo
 
 The first available agent is used unless you specify one explicitly.
 
@@ -75,6 +77,7 @@ roborev refine --model claude-sonnet-4-20250514
 | Cursor | Model name | `claude-sonnet-4-20250514`, `gpt-4.1` |
 | OpenCode | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
 | Droid | Factory model name | (see Factory.ai docs) |
+| Kilo | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
 
 ### Configuration
 
@@ -105,6 +108,7 @@ Different agents have different levels of support for agentic mode (file edits a
 | Cursor | Full (uses `--yolo` flag) |
 | OpenCode | Full (auto-approves in non-interactive mode) |
 | Droid | Full (runs autonomously) |
+| Kilo | Full (runs autonomously) |
 
 See [Custom Tasks & Agentic Mode](/guides/custom-tasks/) for details on review vs agentic modes.
 

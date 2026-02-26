@@ -5,6 +5,42 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.38
+<small>2026-02-26</small>
+
+**New features**
+
+- Kilo agent support via the `kilo` CLI.
+- `roborev wait` accepts multiple job IDs in a single command.
+
+**Improvements**
+
+- TUI task view supports mouse interactions (click to select, double-click to view).
+- `roborev update` manages the daemon lifecycle for smoother upgrades.
+- Updated `flake.nix` for current Nix packaging and release metadata.
+
+**Bug fixes**
+
+- Use `ANTHROPIC_API_KEY` for the OpenCode agent in GitHub Actions workflows.
+- `roborev fix` skips reviews that already have a `PASS` verdict.
+
+---
+
+## 0.37
+<small>2026-02-25</small>
+
+**Improvements**
+
+- TUI help bar restyled with two-tone key hints and aligned columns for easier shortcut scanning.
+- Unified stream output formatting across CLI and TUI views for more consistent display.
+- Refreshed Nix flake metadata to improve Nix-based install and packaging workflows.
+
+**Bug fixes**
+
+- Show the correct `roborev` version when installed via `go install`.
+
+---
+
 ## 0.36
 <small>2026-02-24</small>
 

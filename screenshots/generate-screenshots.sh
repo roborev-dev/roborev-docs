@@ -3,7 +3,7 @@
 set -euo pipefail
 
 OUTPUT_DIR="${1:-/output}"
-FREEZE_CFG="/tapes/freeze.json"
+FREEZE_CFG="/screenshots/freeze.json"
 SESSION="rr"
 CAPTURED=0
 
@@ -37,8 +37,8 @@ wait_until() {
     done
 }
 
-# --- Start tmux session ---
-tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 40
+# --- Start tmux session (tall for hero, resized later) ---
+tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 50
 tmux set-option -g default-terminal "tmux-256color"
 tmux set-option -ga terminal-overrides ",*:Tc"
 tmux send-keys -t "$SESSION" "export COLORTERM=truecolor" Enter
@@ -52,15 +52,18 @@ echo "==> TUI screenshots"
 # Start the daemon in the background and wait for it to be ready
 send "roborev daemon run &" Enter
 daemon_ready=false
-for i in $(seq 1 30); do
-    if roborev status 2>/dev/null | grep -qE '^Daemon:\s+running\b'; then
+for i in $(seq 1 60); do
+    status_out=$(roborev status 2>&1 || true)
+    if printf '%s' "$status_out" | grep -q 'Daemon:.*running'; then
         daemon_ready=true
         break
     fi
     sleep 0.5
 done
 if [[ "$daemon_ready" != "true" ]]; then
-    echo "ERROR: daemon did not become ready within 15s"
+    echo "ERROR: daemon did not become ready within 30s"
+    echo "  roborev status output:"
+    roborev status 2>&1 || true
     exit 1
 fi
 
@@ -68,19 +71,53 @@ send "roborev tui" Enter
 wait_until "Queue"
 sleep 0.5
 
-# 1. Queue view (default)
+# 1. Hero (taller window for landing page)
+capture "tui-hero"
+
+# Resize to standard 40 rows for remaining screenshots
+tmux resize-window -t "$SESSION" -x 120 -y 40
+sleep 1
+
+# 2. Queue view (standard size)
 capture "tui-queue"
 
-# TODO: Add more TUI screenshots here as needed:
-# - tui-review (review detail view)
-# - tui-filter (repository filter modal)
-# - tui-branch-filter (branch filter modal)
-# - tui-help (keyboard shortcuts overlay)
-# - tui-address (addressing findings)
-# - tui-respond (comment modal)
-# - tui-navigation (basic navigation)
+# 3. Address: toggle addressed on first job
+send "a"
+sleep 0.5
+capture "tui-address"
+send "a"
+sleep 0.3
 
-# Quit TUI
+# 4. Review detail view: navigate down and open
+send "j"
+sleep 0.3
+send "Enter"
+wait_until "Review"
+sleep 0.5
+capture "tui-review"
+
+# 5. Copy: press y to copy review to clipboard
+send "y"
+sleep 0.5
+capture "tui-copy"
+
+# 6. Comment modal: press c to open
+send "c"
+sleep 0.5
+capture "tui-respond"
+send "Escape"
+sleep 0.3
+
+# 7. Help overlay: press ? from review view
+send "?"
+sleep 0.5
+capture "tui-help"
+
+# Close help, back to queue, quit
+send "?"
+sleep 0.3
+send "q"
+sleep 0.3
 send "q"
 sleep 1
 
@@ -100,6 +137,22 @@ send "roborev status" Enter
 wait_until "Status"
 sleep 0.5
 capture "cli-status"
+
+# Clear and capture roborev help
+send "clear" Enter
+sleep 0.5
+send "roborev help" Enter
+wait_until "Available Commands"
+sleep 0.5
+capture "cli-help"
+
+# Clear and capture roborev repo list
+send "clear" Enter
+sleep 0.5
+send "roborev repo list" Enter
+wait_until "NAME"
+sleep 0.5
+capture "cli-repo-list"
 
 # Cleanup
 tmux kill-session -t "$SESSION" 2>/dev/null || true

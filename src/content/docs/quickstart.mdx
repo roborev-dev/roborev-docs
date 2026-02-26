@@ -4,6 +4,7 @@ description: Get up and running with roborev in minutes
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Screenshot from '../../components/Screenshot.astro';
 
 ## Install
 
@@ -51,7 +52,7 @@ Hook installation automatically detects your git hook manager (Husky, etc.) via 
 
 Check the daemon status at any time:
 
-<video src="/cli-status.webm" autoplay muted loop playsinline />
+<Screenshot src="/cli-status.svg" alt="roborev status output" />
 
 ## Addressing Reviews
 
@@ -86,7 +87,7 @@ and press `y` to copy a review to your clipboard for pasting into your agent
 session. You can also use the [agent skills](/guides/agent-skills/) for
 supported agents.
 
-<video src="/tui-address.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-address.svg" alt="roborev TUI with addressed review" />
 
 ## Next Steps
 

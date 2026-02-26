@@ -8,8 +8,8 @@ dist/
 # Generated during build
 public/install.sh
 
-# VHS demo data (contains private review data)
-vhs/demo-data/
+# Screenshot demo data (contains private review data)
+screenshots/demo-data/
 
 # OS
 .DS_Store

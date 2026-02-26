@@ -149,6 +149,9 @@ echo "Rewriting repo paths for Docker..."
 sqlite3 "$DEST_DB" <<'PATHS'
 UPDATE repos SET root_path = '/repos/roborev' WHERE name = 'roborev';
 UPDATE repos SET root_path = '/repos/roborev-docs' WHERE name = 'roborev-docs';
+
+-- Clear sync metadata so reviews appear as local, not [remote]
+UPDATE review_jobs SET source_machine_id = NULL, synced_at = NULL;
 PATHS
 
 # Report stats

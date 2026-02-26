@@ -4,6 +4,7 @@ description: Use reviews in your agent sessions and record responses and comment
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import Screenshot from '../../../components/Screenshot.astro';
 
 Reviews are designed to be fed back into your AI coding agent sessions to address findings. The quickest way is `roborev fix`, which runs an agent to apply changes automatically. You can also copy reviews into an agent session manually, or add comments for context.
 
@@ -23,7 +24,7 @@ The agent reads the review, applies changes, commits, and marks the review as ad
 
 Press `y` in the TUI to copy the full review content to your clipboard. Paste it into an AI coding agent session to address the findings. You can also share reviews with teammates, include them in GitHub issues, or reference them in commit messages.
 
-<video src="/tui-copy.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-copy.svg" alt="roborev TUI copy review to clipboard" />
 
 ## Adding a Comment
 
@@ -31,7 +32,7 @@ Press `y` in the TUI to copy the full review content to your clipboard. Paste it
 
 Press `c` from either the queue view or review detail view to open the comment modal:
 
-<video src="/tui-respond.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-respond.svg" alt="roborev TUI comment modal" />
 
 1. Navigate to the review you want to comment on
 2. Press `c` to open the comment modal

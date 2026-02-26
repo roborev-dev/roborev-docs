@@ -3,6 +3,8 @@ title: Terminal UI (TUI)
 description: Interactive terminal interface for viewing and managing reviews
 ---
 
+import Screenshot from '../../../components/Screenshot.astro';
+
 The interactive terminal UI (`roborev tui`) provides a real-time view of the review queue.
 
 ```bash
@@ -22,7 +24,7 @@ When set via flags, the filter is locked and cannot be changed in the TUI. This 
 
 ## Queue View
 
-<video src="/tui-queue.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-queue.svg" alt="roborev TUI queue view" />
 
 | Key | Action |
 |-----|--------|
@@ -99,7 +101,7 @@ Pressing `h` toggles the hide-addressed filter for the current session without c
 
 Press `Enter` on a job to view its review.
 
-<video src="/tui-review.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-review.svg" alt="roborev TUI review detail view" />
 
 | Key | Action |
 |-----|--------|
@@ -146,6 +148,8 @@ Press `T` from the queue view to switch to the Tasks view, which shows all fix j
 | `T` / `Esc` | Return to queue |
 | `?` | Toggle help |
 
+The Tasks view also supports mouse interactions: click a task to select it, or double-click to view its output.
+
 ## Applying and Rebasing Patches
 
 Press `A` on a completed fix job to apply the generated patch and commit it to your working tree. The parent review is automatically marked as addressed when the patch is applied.
@@ -171,7 +175,7 @@ The prompt header shows the job ID, git ref, and agent. Below the header, the co
 
 Press `y` to copy the review content to your clipboard. This works from both the queue view (on completed jobs) and the review detail view.
 
-<video src="/tui-copy.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-copy.svg" alt="roborev TUI copy review to clipboard" />
 
 The copied content includes a metadata header for reference:
 
@@ -190,7 +194,7 @@ Press `m` from either the queue view or review detail view to see the full commi
 
 Press `?` at any time to toggle the commands overlay. This displays all available shortcuts for the current view.
 
-<video src="/tui-help.webm" autoplay muted loop playsinline />
+<Screenshot src="/tui-help.svg" alt="roborev TUI keyboard commands" />
 
 ## Review Screen Layout
 

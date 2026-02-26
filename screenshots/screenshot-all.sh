@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-IMAGE_NAME="roborev-vhs"
+IMAGE_NAME="roborev-screenshots"
 DEMO_DATA_DIR="$SCRIPT_DIR/demo-data"
 OUTPUT_DIR="$SCRIPT_DIR/../public"
 ROBOREV_DOCS_REPO="$SCRIPT_DIR/.."
@@ -72,8 +72,12 @@ fi
 
 # --- Step 2: Build Docker image ---
 if [[ "$SKIP_BUILD" == false ]]; then
-    echo "==> Building Docker image: $IMAGE_NAME"
-    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f "$SCRIPT_DIR/Dockerfile" "$REPO"
+    ROBOREV_VERSION=$(cd "$REPO" && git tag --sort=-v:refname | grep -E '^v[0-9]+\.' | head -1 || echo "dev")
+    echo "==> Building Docker image: $IMAGE_NAME (version: $ROBOREV_VERSION)"
+    DOCKER_BUILDKIT=1 docker build \
+        --build-arg "VERSION=$ROBOREV_VERSION" \
+        -t "$IMAGE_NAME" \
+        -f "$SCRIPT_DIR/Dockerfile" "$REPO"
     echo ""
 fi
 
@@ -82,14 +86,14 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "==> Generating SVG screenshots..."
 docker run --rm \
-    -v "$SCRIPT_DIR:/tapes" \
+    -v "$SCRIPT_DIR:/screenshots" \
     -v "$DEMO_DATA_DIR:/data" \
     -v "$OUTPUT_DIR:/output" \
     -v "$REPO:/repos/roborev:ro" \
     -v "$ROBOREV_DOCS_REPO:/repos/roborev-docs:ro" \
     -e ROBOREV_DATA_DIR=/data \
     "$IMAGE_NAME" \
-    /tapes/generate-screenshots.sh /output
+    /screenshots/generate-screenshots.sh /output
 
 echo ""
 echo "Done! Output files are in $OUTPUT_DIR"

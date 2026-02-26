@@ -74,7 +74,7 @@ Before enabling the CI poller, you need:
 
    If you do provide a local checkout, it must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
 
-3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`. You can check what's available with:
+3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`, `kilo`. You can check what's available with:
    ```bash
    roborev check-agents             # smoke-test all installed agents
    roborev check-agents --agent codex  # test a specific agent
@@ -470,7 +470,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `synthesis_agent` | string | | Agent for combining multi-job results |
 | `synthesis_model` | string | | Model override for synthesis |
 
-When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid.
+When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid, kilo.
 
 ### GitHub App Options
 

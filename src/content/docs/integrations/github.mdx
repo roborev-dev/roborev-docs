@@ -307,9 +307,12 @@ If you manage the daemon with systemd or launchd, use `roborev init --no-daemon`
 **macOS (launchd):**
 
 ```bash
-# Create log directory and plist (adjust the path to the roborev binary)
+# Resolve paths — Homebrew prefix differs between Intel and Apple Silicon
+ROBOREV_BIN="$(command -v roborev)"
+BREW_PREFIX="$(brew --prefix 2>/dev/null || echo /usr/local)"
+
 mkdir -p ~/Library/Logs/roborev
-cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << 'EOF'
+cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -318,18 +321,23 @@ cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << 'EOF'
     <string>com.roborev.daemon</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/roborev</string>
+        <string>${ROBOREV_BIN}</string>
         <string>daemon</string>
         <string>run</string>
     </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>${BREW_PREFIX}/bin:${BREW_PREFIX}/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/Users/YOU/Library/Logs/roborev/daemon.log</string>
+    <string>${HOME}/Library/Logs/roborev/daemon.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/YOU/Library/Logs/roborev/daemon.log</string>
+    <string>${HOME}/Library/Logs/roborev/daemon.log</string>
 </dict>
 </plist>
 EOF
@@ -337,7 +345,7 @@ EOF
 launchctl load ~/Library/LaunchAgents/com.roborev.daemon.plist
 ```
 
-Replace `/Users/YOU` with your home directory. Launchd does not expand `~` in plist values.
+The heredoc expands `${ROBOREV_BIN}`, `${BREW_PREFIX}`, and `${HOME}` at generation time so the plist contains absolute paths. Launchd does not expand `~` or environment variables in plist values.
 
 **Linux (systemd):**
 

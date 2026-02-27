@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 IMAGE_NAME="roborev-screenshots"
-DEMO_DATA_DIR="$SCRIPT_DIR/demo-data"
+DEMO_DATA_DIR="${TMPDIR:-/tmp}/roborev-demo-data"
 OUTPUT_DIR="$SCRIPT_DIR/../public"
 ROBOREV_DOCS_REPO="$SCRIPT_DIR/.."
 

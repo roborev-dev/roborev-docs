@@ -8,8 +8,12 @@ dist/
 # Generated during build
 public/install.sh
 
-# Screenshot demo data (contains private review data)
+# Screenshot demo data (contains private review data).
+# Data now lives in $TMPDIR, but these patterns remain as defense-in-depth.
 screenshots/demo-data/
+*.db
+*.db-wal
+*.db-shm
 
 # OS
 .DS_Store

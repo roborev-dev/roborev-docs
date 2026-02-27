@@ -5,7 +5,7 @@
 set -euo pipefail
 
 SOURCE_DB="${ROBOREV_DATA_DIR:-$HOME/.roborev}/reviews.db"
-DEMO_DIR="$(dirname "$0")/demo-data"
+DEMO_DIR="${TMPDIR:-/tmp}/roborev-demo-data"
 DEST_DB="$DEMO_DIR/reviews.db"
 
 # Safety checks

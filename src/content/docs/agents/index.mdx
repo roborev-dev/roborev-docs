@@ -118,33 +118,17 @@ See [Custom Tasks & Agentic Mode](/guides/custom-tasks/) for details on review v
 
 ## ACP (Agent Client Protocol)
 
-ACP lets you integrate any agent that speaks the Agent Client Protocol, even if roborev doesn't have a built-in adapter for it. Configure a single ACP agent in the `[acp]` section of `~/.roborev/config.toml`:
+ACP lets you integrate any agent that speaks the [Agent Client Protocol](https://zed.dev/blog/acp), even if roborev doesn't have a built-in adapter for it. Configure an ACP agent in the `[acp]` section of `~/.roborev/config.toml`:
 
 ```toml
 [acp]
-name = "my-agent"                 # Agent name (required)
-command = "/usr/local/bin/my-acp" # ACP agent command (required)
-args = ["--verbose"]              # Additional arguments
-model = "my-model"                # Default model
-timeout = 600                     # Command timeout in seconds (default: 600)
-read_only_mode = "plan"           # Mode for review flows
-auto_approve_mode = "auto-approve" # Mode for agentic flows
-disable_mode_negotiation = false  # Skip ACP SetSessionMode negotiation
+name = "codex-acp"
+command = "codex-acp"
 ```
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `name` | string | (required) | Agent name used in `--agent` flag and TUI display |
-| `command` | string | (required) | Path or command for the ACP agent binary |
-| `args` | array | `[]` | Additional CLI arguments passed to the agent |
-| `model` | string | | Default model |
-| `timeout` | int | `600` | Command timeout in seconds |
-| `read_only_mode` | string | `"plan"` | Mode value sent for review (read-only) flows |
-| `auto_approve_mode` | string | `"auto-approve"` | Mode value sent for agentic flows |
-| `mode` | string | | Default agent mode (overrides read_only_mode unless explicitly opting in) |
-| `disable_mode_negotiation` | bool | `false` | Skip ACP SetSessionMode while keeping authorization behavior |
-
 Once configured, the ACP agent appears in the auto-detection fallback order and can be selected with `--agent <name>`.
+
+See the [Agent Client Protocol (ACP) guide](/guides/acp/) for setup examples, the full configuration reference, mode negotiation, and troubleshooting.
 
 ## See Also
 

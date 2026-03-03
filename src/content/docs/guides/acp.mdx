@@ -25,21 +25,7 @@ Several agents have ACP wrappers you can install directly.
 | Claude Code | `claude-agent-acp` | `npm install -g @zed-industries/claude-agent-acp` |
 | Gemini | `gemini --experimental-acp` | `npm install -g @google/gemini-cli` |
 
-### Using the Built-in ACP Dispatcher
-
-The simplest setup uses the `acp-agent` dispatcher with the `ROBOREV_ACP_ADAPTER` environment variable:
-
-```toml
-# .roborev.toml
-agent = "acp"
-```
-
-```bash
-export ROBOREV_ACP_ADAPTER=claude
-roborev review HEAD
-```
-
-### Pointing Directly at a Wrapper
+### Configuring a Wrapper
 
 Set `command` to the wrapper binary in your ACP config:
 
@@ -50,21 +36,21 @@ name = "codex-acp"
 command = "codex-acp"
 ```
 
-### Custom Wrapper Command
+### Environment Variable Override
 
-Use `ROBOREV_ACP_ADAPTER_COMMAND` for a fully custom binary path:
+Override the ACP command for a single invocation without editing config files:
 
 ```bash
-export ROBOREV_ACP_ADAPTER_COMMAND=/opt/agents/my-custom-acp
-roborev review HEAD
+ROBOREV_ACP_ADAPTER_COMMAND=/opt/agents/my-custom-acp roborev review HEAD
 ```
 
 ### Verifying the Setup
 
-Check that roborev can find and communicate with the ACP agent:
+Confirm the configured command is on your PATH, then run a review to test end-to-end communication:
 
 ```bash
-roborev check-agents --agent acp
+which codex-acp          # or your configured command
+roborev review HEAD
 ```
 
 ## Custom ACP Agents
@@ -79,7 +65,7 @@ command = "/usr/local/bin/my-acp-agent"
 args = ["--verbose"]
 ```
 
-Once configured, the agent appears in the auto-detection fallback order and can be selected with `--agent my-agent`.
+Once configured, the agent can be selected with `--agent my-agent`.
 
 ## Configuration Reference
 
@@ -99,7 +85,7 @@ disable_mode_negotiation = false   # Skip SetSessionMode RPC
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `name` | string | (required) | Agent name used in `--agent` flag and TUI display |
+| `name` | string | (required) | Agent name used in `--agent` flag |
 | `command` | string | (required) | Path or command for the ACP agent binary |
 | `args` | array | `[]` | Additional CLI arguments passed to the agent |
 | `model` | string | | Default model to request from the agent |
@@ -129,7 +115,7 @@ Some agents don't support ACP session modes. Set `disable_mode_negotiation = tru
 
 ACP agents run as subprocesses with the following guardrails:
 
-- **Path validation**: All file access is validated against the repository root using symlink-aware path resolution. Agents cannot read or write outside the repo.
+- **Path validation**: File operations (reads, writes, edits) are validated against the repository root using symlink-aware path resolution. Terminal operations in read-write mode are not path-bounded and can execute arbitrary commands.
 - **Mode enforcement**: Write and terminal operations are blocked at the operation boundary in read-only mode, independent of what the agent requests.
 - **Bounded reads**: File reads are capped at 10 MB. Terminal output is capped at 1 MB.
 

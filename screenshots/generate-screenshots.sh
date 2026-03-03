@@ -68,7 +68,7 @@ if [[ "$daemon_ready" != "true" ]]; then
 fi
 
 send "roborev tui" Enter
-wait_until "Queue"
+wait_until "roborev queue"
 sleep 0.5
 
 # 1. Hero (taller window for landing page)

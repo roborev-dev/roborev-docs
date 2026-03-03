@@ -173,7 +173,7 @@ PATHS
 EXPECTED_REPOS="roborev agentsview msgvault"
 for repo in $EXPECTED_REPOS; do
     if ! sqlite3 "$DEST_DB" "SELECT 1 FROM repos WHERE name = '$repo'" | grep -q 1; then
-        echo "Error: expected repo '$repo' not found in source database"
+        echo "Error: expected repo '$repo' not found in demo database after copy"
         exit 1
     fi
 done

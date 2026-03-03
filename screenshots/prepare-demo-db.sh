@@ -1,5 +1,5 @@
 #!/bin/bash
-# Prepare an isolated demo database with only roborev reviews
+# Prepare an isolated demo database with selected repo reviews
 # This script ONLY READS from the source database - never modifies it
 
 set -euo pipefail
@@ -112,18 +112,18 @@ CREATE INDEX idx_review_jobs_branch ON review_jobs(branch);
 CREATE INDEX idx_commits_sha ON commits(sha);
 SCHEMA
 
-# Extract roborev data only (READ from source, WRITE to dest)
-echo "Extracting roborev reviews..."
+# Extract selected repos (READ from source, WRITE to dest)
+echo "Extracting reviews..."
 
 # Attach source as read-only and copy filtered data
 sqlite3 "$DEST_DB" <<SQL
 ATTACH DATABASE 'file:$SOURCE_DB?mode=ro' AS source;
 
--- Copy roborev repo(s)
+-- Copy selected repos
 INSERT INTO repos (id, root_path, name, created_at)
 SELECT id, root_path, name, created_at
 FROM source.repos
-WHERE name LIKE '%roborev%' OR root_path LIKE '%roborev%';
+WHERE name IN ('roborev', 'agentsview', 'msgvault');
 
 -- Copy commits for those repos
 INSERT INTO commits (id, repo_id, sha, author, subject, timestamp, created_at)
@@ -159,11 +159,11 @@ DETACH DATABASE source;
 SQL
 
 # Rewrite repo paths for Docker container
-# The repos will be mounted at /repos/roborev and /repos/roborev-docs
 echo "Rewriting repo paths for Docker..."
 sqlite3 "$DEST_DB" <<'PATHS'
 UPDATE repos SET root_path = '/repos/roborev' WHERE name = 'roborev';
-UPDATE repos SET root_path = '/repos/roborev-docs' WHERE name = 'roborev-docs';
+UPDATE repos SET root_path = '/repos/agentsview' WHERE name = 'agentsview';
+UPDATE repos SET root_path = '/repos/msgvault' WHERE name = 'msgvault';
 
 -- Clear sync metadata so reviews appear as local, not [remote]
 UPDATE review_jobs SET source_machine_id = NULL, synced_at = NULL;

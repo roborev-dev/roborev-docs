@@ -5,6 +5,20 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.39
+<small>2026-02-28</small>
+
+**New features**
+
+- Compact mode for better usability on short terminal windows.
+- Distraction-free toggle in the TUI for a cleaner review experience.
+
+**Bug fixes**
+
+- Custom fix instructions now include full review context during fix generation.
+
+---
+
 ## 0.38
 <small>2026-02-26</small>
 
@@ -17,7 +31,6 @@ All notable changes to roborev, grouped by minor release.
 
 - TUI task view supports mouse interactions (click to select, double-click to view).
 - `roborev update` manages the daemon lifecycle for smoother upgrades.
-- Updated `flake.nix` for current Nix packaging and release metadata.
 
 **Bug fixes**
 
@@ -33,7 +46,6 @@ All notable changes to roborev, grouped by minor release.
 
 - TUI help bar restyled with two-tone key hints and aligned columns for easier shortcut scanning.
 - Unified stream output formatting across CLI and TUI views for more consistent display.
-- Refreshed Nix flake metadata to improve Nix-based install and packaging workflows.
 
 **Bug fixes**
 
@@ -55,7 +67,6 @@ All notable changes to roborev, grouped by minor release.
 **Improvements**
 
 - TUI help bar uses table-based rendering for consistent column alignment across all views.
-- Refreshed project dependencies and Nix flake packaging updates.
 
 **Bug fixes**
 
@@ -78,7 +89,6 @@ All notable changes to roborev, grouped by minor release.
 
 - Test and production runtime data are isolated so `go test` runs do not pollute `~/.roborev/` logs or interfere with the production daemon.
 - CLI and TUI streaming output uses gutter-grouped tool calls, markdown text wrapping, and Codex reasoning item rendering for clearer review progress.
-- Updated Nix flake packaging metadata.
 
 **Bug fixes**
 
@@ -147,7 +157,6 @@ All notable changes to roborev, grouped by minor release.
 
 - Improved TUI hint bar to make available actions clearer.
 - Removed the hardcoded OpenCode model so model selection follows your configuration.
-- Updated `flake.nix` to `v0.31.1` for Nix-based setups.
 
 **Bug fixes**
 
@@ -169,7 +178,6 @@ All notable changes to roborev, grouped by minor release.
 **Improvements**
 
 - Refreshed built-in Claude and Codex skill guides for review/refine/respond/fix workflows.
-- Updated `flake.nix` metadata for smoother Nix packaging.
 
 ---
 

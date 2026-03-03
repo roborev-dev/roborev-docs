@@ -44,6 +44,7 @@ When set via flags, the filter is locked and cannot be changed in the TUI. This 
 | `f` | Open filter (repo/branch tree) |
 | `b` | Open filter with branches expanded |
 | `h` | Toggle hide addressed/failed/canceled |
+| `D` | Toggle distraction-free mode |
 | `g` | Jump to top of queue |
 | `?` | Show all commands |
 | `Esc` | Clear filters (one layer at a time) |
@@ -96,6 +97,12 @@ To start the TUI with addressed items already hidden, set `hide_addressed_by_def
 Pressing `h` toggles the hide-addressed filter for the current session without changing the config.
 
 `Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-addressed off directly.
+
+## Distraction-Free Mode
+
+Press `D` in the queue view to toggle distraction-free mode. This hides the status line, table header, scroll indicator, and help footer, leaving only the title and the job list. Useful for focusing on reviews when screen space is limited.
+
+The same compact layout activates automatically when the terminal height is below 15 rows.
 
 ## Review View
 

@@ -433,7 +433,7 @@ gemini = ["security", "default"]
 
 This creates 3 jobs per PR (codex runs security, gemini runs security and default) rather than the 4 you'd get from a 2x2 cross-product. Map keys are sorted for deterministic job order.
 
-When `[ci.reviews]` is set, `agents` and `review_types` are ignored. To disable reviews for a specific repo, set empty lists in the repo's `.roborev.toml`:
+When `[ci.reviews]` is set, `agents` and `review_types` are ignored. To disable reviews for a specific repo, set an empty `[ci.reviews]` table in the repo's `.roborev.toml`:
 
 ```toml
 # .roborev.toml — disable CI reviews for this repo

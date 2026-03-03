@@ -169,6 +169,15 @@ UPDATE repos SET root_path = '/repos/msgvault' WHERE name = 'msgvault';
 UPDATE review_jobs SET source_machine_id = NULL, synced_at = NULL;
 PATHS
 
+# Validate expected repos were copied
+EXPECTED_REPOS="roborev agentsview msgvault"
+for repo in $EXPECTED_REPOS; do
+    if ! sqlite3 "$DEST_DB" "SELECT 1 FROM repos WHERE name = '$repo'" | grep -q 1; then
+        echo "Error: expected repo '$repo' not found in source database"
+        exit 1
+    fi
+done
+
 # Report stats
 echo ""
 echo "Demo database created successfully!"

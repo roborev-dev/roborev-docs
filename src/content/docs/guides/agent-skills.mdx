@@ -17,8 +17,8 @@ roborev skills install
 | `/roborev:review-branch [--base ...] [--type ...]` | Review all commits on the current branch |
 | `/roborev:design-review [commit]` | Request a design review for a commit |
 | `/roborev:design-review-branch [--base ...]` | Design review all commits on the current branch |
-| `/roborev:fix [job_id...]` | Discover and fix all unaddressed review findings in one pass |
-| `/roborev:address <job_id>` | Fetch a single review and fix its findings |
+| `/roborev:fix [job_id...]` | Discover and fix all open review findings in one pass |
+| `/roborev:address <job_id>` | ~~Deprecated: use `/roborev:fix <job_id>` instead~~ |
 | `/roborev:respond <job_id> [message]` | Add a response to document changes |
 
 ## Usage
@@ -73,9 +73,9 @@ Review all commits on the current branch with a design-focused lens:
 
 This is the branch equivalent of `/roborev:design-review`, running `roborev review --branch --wait --type design` in the background.
 
-### Fix all unaddressed reviews at once
+### Fix all open reviews at once
 
-The most powerful skill is `/roborev:fix`. With no arguments it discovers all unaddressed failed reviews on recent commits and fixes them in a single pass:
+The most powerful skill is `/roborev:fix`. With no arguments it discovers all open failed reviews on recent commits and fixes them in a single pass:
 
 ```
 /roborev:fix
@@ -88,32 +88,36 @@ You can also target specific jobs:
 ```
 
 The agent:
-1. Discovers unaddressed reviews (or uses provided job IDs)
+1. Discovers open reviews (or uses provided job IDs)
 2. Fetches all reviews and collects findings
 3. Groups findings by file and prioritizes by severity
 4. Fixes all issues across all reviews
 5. Runs tests to verify
-6. Records a comment on each addressed review
+6. Records a comment on each closed review
 7. Offers to commit
 
 This is the interactive equivalent of `roborev fix --batch` -- the agent sees all findings at once and can make coordinated fixes across related issues.
 
 ### Fix a single review
 
-When you want to address one specific review:
+Target a specific job ID with `/roborev:fix`:
 
 ```
-/roborev:address 1019
+/roborev:fix 1019
 ```
 
 The agent fetches the review, fixes issues by priority, runs tests, and offers to commit.
+
+:::note
+The `/roborev:address` skill is deprecated. Use `/roborev:fix <job_id>` instead, which handles both single and multi-review fixes.
+:::
 
 ## Agent-Specific Syntax
 
 | Agent | Syntax |
 |-------|--------|
-| Claude Code | `/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`, `/roborev:fix`, `/roborev:address`, `/roborev:respond` |
-| Codex | `$roborev:review`, `$roborev:review-branch`, `$roborev:design-review`, `$roborev:design-review-branch`, `$roborev:fix`, `$roborev:address`, `$roborev:respond` |
+| Claude Code | `/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`, `/roborev:fix`, `/roborev:respond` |
+| Codex | `$roborev:review`, `$roborev:review-branch`, `$roborev:design-review`, `$roborev:design-review-branch`, `$roborev:fix`, `$roborev:respond` |
 
 ## Checking Skill Status
 
@@ -157,7 +161,7 @@ reads the exit code. See [Waiting for a Review Without Enqueuing](/guides/review
 
 ## Interactive vs Automated
 
-Skills provide an **interactive** workflow. The review skills (`/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`) let you request reviews from within your agent session and see results inline. The fix skills (`/roborev:fix`, `/roborev:address`) let your agent address findings while you review the changes before committing.
+Skills provide an **interactive** workflow. The review skills (`/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`) let you request reviews from within your agent session and see results inline. The `/roborev:fix` skill lets your agent address findings while you review the changes before committing.
 
 For **fully automated** fixing, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
 

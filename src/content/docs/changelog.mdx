@@ -5,6 +5,31 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.40
+<small>2026-03-03</small>
+
+**New features**
+
+- ACP (Agent Client Protocol) support: run reviews through any ACP-compatible agent via the `[acp]` config section.
+- Kiro agent integration via `kiro-cli`.
+- Configurable PR comment upsert: update existing roborev PR comments instead of posting duplicates (`ci.upsert_comments`).
+
+**Improvements**
+
+- Renamed `addressed`/`unaddressed` to `closed`/`open` across CLI, TUI, and API. The `roborev close` command replaces `roborev address`, and `roborev fix --open` replaces `--unaddressed`. Old names are still accepted as aliases.
+- Combined the separate Status and P/F columns in the TUI queue into a single Status column with color-coded states (Queued, Running, Pass, Fail, Error, Canceled).
+- Column customization in the TUI: press `o` to reorder or toggle column visibility. New `column_borders`, `column_order`, and `task_column_order` config options.
+- Mouse copy/paste in TUI content views; long stderr lines wrap in log views.
+- Visual polish across TUI queue, review, and task screens: tighter column spacing, box-drawing separators, right-aligned elapsed column.
+- Deprecated the `/roborev:address` skill in favor of `/roborev:fix`.
+
+**Bug fixes**
+
+- Fixed UTF-8 truncation when composing PR comments.
+- Fixed command/footer parsing by trimming trailing blank lines and enforcing `--` separators.
+
+---
+
 ## 0.39
 <small>2026-02-28</small>
 

@@ -34,7 +34,7 @@ import Screenshot from '../../components/Screenshot.astro';
 cd your-repo
 roborev init          # Install post-commit hook
 # do some work, generate commits
-roborev fix           # Fixes unaddressed reviews
+roborev fix           # Fix open reviews
 roborev tui           # View reviews in interactive UI
 ```
 
@@ -61,11 +61,11 @@ Check the daemon status at any time:
 The quickest way to address a review is to let an agent fix it:
 
 ```bash
-roborev fix                        # Fix all unaddressed reviews on this branch
+roborev fix                        # Fix all open reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
 ```
 
-The agent applies changes, commits, and marks the review as addressed.
+The agent applies changes, commits, and closes the review.
 This is a one-shot fix. Use `refine` (below) if you want automatic re-review.
 
 ### With `roborev refine`
@@ -82,12 +82,12 @@ repeats until everything passes. See [Auto-Fix with Refine](/guides/auto-fixing/
 
 ### In the TUI
 
-You can also browse reviews in the TUI, mark them addressed with the `a` key,
+You can also browse reviews in the TUI, mark them closed with the `d` key,
 and press `y` to copy a review to your clipboard for pasting into your agent
 session. You can also use the [agent skills](/guides/agent-skills/) for
 supported agents.
 
-<Screenshot src="/tui-address.svg" alt="roborev TUI with addressed review" />
+<Screenshot src="/tui-address.svg" alt="roborev TUI with closed review" />
 
 ## Next Steps
 

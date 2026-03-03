@@ -81,7 +81,7 @@ sleep 1
 # 2. Queue view (standard size)
 capture "tui-queue"
 
-# 3. Address: toggle addressed on first job
+# 3. Close: toggle closed on first job
 send "a"
 sleep 0.5
 capture "tui-address"

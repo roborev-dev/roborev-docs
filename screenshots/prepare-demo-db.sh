@@ -26,6 +26,21 @@ echo "Source: $SOURCE_DB (READ ONLY)"
 echo "Destination: $DEST_DB"
 echo ""
 
+# Source DBs prior to the rename used "addressed"; newer DBs use "closed".
+REVIEW_STATUS_COL="$(sqlite3 "$SOURCE_DB" "SELECT CASE
+  WHEN EXISTS (SELECT 1 FROM pragma_table_info('reviews') WHERE name = 'closed') THEN 'closed'
+  WHEN EXISTS (SELECT 1 FROM pragma_table_info('reviews') WHERE name = 'addressed') THEN 'addressed'
+  ELSE ''
+END;")"
+
+if [[ -z "$REVIEW_STATUS_COL" ]]; then
+    echo "Error: Source reviews table has neither 'closed' nor legacy 'addressed' column"
+    exit 1
+fi
+
+echo "Review status column: $REVIEW_STATUS_COL"
+echo ""
+
 # Create new database with schema
 echo "Creating demo database schema..."
 sqlite3 "$DEST_DB" <<'SCHEMA'
@@ -78,7 +93,7 @@ CREATE TABLE reviews (
   prompt TEXT NOT NULL,
   output TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  addressed INTEGER NOT NULL DEFAULT 0
+  closed INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE responses (
@@ -129,8 +144,8 @@ FROM source.review_jobs j
 WHERE j.repo_id IN (SELECT id FROM repos);
 
 -- Copy reviews for those jobs
-INSERT INTO reviews (id, job_id, agent, prompt, output, created_at, addressed)
-SELECT r.id, r.job_id, r.agent, r.prompt, r.output, r.created_at, r.addressed
+INSERT INTO reviews (id, job_id, agent, prompt, output, created_at, closed)
+SELECT r.id, r.job_id, r.agent, r.prompt, r.output, r.created_at, r.${REVIEW_STATUS_COL}
 FROM source.reviews r
 WHERE r.job_id IN (SELECT id FROM review_jobs);
 

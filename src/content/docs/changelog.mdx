@@ -16,7 +16,7 @@ All notable changes to roborev, grouped by minor release.
 
 **Improvements**
 
-- Renamed `addressed`/`unaddressed` to `closed`/`open` across CLI, TUI, and API. The `roborev close` command replaces `roborev address`, and `roborev fix --open` replaces `--unaddressed`. Old names are still accepted as aliases.
+- Renamed review status terminology to `closed`/`open` across CLI, TUI, and API. `roborev close` and `roborev fix --open` replace the legacy command/flag aliases (which are still accepted).
 - Combined the separate Status and P/F columns in the TUI queue into a single Status column with color-coded states (Queued, Running, Pass, Fail, Error, Canceled).
 - Column customization in the TUI: press `o` to reorder or toggle column visibility. New `column_borders`, `column_order`, and `task_column_order` config options.
 - Mouse copy/paste in TUI content views; long stderr lines wrap in log views.
@@ -95,7 +95,7 @@ All notable changes to roborev, grouped by minor release.
 
 **Bug fixes**
 
-- `--all-branches` now implies `--unaddressed` on `roborev fix` and `roborev refine`, removing the need to pass both flags.
+- `--all-branches` now implies `--open` on `roborev fix` and `roborev refine`, removing the need to pass both flags.
 - Patch application in git worktrees resolves the correct worktree path via `git worktree list`, fixing failures when the branch is checked out in a non-default worktree location.
 - Temporary command execution uses explicit file sync and retry with exponential backoff to prevent intermittent `text file busy` (ETXTBSY) races on Linux.
 
@@ -151,7 +151,7 @@ All notable changes to roborev, grouped by minor release.
 
 **New features**
 
-- `roborev compact` command to verify and consolidate unaddressed review findings, reducing false positives and merging related findings from multiple reviews into a single consolidated review.
+- `roborev compact` command to verify and consolidate open review findings, reducing false positives and merging related findings from multiple reviews into a single consolidated review.
 - Backup-agent failover: automatically retry failed jobs with a secondary agent when the primary fails (e.g. fall back to Claude Code when Codex rate-limits).
 - GitHub commit status checks: the CI poller posts pending/success/failure statuses on PR commits when GitHub App auth is configured.
 - Ref-aware configuration: the CI poller reads `.roborev.toml` from the PR branch's git ref, so configuration can vary by branch.
@@ -185,7 +185,7 @@ All notable changes to roborev, grouped by minor release.
 
 **Bug fixes**
 
-- Fixed TUI Cursor cancel behavior and corrected addressed-stats display.
+- Fixed TUI Cursor cancel behavior and corrected closed/open stats display.
 - Fixed agent prompt handling on Windows to avoid the 32KB command-line limit.
 - Fixed refine loops so git hook failures no longer break execution.
 - Stripped `CLAUDECODE` when spawning the `claude-code` agent to prevent environment leakage.
@@ -281,7 +281,7 @@ All notable changes to roborev, grouped by minor release.
 - CI poller that detects GitHub pull requests and queues reviews automatically.
 - GitHub App integration for authenticated PR review workflows.
 - Persistent CI review tracking that survives daemon restarts.
-- `hide_addressed_by_default` config option for the TUI.
+- `hide_closed_by_default` config option for the TUI.
 
 **Improvements**
 
@@ -298,7 +298,7 @@ All notable changes to roborev, grouped by minor release.
 
 - `roborev list` command for viewing stored reviews.
 - `--json` flag on `roborev show` for machine-readable output.
-- Color-coded Addressed column in the TUI.
+- Color-coded Closed column in the TUI.
 
 **Improvements**
 
@@ -369,7 +369,7 @@ All notable changes to roborev, grouped by minor release.
 
 - Cursor agent support.
 - `check-agents` command to list and smoke-test available agents.
-- `--unaddressed` flag on `fix` for batch fixing.
+- `--open` flag on `fix` for batch fixing.
 - `show --prompt` to display the prompt sent to the agent.
 
 **Improvements**
@@ -521,7 +521,7 @@ All notable changes to roborev, grouped by minor release.
 
 **Bug fixes**
 
-- Fixed race condition that caused addressed items to briefly reappear.
+- Fixed race condition that caused closed items to briefly reappear.
 - Fixed markdown formatting in verdict parsing.
 - Fixed `sync now` to connect automatically when the daemon is not yet connected.
 
@@ -587,7 +587,7 @@ All notable changes to roborev, grouped by minor release.
 
 **Bug fixes**
 
-- Fixed queue cursor behavior when hide-addressed is active and addressing from the review screen.
+- Fixed queue cursor behavior when hide-closed is active and closing from the review screen.
 
 ---
 
@@ -629,9 +629,9 @@ All notable changes to roborev, grouped by minor release.
 
 **New features**
 
-- `h` hotkey to hide addressed reviews.
+- `h` hotkey to hide closed reviews.
 - Branch display in the TUI review view.
-- Distinct `[ADDRESSED]` color styling in review view.
+- Distinct `[CLOSED]` color styling in review view.
 
 **Improvements**
 
@@ -708,7 +708,7 @@ All notable changes to roborev, grouped by minor release.
 **New features**
 
 - Project-specific review guidelines in `.roborev.toml`.
-- Addressed status tracking with Addr'd column and toggle.
+- Closed status tracking with a dedicated closed column and toggle.
 - Prompt inspection in the TUI.
 - Page up/down navigation in the TUI.
 - Daemon version tracking with auto-restart on upgrade.
@@ -718,7 +718,7 @@ All notable changes to roborev, grouped by minor release.
 
 **Improvements**
 
-- Optimistic updates for addressed toggle.
+- Optimistic updates for close toggle.
 - Compact timestamp format in the TUI queue.
 - Daemon version displayed in the TUI and CLI.
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Prepare an isolated demo database with only roborev reviews
+# Prepare an isolated demo database with selected repo reviews
 # This script ONLY READS from the source database - never modifies it
 
 set -euo pipefail
@@ -24,6 +24,21 @@ fi
 
 echo "Source: $SOURCE_DB (READ ONLY)"
 echo "Destination: $DEST_DB"
+echo ""
+
+# Source DBs prior to the rename used "addressed"; newer DBs use "closed".
+REVIEW_STATUS_COL="$(sqlite3 "$SOURCE_DB" "SELECT CASE
+  WHEN EXISTS (SELECT 1 FROM pragma_table_info('reviews') WHERE name = 'closed') THEN 'closed'
+  WHEN EXISTS (SELECT 1 FROM pragma_table_info('reviews') WHERE name = 'addressed') THEN 'addressed'
+  ELSE ''
+END;")"
+
+if [[ -z "$REVIEW_STATUS_COL" ]]; then
+    echo "Error: Source reviews table has neither 'closed' nor legacy 'addressed' column"
+    exit 1
+fi
+
+echo "Review status column: $REVIEW_STATUS_COL"
 echo ""
 
 # Create new database with schema
@@ -78,7 +93,7 @@ CREATE TABLE reviews (
   prompt TEXT NOT NULL,
   output TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  addressed INTEGER NOT NULL DEFAULT 0
+  closed INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE responses (
@@ -97,18 +112,18 @@ CREATE INDEX idx_review_jobs_branch ON review_jobs(branch);
 CREATE INDEX idx_commits_sha ON commits(sha);
 SCHEMA
 
-# Extract roborev data only (READ from source, WRITE to dest)
-echo "Extracting roborev reviews..."
+# Extract selected repos (READ from source, WRITE to dest)
+echo "Extracting reviews..."
 
 # Attach source as read-only and copy filtered data
 sqlite3 "$DEST_DB" <<SQL
 ATTACH DATABASE 'file:$SOURCE_DB?mode=ro' AS source;
 
--- Copy roborev repo(s)
+-- Copy selected repos
 INSERT INTO repos (id, root_path, name, created_at)
 SELECT id, root_path, name, created_at
 FROM source.repos
-WHERE name LIKE '%roborev%' OR root_path LIKE '%roborev%';
+WHERE name IN ('roborev', 'agentsview', 'msgvault');
 
 -- Copy commits for those repos
 INSERT INTO commits (id, repo_id, sha, author, subject, timestamp, created_at)
@@ -129,8 +144,8 @@ FROM source.review_jobs j
 WHERE j.repo_id IN (SELECT id FROM repos);
 
 -- Copy reviews for those jobs
-INSERT INTO reviews (id, job_id, agent, prompt, output, created_at, addressed)
-SELECT r.id, r.job_id, r.agent, r.prompt, r.output, r.created_at, r.addressed
+INSERT INTO reviews (id, job_id, agent, prompt, output, created_at, closed)
+SELECT r.id, r.job_id, r.agent, r.prompt, r.output, r.created_at, r.${REVIEW_STATUS_COL}
 FROM source.reviews r
 WHERE r.job_id IN (SELECT id FROM review_jobs);
 
@@ -144,15 +159,24 @@ DETACH DATABASE source;
 SQL
 
 # Rewrite repo paths for Docker container
-# The repos will be mounted at /repos/roborev and /repos/roborev-docs
 echo "Rewriting repo paths for Docker..."
 sqlite3 "$DEST_DB" <<'PATHS'
 UPDATE repos SET root_path = '/repos/roborev' WHERE name = 'roborev';
-UPDATE repos SET root_path = '/repos/roborev-docs' WHERE name = 'roborev-docs';
+UPDATE repos SET root_path = '/repos/agentsview' WHERE name = 'agentsview';
+UPDATE repos SET root_path = '/repos/msgvault' WHERE name = 'msgvault';
 
 -- Clear sync metadata so reviews appear as local, not [remote]
 UPDATE review_jobs SET source_machine_id = NULL, synced_at = NULL;
 PATHS
+
+# Validate expected repos were copied
+EXPECTED_REPOS="roborev agentsview msgvault"
+for repo in $EXPECTED_REPOS; do
+    if ! sqlite3 "$DEST_DB" "SELECT 1 FROM repos WHERE name = '$repo'" | grep -q 1; then
+        echo "Error: expected repo '$repo' not found in demo database after copy"
+        exit 1
+    fi
+done
 
 # Report stats
 echo ""

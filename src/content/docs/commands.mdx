@@ -12,7 +12,7 @@ import Screenshot from '../../components/Screenshot.astro';
 ```bash
 roborev init [--agent <name>]    # Initialize repo + daemon + hook
                                  # --no-daemon: skip auto-starting daemon
-roborev fix                      # Address unaddressed reviews
+roborev fix                      # Fix open reviews
 roborev status                   # Check daemon and queue
 roborev tui                      # Interactive terminal UI
                                  # --repo: pre-filter to repo
@@ -92,6 +92,9 @@ roborev show <sha>               # Show review for commit
 roborev show <job_id>            # Show review by job ID
 roborev show --job <id>          # Force interpretation as job ID
 roborev show --prompt <job_id>   # Show the prompt sent to the agent
+roborev list                     # List jobs for current repo/branch
+roborev list --open              # List only open reviews
+roborev list --closed            # List only closed reviews
 roborev tui                      # Interactive browser
 roborev tui --repo --branch      # Pre-filtered to current repo+branch
 roborev log <job_id>             # View job log
@@ -134,8 +137,8 @@ The `clean` subcommand removes log files older than the specified number of days
 ```bash
 roborev comment <job_id> "message"   # Add comment with message
 roborev comment <job_id>             # Opens editor
-roborev address <job_id>             # Mark as addressed
-roborev address <job_id> --unaddress # Mark as unaddressed
+roborev close <job_id>               # Mark as closed
+roborev close <job_id> --reopen      # Reopen a closed review
 ```
 
 | Flag | Description |
@@ -143,6 +146,10 @@ roborev address <job_id> --unaddress # Mark as unaddressed
 | `--message, -m` | Comment message (inline) |
 | `--commenter` | Name of commenter |
 | `--job` | Force interpretation as job ID |
+
+:::note
+`roborev address` is still accepted as an alias for `roborev close`.
+:::
 
 See: [Responding to Reviews](/guides/responding-to-reviews/)
 
@@ -167,7 +174,7 @@ roborev refine --branch feature  # Validate branch before refining
 | `--max-iterations <n>` | Limit fix attempts (default: 10) |
 | `--since <commit>` | Refine commits since specific commit |
 | `--branch <name>` | Validate current branch before refining |
-| `--all-branches` | Discover and refine all branches with failed reviews (implies `--unaddressed`) |
+| `--all-branches` | Discover and refine all branches with failed reviews (implies `--open`) |
 | `--list` | List failed reviews that would be refined without running |
 | `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--quiet` | Only show progress/elapsed time |
@@ -178,13 +185,13 @@ See: [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/)
 ## Fixing Reviews
 
 ```bash
-roborev fix                        # Fix all unaddressed reviews on this branch
+roborev fix                        # Fix all open reviews on this branch
 roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
-roborev fix --batch                # Batch all unaddressed into one agent prompt
+roborev fix --batch                # Batch all open into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
-roborev fix --all-branches         # Fix all unaddressed across all branches
-roborev fix --list                 # List unaddressed reviews without fixing
+roborev fix --all-branches         # Fix all open across all branches
+roborev fix --list                 # List open reviews without fixing
 ```
 
 | Flag | Description |
@@ -193,10 +200,11 @@ roborev fix --list                 # List unaddressed reviews without fixing
 | `-m, --model <model>` | Model to use |
 | `--reasoning <level>` | Set reasoning depth |
 | `--quiet` | Suppress agent output |
-| `--unaddressed` | Fix all unaddressed reviews on branch (default when no job IDs given) |
-| `--all-branches` | Include unaddressed jobs from all branches (implies `--unaddressed`) |
+| `--open` | Fix all open reviews on branch (default when no job IDs given) |
+| `--all-branches` | Include open jobs from all branches (implies `--open`) |
 | `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
-| `--list` | List unaddressed reviews with details (job ID, ref, branch, agent, verdict) without running any fixes |
+| `--list` | List open reviews with details (job ID, ref, branch, agent, verdict) without running any fixes |
+| `--newest-first` | Process jobs newest first instead of oldest first (requires `--open`) |
 
 See: [Assisted Refactoring](/guides/assisted-refactoring/)
 
@@ -226,7 +234,7 @@ roborev compact --reasoning thorough         # Use thorough reasoning level
 | `--timeout <duration>` | Timeout for `--wait` mode (default: 10m) |
 | `--quiet` | Suppress progress output |
 
-Compact discovers unaddressed completed reviews, sends them to an agent for verification against the current codebase, and consolidates related findings into a single review job. Original jobs are automatically marked as addressed when consolidation finishes. This adds a quality layer between `review` and `fix` to reduce false positives.
+Compact discovers open completed reviews, sends them to an agent for verification against the current codebase, and consolidates related findings into a single review job. Original jobs are automatically closed when consolidation finishes. This adds a quality layer between `review` and `fix` to reduce false positives.
 
 :::note
 Avoid running multiple compact commands concurrently on the same branch. The operation is not atomic and concurrent runs can produce inconsistent state.

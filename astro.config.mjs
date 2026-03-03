@@ -111,6 +111,7 @@ export default defineConfig({
             { label: 'Code Analysis & Refactoring', slug: 'guides/assisted-refactoring' },
             { label: 'Auto-Fix with Refine', slug: 'guides/auto-fixing' },
             { label: 'Custom Tasks & Agentic Mode', slug: 'guides/custom-tasks' },
+            { label: 'Agent Client Protocol (ACP)', slug: 'guides/acp' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
             { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
           ],

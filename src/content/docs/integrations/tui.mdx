@@ -34,16 +34,17 @@ When set via flags, the filter is locked and cannot be changed in the TUI. This 
 | `l` | View job log |
 | `p` | View prompt |
 | `m` | View commit message |
-| `a` | Toggle addressed |
+| `a` | Toggle closed |
 | `c` | Add comment |
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
 | `F` | Launch fix job (completed reviews) |
 | `T` | Switch to Tasks view |
+| `o` | Column options (reorder, toggle visibility) |
 | `f` | Open filter (repo/branch tree) |
 | `b` | Open filter with branches expanded |
-| `h` | Toggle hide addressed/failed/canceled |
+| `h` | Toggle hide closed/failed/canceled |
 | `D` | Toggle distraction-free mode |
 | `g` | Jump to top of queue |
 | `?` | Show all commands |
@@ -92,17 +93,25 @@ Branches are lazy-loaded: they fetch from the daemon when you expand a repo or t
 
 The current working directory's repo sorts to the top of the tree, and its current branch sorts to the top of that repo's branch list.
 
-To start the TUI with addressed items already hidden, set `hide_addressed_by_default = true` in `~/.roborev/config.toml`. To auto-filter to the current repository on startup, set `auto_filter_repo = true`. See [Configuration](/configuration/) for details.
+To start the TUI with closed items already hidden, set `hide_closed_by_default = true` in `~/.roborev/config.toml`. To auto-filter to the current repository on startup, set `auto_filter_repo = true`. See [Configuration](/configuration/) for details.
 
-Pressing `h` toggles the hide-addressed filter for the current session without changing the config.
+Pressing `h` toggles the hide-closed filter for the current session without changing the config.
 
-`Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-addressed off directly.
+`Esc` clears filters one layer at a time in the order they were applied. Press `h` again to toggle hide-closed off directly.
 
 ## Distraction-Free Mode
 
 Press `D` in the queue view to toggle distraction-free mode. This hides the status line, table header, scroll indicator, and help footer, leaving only the title and the job list. Useful for focusing on reviews when screen space is limited.
 
 The same compact layout activates automatically when the terminal height is below 15 rows.
+
+## Column Customization
+
+Press `o` in the queue or tasks view to open the column options modal. From there you can reorder columns or toggle their visibility.
+
+Custom column order is saved to `column_order` (queue) and `task_column_order` (tasks) in `~/.roborev/config.toml`. To show separator lines between columns, set `column_borders = true`.
+
+The queue's Status column combines the previous Status and P/F (Pass/Fail) columns into a single field with color-coded values: Queued (yellow), Running (blue), Pass (green), Fail (red), Error (orange), Canceled (gray).
 
 ## Review View
 
@@ -115,7 +124,7 @@ Press `Enter` on a job to view its review.
 | `Up`/`k`, `Down`/`j` | Scroll content |
 | `Left`/`h`, `Right`/`l` | Previous/next review (loads more if at end) |
 | `PgUp`, `PgDn` | Page through content |
-| `a` | Toggle addressed |
+| `a` | Toggle closed |
 | `c` | Add comment |
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
@@ -159,7 +168,7 @@ The Tasks view also supports mouse interactions: click a task to select it, or d
 
 ## Applying and Rebasing Patches
 
-Press `A` on a completed fix job to apply the generated patch and commit it to your working tree. The parent review is automatically marked as addressed when the patch is applied.
+Press `A` on a completed fix job to apply the generated patch and commit it to your working tree. The parent review is automatically closed when the patch is applied.
 
 If the patch conflicts with the current state of your working tree (e.g. because new commits landed after the review), roborev offers to re-run the fix against current HEAD. Press `R` to trigger a rebase: the agent receives the original patch as context and produces a new patch targeting the current code.
 
@@ -210,12 +219,12 @@ The review detail view shows:
 ```
 Review #42 myrepo (codex: claude-sonnet-4-5-20250929)
 /path/to/repo abc1234 on feature-branch
-Verdict: Pass [ADDRESSED]
+Verdict: Pass [CLOSED]
 ```
 
-- **Line 1**: Review identity - job ID, repo name, agent and model (if explicitly configured)
-- **Line 2**: Location - repo path, git ref, branch
-- **Line 3**: Status - verdict and addressed state
+- **Line 1**: Review identity: job ID, repo name, agent and model (if explicitly configured)
+- **Line 2**: Location: repo path, git ref, branch
+- **Line 3**: Status: verdict and closed state
 
 ## Verdicts
 
@@ -256,8 +265,8 @@ If the TUI binary version differs from the running daemon version, a persistent 
 2. Navigate to reviews needing attention
 3. Press `Enter` to view full review
 4. Address the findings in your code
-5. Press `a` to mark as addressed
-6. Use `h` to hide addressed items
+5. Press `a` to mark as closed
+6. Use `h` to hide closed items
 
 ## See Also
 

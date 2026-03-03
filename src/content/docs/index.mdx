@@ -26,6 +26,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <a href="/agents/"><img src="/agents/cursor.svg" alt="Cursor" data-agent="cursor" width="800" height="190" /></a>
   <a href="/agents/"><span class="agent-text">Droid</span></a>
   <a href="/agents/"><span class="agent-text">Kilo</span></a>
+  <a href="/agents/"><span class="agent-text">Kiro</span></a>
 </div>
 
 ## Quick Start
@@ -39,7 +40,7 @@ Then from within your git repositories:
 ```bash
 roborev init          # Install post-commit hook
 # do some work, generate commits
-roborev fix           # Fixes unaddressed reviews
+roborev fix           # Fix open reviews
 roborev tui           # View reviews in interactive UI
 ```
 
@@ -67,7 +68,7 @@ Every commit gets reviewed. Issues surface in seconds, not hours.
     Built-in analysis types (duplication, complexity, refactoring, test fixtures, dead code) that agents can fix automatically.
   </Card>
   <Card title="Multi-Agent" icon="rocket">
-    Works with Codex, Claude Code, Gemini, Copilot, OpenCode, Cursor, Droid, and Kilo. Auto-detects installed agents.
+    Works with Codex, Claude Code, Gemini, Copilot, OpenCode, Cursor, Droid, Kilo, and Kiro. Auto-detects installed agents.
   </Card>
   <Card title="Rich Markdown Display" icon="document">
     Reviews render with full Markdown formatting: syntax-highlighted code blocks, headings, lists, and inline styles, right in your terminal.

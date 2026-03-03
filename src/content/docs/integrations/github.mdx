@@ -74,7 +74,7 @@ Before enabling the CI poller, you need:
 
    If you do provide a local checkout, it must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
 
-3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`, `kilo`. You can check what's available with:
+3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`, `kilo`, `kiro`. You can check what's available with:
    ```bash
    roborev check-agents             # smoke-test all installed agents
    roborev check-agents --agent codex  # test a specific agent
@@ -417,6 +417,29 @@ agents = ["codex", "gemini"]
 
 When the matrix is 1x1 (single review type, single agent), synthesis is skipped and the output is posted directly.
 
+### Granular Review Matrix
+
+For finer control, use `[ci.reviews]` to assign specific review types to specific agents instead of the full cross-product:
+
+```toml
+[ci]
+enabled = true
+repos = ["myorg/backend"]
+
+[ci.reviews]
+codex = ["security"]
+gemini = ["security", "default"]
+```
+
+This creates 3 jobs per PR (codex runs security, gemini runs security and default) rather than the 4 you'd get from a 2x2 cross-product. Map keys are sorted for deterministic job order.
+
+When `[ci.reviews]` is set, `agents` and `review_types` are ignored. To disable reviews for a specific repo, set an empty `[ci.reviews]` table in the repo's `.roborev.toml`:
+
+```toml
+# .roborev.toml — disable CI reviews for this repo
+[ci.reviews]
+```
+
 ### Synthesis
 
 When multiple jobs complete, their outputs are combined by an LLM synthesis step into a single well-formatted PR comment. The synthesis agent:
@@ -431,10 +454,44 @@ You can customize the synthesis behavior:
 ```toml
 [ci]
 synthesis_agent = "claude-code"                  # Agent to use for synthesis
+synthesis_backup_agent = "gemini"                # Backup if primary fails
 synthesis_model = "claude-sonnet-4-5-20250929"   # Model override for synthesis
 ```
 
-If synthesis fails, roborev falls back to posting all review outputs in collapsible `<details>` blocks.
+If the primary synthesis agent fails (quota, unavailable), roborev tries `synthesis_backup_agent` before falling back to raw formatting. The raw fallback posts all review outputs inline with headings and separators (no collapsed sections).
+
+## Comment Upsert
+
+By default, each review run creates a new PR comment. When `upsert_comments` is enabled, roborev finds and updates its existing comment instead of posting a duplicate. This keeps PR threads clean when reviews run repeatedly on the same PR.
+
+```toml
+[ci]
+upsert_comments = true
+```
+
+roborev embeds an invisible HTML marker in its PR comments to identify them. When upserting, it searches for the marker, patches the matching comment via the GitHub API, and falls back to creating a new comment if the existing one can't be updated (e.g., token mismatch between the original poster and the current auth).
+
+Per-repo overrides in `.roborev.toml` can enable or disable upsert independently of the global setting:
+
+```toml
+# .roborev.toml
+[ci]
+upsert_comments = false   # Disable upsert for this repo even if globally enabled
+```
+
+## PR Throttling
+
+When contributors push frequently to the same PR, the poller can generate excessive reviews. The `throttle_interval` config sets a minimum time between reviews of the same PR:
+
+```toml
+[ci]
+throttle_interval = "1h"              # default; minimum time between reviews per PR
+throttle_bypass_users = ["wesm"]      # these users bypass throttling
+```
+
+When a PR is pushed within the throttle window, the poller defers the review and posts a pending GitHub status showing the next eligible review time. Set `throttle_interval = "0"` to disable throttling entirely.
+
+Users listed in `throttle_bypass_users` get immediate reviews on every push regardless of the interval. Matching is case-insensitive.
 
 ## Per-Repo Overrides
 
@@ -457,8 +514,10 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 |--------|------|---------|-------------|
 | `agents` | array | global `agents` | Agents for CI reviews of this repo |
 | `review_types` | array | global `review_types` | Review types for CI reviews of this repo |
+| `reviews` | table | global `reviews` | Granular agent-to-review-type map (overrides `agents` and `review_types`; empty table disables reviews) |
 | `reasoning` | string | `"thorough"` | Reasoning level: `thorough`, `standard`, or `fast` |
 | `min_severity` | string | `"low"` | Minimum severity to include: `low`, `medium`, `high`, or `critical` |
+| `upsert_comments` | bool | global `upsert_comments` | Override global comment upsert setting for this repo |
 
 ## CI Options Reference
 
@@ -473,12 +532,17 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `max_repos` | int | `100` | Safety cap on total expanded repos (explicit repos have priority over wildcard-expanded ones) |
 | `review_types` | array | `["security"]` | Review types to run for each PR: `security`, `design`, or `default`. `"review"` and `"general"` are accepted as aliases for `"default"`. |
 | `agents` | array | auto-detect | Agents to run for each PR (e.g., `["codex", "gemini"]`) |
+| `reviews` | table | | Granular agent-to-review-type map. Overrides `agents` and `review_types` when set. See [Granular Review Matrix](#granular-review-matrix). |
 | `model` | string | | Model override for CI reviews |
 | `min_severity` | string | `"low"` | Minimum severity to include in output: `low`, `medium`, `high`, or `critical` |
+| `throttle_interval` | string | `"1h"` | Minimum time between reviews of the same PR. Set `"0"` to disable. |
+| `throttle_bypass_users` | array | `[]` | GitHub usernames that bypass throttling (case-insensitive) |
 | `synthesis_agent` | string | | Agent for combining multi-job results |
+| `synthesis_backup_agent` | string | | Backup agent for synthesis when the primary fails |
 | `synthesis_model` | string | | Model override for synthesis |
+| `upsert_comments` | bool | `false` | Update existing PR comments instead of creating new ones |
 
-When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid, kilo.
+When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid, kilo, kiro.
 
 ### GitHub App Options
 
@@ -551,11 +615,33 @@ agents = ["codex", "gemini"]
 
 # Synthesis settings
 synthesis_agent = "claude-code"
+synthesis_backup_agent = "gemini"
 synthesis_model = "claude-sonnet-4-5-20250929"
 
 github_app_id = 123456
 github_app_private_key = "${ROBOREV_APP_KEY}"
 github_app_installation_id = 12345678
+```
+
+### GitHub App -- Granular Review Matrix
+
+```toml
+[ci]
+enabled = true
+poll_interval = "5m"
+repos = ["myorg/backend"]
+throttle_interval = "30m"
+throttle_bypass_users = ["wesm"]
+synthesis_agent = "claude-code"
+
+github_app_id = 123456
+github_app_private_key = "${ROBOREV_APP_KEY}"
+github_app_installation_id = 12345678
+
+# Assign specific review types per agent (3 jobs instead of 4)
+[ci.reviews]
+codex = ["security"]
+gemini = ["security", "default"]
 ```
 
 ### GitHub App -- Multiple Installations

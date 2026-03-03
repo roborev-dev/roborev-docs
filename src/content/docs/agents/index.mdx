@@ -17,6 +17,7 @@ roborev supports multiple AI coding agents and auto-detects which ones are insta
 | OpenCode | `opencode` | `npm install -g opencode-ai` |
 | Droid | `droid` | See [factory.ai](https://factory.ai/) |
 | Kilo | `kilo` | `npm install -g @kilocode/cli` |
+| Kiro | `kiro-cli` | See [kiro.dev](https://kiro.dev/) |
 
 ## Auto-Detection
 
@@ -30,6 +31,7 @@ roborev auto-detects installed agents and falls back in this order:
 6. OpenCode
 7. Droid
 8. Kilo
+9. Kiro
 
 The first available agent is used unless you specify one explicitly.
 
@@ -78,6 +80,7 @@ roborev refine --model claude-sonnet-4-20250514
 | OpenCode | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
 | Droid | Factory model name | (see Factory.ai docs) |
 | Kilo | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
+| Kiro | Model name | (see Kiro docs) |
 
 ### Configuration
 
@@ -109,8 +112,23 @@ Different agents have different levels of support for agentic mode (file edits a
 | OpenCode | Full (auto-approves in non-interactive mode) |
 | Droid | Full (runs autonomously) |
 | Kilo | Full (runs autonomously) |
+| Kiro | Full (uses `--trust-all-tools`) |
 
 See [Custom Tasks & Agentic Mode](/guides/custom-tasks/) for details on review vs agentic modes.
+
+## ACP (Agent Client Protocol)
+
+ACP lets you integrate any agent that speaks the [Agent Client Protocol](https://zed.dev/blog/acp), even if roborev doesn't have a built-in adapter for it. Configure an ACP agent in the `[acp]` section of `~/.roborev/config.toml`:
+
+```toml
+[acp]
+name = "codex-acp"
+command = "codex-acp"
+```
+
+Once configured, the ACP agent can be selected with `--agent <name>`.
+
+See the [Agent Client Protocol (ACP) guide](/guides/acp/) for setup examples, the full configuration reference, mode negotiation, and troubleshooting.
 
 ## See Also
 

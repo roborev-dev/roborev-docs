@@ -111,7 +111,10 @@ Press `o` in the queue or tasks view to open the column options modal. From ther
 
 Custom column order is saved to `column_order` (queue) and `task_column_order` (tasks) in `~/.roborev/config.toml`. To show separator lines between columns, set `column_borders = true`.
 
-The queue's Status column combines the previous Status and P/F (Pass/Fail) columns into a single field with color-coded values: Queued (yellow), Running (blue), Pass (green), Fail (red), Error (orange), Canceled (gray).
+The queue displays two separate status columns:
+
+- **Status**: The job's lifecycle state: Queued (yellow), Running (blue), Done (default), Error (orange), Canceled (gray).
+- **P/F**: The review verdict, shown once the review completes: Pass (green) or Fail (red). This reflects whether the code review found issues, not whether the job itself errored. A job can finish successfully (Status = Done) with a Fail verdict if the reviewer flagged problems.
 
 ## Review View
 

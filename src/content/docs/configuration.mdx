@@ -192,7 +192,10 @@ If the primary agent fails (rate limits, network errors, crashes), roborev can a
 # ~/.roborev/config.toml
 default_agent = "codex"
 default_backup_agent = "claude-code"  # Fallback for any workflow
+default_backup_model = "claude-sonnet-4-20250514"  # Model for the backup agent
 ```
+
+When a backup agent takes over, it uses the model specified by `default_backup_model`. Without this setting, the backup agent uses whatever model is configured for it normally. This is useful when your backup agent needs a different model than the one configured as `default_model` (which is typically chosen for the primary agent).
 
 You can also set backup agents per workflow:
 
@@ -241,6 +244,7 @@ Create `~/.roborev/config.toml` to set system-wide defaults.
 ```toml
 default_agent = "codex"
 default_model = "gpt-5.2-codex"  # Default LLM
+default_backup_model = "claude-sonnet-4-20250514"  # Fallback model for backup agent
 server_addr = "127.0.0.1:7373"
 max_workers = 4
 job_timeout = "10m"  # Per-job timeout (default: 10m)
@@ -256,6 +260,7 @@ column_borders = true             # Show separators between TUI columns
 |--------|------|---------|-------------|------------|
 | `default_agent` | string | auto-detect | Default AI agent to use | Yes |
 | `default_backup_agent` | string | - | Fallback agent when the primary fails | Yes |
+| `default_backup_model` | string | - | Fallback model used when a backup agent runs | Yes |
 | `default_model` | string | agent default | Model to use (format varies by agent) | Yes |
 | `server_addr` | string | 127.0.0.1:7373 | Daemon listen address | No |
 | `max_workers` | int | 4 | Number of parallel review workers | No |
@@ -325,6 +330,22 @@ allow_unsafe_agents = true
 :::caution
 This makes all review operations potentially write to your codebase. Use with caution. It's generally safer to enable agentic mode per-job with `--agentic`.
 :::
+
+### Advanced Section
+
+The `[advanced]` section controls opt-in features that are not part of the default workflow.
+
+```toml
+# ~/.roborev/config.toml
+[advanced]
+enable_tasks = true   # Enable background tasks in the TUI
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enable_tasks` | bool | false | Enable the TUI background tasks workflow (fix jobs, patch application, rebasing) |
+
+When enabled, the TUI exposes the `F` (fix) and `T` (tasks) shortcuts for launching fix jobs and managing patches. See [Background Tasks](/advanced/background-tasks/) for the full reference.
 
 ## Hooks
 

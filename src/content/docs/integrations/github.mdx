@@ -74,7 +74,7 @@ Before enabling the CI poller, you need:
 
    If you do provide a local checkout, it must use `origin` as its remote name (the default). The poller runs `git fetch origin` and `git fetch origin pull/<number>/head` to retrieve PR commits, including those from contributor forks.
 
-3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`, `kilo`, `kiro`. You can check what's available with:
+3. **At least one AI agent** installed. The poller auto-detects installed agents in this order: `codex`, `claude-code`, `gemini`, `copilot`, `cursor`, `opencode`, `droid`, `kilo`, `kiro`, `pi`. You can check what's available with:
    ```bash
    roborev check-agents             # smoke-test all installed agents
    roborev check-agents --agent codex  # test a specific agent
@@ -491,6 +491,8 @@ throttle_bypass_users = ["wesm"]      # these users bypass throttling
 
 When a PR is pushed within the throttle window, the poller defers the review and posts a pending GitHub status showing the next eligible review time. Set `throttle_interval = "0"` to disable throttling entirely.
 
+Throttling is bypassed when a new push supersedes an in-progress review: the old review is canceled and the new one starts immediately, so you always get feedback on the latest code.
+
 Users listed in `throttle_bypass_users` get immediate reviews on every push regardless of the interval. Matching is case-insensitive.
 
 ## Per-Repo Overrides
@@ -542,7 +544,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `synthesis_model` | string | | Model override for synthesis |
 | `upsert_comments` | bool | `false` | Update existing PR comments instead of creating new ones |
 
-When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid, kilo, kiro.
+When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid, kilo, kiro, pi.
 
 ### GitHub App Options
 

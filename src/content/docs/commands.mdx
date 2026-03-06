@@ -441,6 +441,10 @@ roborev stream --repo .          # Filter to current repo
 
 See: [PostgreSQL Sync](/guides/postgres-sync/), [Event Streaming](/integrations/streaming/)
 
+## Multi-Repo Workspaces
+
+`roborev list` looks in immediate child subfolders for repositories, so you can run it from a parent directory that contains multiple repos. `roborev review` suggests repo-level review commands when run from a workspace root, making it easy to review across projects.
+
 ## Global Flags
 
 These flags work across most commands:

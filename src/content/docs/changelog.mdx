@@ -5,6 +5,27 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.42
+<small>2026-03-05</small>
+
+**New features**
+
+- Multi-repo workspace support: `roborev list` looks in immediate child subfolders for repos, and `roborev review` suggests repo-level review commands.
+- Cursor agent support.
+- Pi coding agent support.
+- Save generated patch files to disk from the TUI Tasks view.
+
+**Improvements**
+
+- Skip review throttling when a new push supersedes an in-progress review. The old review is canceled and the new one starts immediately.
+- Validate configured agent names and reject unknown agents earlier.
+
+**Bug fixes**
+
+- Improve Claude review failure reporting so agent errors are captured and surfaced correctly.
+
+---
+
 ## 0.41
 <small>2026-03-04</small>
 

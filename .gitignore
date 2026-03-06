@@ -15,6 +15,9 @@ screenshots/demo-data/
 *.db-wal
 *.db-shm
 
+# Superset metadata
+.superset/
+
 # OS
 .DS_Store
 

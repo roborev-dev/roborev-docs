@@ -4,10 +4,15 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
   site: 'https://roborev.io',
   redirects: {
-    '/integrations/postgres-sync/': '/guides/postgres-sync/',
-    '/agents/modes/': '/guides/custom-tasks/',
+    '/integrations/postgres-sync/': '/advanced/postgres-sync/',
+    '/agents/modes/': '/advanced/custom-tasks/',
     '/guides/reviewing-branches/': '/guides/reviewing-code/',
     '/guides/reviewing-dirty/': '/guides/reviewing-code/',
+    '/guides/custom-tasks/': '/advanced/custom-tasks/',
+    '/guides/acp/': '/advanced/acp/',
+    '/guides/postgres-sync/': '/advanced/postgres-sync/',
+    '/integrations/streaming/': '/advanced/streaming/',
+    '/integrations/git-worktrees/': '/guides/repository-management/',
   },
   integrations: [
     starlight({
@@ -110,18 +115,23 @@ export default defineConfig({
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Code Analysis & Refactoring', slug: 'guides/assisted-refactoring' },
             { label: 'Auto-Fix with Refine', slug: 'guides/auto-fixing' },
-            { label: 'Custom Tasks & Agentic Mode', slug: 'guides/custom-tasks' },
-            { label: 'Agent Client Protocol (ACP)', slug: 'guides/acp' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
-            { label: 'PostgreSQL Sync', slug: 'guides/postgres-sync' },
+          ],
+        },
+        {
+          label: 'Advanced Features',
+          items: [
+            { label: 'Background Tasks', slug: 'advanced/background-tasks' },
+            { label: 'Custom Tasks & Agentic Mode', slug: 'advanced/custom-tasks' },
+            { label: 'Agent Client Protocol (ACP)', slug: 'advanced/acp' },
+            { label: 'PostgreSQL Sync', slug: 'advanced/postgres-sync' },
+            { label: 'Event Streaming', slug: 'advanced/streaming' },
           ],
         },
         {
           label: 'Integrations',
           items: [
             { label: 'Claude Chic', slug: 'integrations/claudechic' },
-            { label: 'Event Streaming', slug: 'integrations/streaming' },
-            { label: 'Git Worktrees', slug: 'integrations/git-worktrees' },
           ],
         },
         { label: 'Review Hooks', slug: 'guides/hooks' },

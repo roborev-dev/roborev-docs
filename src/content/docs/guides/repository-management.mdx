@@ -7,7 +7,7 @@ import Screenshot from '../../../components/Screenshot.astro';
 
 Manage repositories tracked by roborev:
 
-<Screenshot src="/cli-repo-list.svg" alt="roborev repo list output" />
+<Screenshot src="/cli-repo-list.svg" alt="roborev repo list output" maxWidth="480px" />
 
 ```bash
 roborev repo list                    # List all repos with review counts
@@ -58,7 +58,7 @@ roborev repo delete old-project   # Remove one you no longer need
 
 You can have multiple local clones of the same remote repository (e.g., `~/project-main` and `~/project-feature`). Each clone is tracked separately in roborev while sharing the same repository identity for sync purposes.
 
-When using [PostgreSQL Sync](/guides/postgres-sync/), reviews from teammates are intelligently matched:
+When using [PostgreSQL Sync](/advanced/postgres-sync/), reviews from teammates are intelligently matched:
 - If you have exactly one local clone with that identity, synced reviews appear there
 - If you have multiple clones, a placeholder repo is created to avoid ambiguity
 
@@ -77,7 +77,29 @@ The default display name is the directory name. You can customize this with:
 display_name = "My Custom Name"
 ```
 
+## Git Worktrees
+
+roborev fully supports git worktrees. Reviews are stored against the main repository, so commits made in any worktree are associated with the same review history. No configuration is needed.
+
+```bash
+# Create a worktree for a feature branch
+git worktree add ~/projects/myapp-feature feature-branch
+cd ~/projects/myapp-feature
+
+# Reviews work normally, stored under the main repo
+roborev review --branch
+roborev refine
+roborev tui
+```
+
+When running commands from a worktree:
+
+- Reviews are stored using the **main repository path** (not the worktree path)
+- The TUI shows all reviews for the repository regardless of which worktree you're in
+- `refine` correctly finds and addresses reviews for commits in any worktree
+
+Without this, you'd get duplicate repository entries, scattered reviews, and confusion about which reviews belong to which code. With worktree support, everything is consolidated under the main repository.
+
 ## See Also
 
-- [Git Worktrees](/integrations/git-worktrees/) - How worktrees are handled
 - [Configuration](/configuration/) - Per-repo and global settings

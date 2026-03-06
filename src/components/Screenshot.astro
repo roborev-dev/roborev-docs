@@ -2,13 +2,15 @@
 interface Props {
   src: string;
   alt: string;
+  maxWidth?: string;
 }
 
-const { src, alt } = Astro.props;
+const { src, alt, maxWidth } = Astro.props;
+const imgStyle = maxWidth ? `max-width: ${maxWidth}` : undefined;
 ---
 
 <figure class="screenshot" data-lightbox>
-  <img src={src} alt={alt} loading="lazy" />
+  <img src={src} alt={alt} loading="lazy" style={imgStyle} />
 </figure>
 
 <style>

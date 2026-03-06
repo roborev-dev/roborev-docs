@@ -5,6 +5,26 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.43
+<small>2026-03-06</small>
+
+**New features**
+
+- `default_backup_model` config option to control the fallback model used by agent workflows when the primary model is unavailable.
+- `advanced.enable_tasks` config flag to opt in to the TUI background tasks workflow (fix jobs, patch application, and rebasing). This workflow was previously enabled by default and has been moved behind a flag to avoid confusion about the primary review workflow.
+
+**Improvements**
+
+- `Ctrl-D` quits the TUI as an additional shortcut alongside `q`.
+- Improved built-in agent skill definitions for more reliable matching, and expanded agent configuration documentation.
+
+**Bug fixes**
+
+- Agent resolution for `review`, `analyze`, `fix`, and `refine` commands now selects the intended agent more reliably.
+- CLI `--agent` overrides no longer inherit the wrong `default_model` from configuration.
+
+---
+
 ## 0.42
 <small>2026-03-05</small>
 

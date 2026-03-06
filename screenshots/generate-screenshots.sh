@@ -38,14 +38,7 @@ wait_until() {
 }
 
 # --- Ensure tasks are disabled (default for most users) ---
-mkdir -p "$(dirname "$ROBOREV_DATA_DIR/config.toml")"
-if [[ -f "$ROBOREV_DATA_DIR/config.toml" ]]; then
-    if ! grep -q '^\[advanced\]' "$ROBOREV_DATA_DIR/config.toml"; then
-        printf '\n[advanced]\nenable_tasks = false\n' >> "$ROBOREV_DATA_DIR/config.toml"
-    fi
-else
-    printf '[advanced]\nenable_tasks = false\n' > "$ROBOREV_DATA_DIR/config.toml"
-fi
+roborev config set advanced.enable_tasks false --global
 
 # --- Start tmux session (tall for hero, resized later) ---
 tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 50

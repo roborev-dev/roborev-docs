@@ -38,6 +38,12 @@ wait_until() {
 }
 
 # --- Ensure tasks are disabled (default for most users) ---
+# This script runs inside a Docker container with an ephemeral
+# ROBOREV_DATA_DIR, so --global only affects the container's config.
+if [[ -z "${ROBOREV_DATA_DIR:-}" ]]; then
+    echo "ERROR: ROBOREV_DATA_DIR must be set (this script runs inside Docker)"
+    exit 1
+fi
 roborev config set advanced.enable_tasks false --global
 
 # --- Start tmux session (tall for hero, resized later) ---

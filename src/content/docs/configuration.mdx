@@ -220,6 +220,10 @@ When a job fails with an agent error (not a review finding), roborev resolves th
 
 If a backup agent is found and installed, the job is retried with that agent. The failover is logged in the daemon output. If no backup is configured or the backup agent isn't installed, the job fails normally.
 
+### Agent Name Validation
+
+Unknown agent names in configuration files and CLI flags are now validated and rejected early. If you specify an agent name that roborev doesn't recognize, you'll get a clear error message at startup or command invocation instead of a confusing failure later.
+
 ### Excluded Branches
 
 Skip automatic reviews on work-in-progress branches:

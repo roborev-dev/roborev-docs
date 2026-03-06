@@ -499,21 +499,21 @@ img.diagram-center {
 }
 
 .agent-matrix img {
-  height: 28px;
+  height: 24px;
   width: auto;
   border: none !important;
 }
 
 .agent-matrix img[data-agent="codex"] {
-  height: 65px;
+  height: 55px;
 }
 
 .agent-matrix img[data-agent="gemini"] {
-  height: 34px;
+  height: 29px;
 }
 
 .agent-matrix .agent-text {
-  font-size: 1.7rem;
+  font-size: 1.45rem;
   font-weight: 600;
   color: var(--sl-color-gray-1);
   letter-spacing: 0.02em;
@@ -528,18 +528,18 @@ img.diagram-center {
   }
 
   .agent-matrix img {
-    height: 20px;
+    height: 17px;
   }
 
   .agent-matrix img[data-agent="codex"] {
-    height: 50px;
+    height: 42px;
   }
 
   .agent-matrix img[data-agent="gemini"] {
-    height: 24px;
+    height: 20px;
   }
 
   .agent-matrix .agent-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 }

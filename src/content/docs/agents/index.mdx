@@ -18,6 +18,7 @@ roborev supports multiple AI coding agents and auto-detects which ones are insta
 | Droid | `droid` | See [factory.ai](https://factory.ai/) |
 | Kilo | `kilo` | `npm install -g @kilocode/cli` |
 | Kiro | `kiro-cli` | See [kiro.dev](https://kiro.dev/) |
+| Pi | `pi` | `npm install -g @mariozechner/pi-coding-agent` |
 
 ## Auto-Detection
 
@@ -32,6 +33,7 @@ roborev auto-detects installed agents and falls back in this order:
 7. Droid
 8. Kilo
 9. Kiro
+10. Pi
 
 The first available agent is used unless you specify one explicitly.
 
@@ -81,6 +83,7 @@ roborev refine --model claude-sonnet-4-20250514
 | Droid | Factory model name | (see Factory.ai docs) |
 | Kilo | `provider/model` | `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4.1` |
 | Kiro | Model name | (see Kiro docs) |
+| Pi | Model name | `claude-sonnet-4-20250514`, `gpt-4.1` |
 
 ### Configuration
 
@@ -113,6 +116,7 @@ Different agents have different levels of support for agentic mode (file edits a
 | Droid | Full (runs autonomously) |
 | Kilo | Full (runs autonomously) |
 | Kiro | Full (uses `--trust-all-tools`) |
+| Pi | Full (tools execute without confirmation) |
 
 See [Custom Tasks & Agentic Mode](/guides/custom-tasks/) for details on review vs agentic modes.
 

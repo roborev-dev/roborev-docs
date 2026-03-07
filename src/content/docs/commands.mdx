@@ -39,7 +39,6 @@ roborev review --branch --base develop  # Against specific base
 
 # Uncommitted changes
 roborev review --dirty           # Review working tree
-roborev review --dirty --wait    # Wait for result
 
 # Review types
 roborev review --type security   # Security-focused review
@@ -48,7 +47,7 @@ roborev review --type design     # Design-focused review
 
 | Flag | Description |
 |------|-------------|
-| `--wait` | Wait for review to complete and display result |
+| `--wait` | Block until review completes (intended for CI, scripting, and orchestrators; not recommended in interactive agent sessions) |
 | `--quiet` | Only show progress/elapsed time |
 | `--branch [name]` | Review all commits on branch since base (optionally specify branch name) |
 | `--base <branch>` | Base branch for `--branch` comparison (default: auto-detect) |
@@ -80,7 +79,7 @@ roborev wait --quiet             # Suppress output (for hooks/agents)
 | `--job` | Force argument to be treated as job ID |
 | `-q, --quiet` | Suppress output (exit code only) |
 
-Unlike `roborev review --wait`, this does not enqueue a new review. It waits for an already-running job, making it useful when a post-commit hook has already triggered the review.
+Unlike `roborev review --wait`, this does not enqueue a new review. It waits for an already-running job, making it useful when a post-commit hook has already triggered the review. For most interactive workflows, use `roborev tui` to browse completed reviews instead of blocking.
 
 See: [Reviewing Code](/guides/reviewing-code/)
 

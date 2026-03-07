@@ -11,10 +11,9 @@ Use `--branch` to review all commits since your branch diverged from main:
 roborev review --branch              # Review branch vs auto-detected main/master
 roborev review --branch=feature-xyz  # Review a specific branch by name
 roborev review --branch --base dev   # Review branch vs specific base
-roborev review --branch --wait       # Wait for review and show result
 ```
 
-This is useful for pre-merge reviews of entire feature branches.
+Reviews are enqueued and run in the background. Open `roborev tui` to browse results as they complete. This is the recommended workflow for pre-merge reviews of entire feature branches.
 
 ### Reviewing a Different Branch
 
@@ -40,11 +39,13 @@ Before creating a pull request, review your entire branch:
 
 ```bash
 git checkout feature-branch
-roborev review --branch --wait
-roborev compact --wait   # Consolidate findings across commits
-roborev fix              # Address consolidated findings
-roborev tui              # Browse results
+roborev review --branch          # Enqueue branch review (runs in background)
+roborev tui                      # Browse results as they arrive
+roborev compact                  # Consolidate findings across commits
+roborev fix                      # Address consolidated findings
 ```
+
+The TUI gives you a persistent queue of open reviews that must be explicitly addressed and closed, creating an accountability loop that prevents findings from getting lost.
 
 ### CI Integration
 
@@ -61,7 +62,7 @@ fi
 |------|-------------|
 | `--branch [name]` | Review all commits on the branch since base. Optionally specify a branch name with `--branch=name`. |
 | `--base <branch>` | Compare against a specific base branch (default: auto-detect main/master) |
-| `--wait` | Wait for all reviews to complete |
+| `--wait` | Block until all reviews complete (for CI and scripting; see [When to use `--wait`](#when-to-use---wait)) |
 | `--quiet` | Suppress output |
 | `--agent <name>` | Use specific agent |
 | `--reasoning <level>` | Set reasoning depth |
@@ -72,8 +73,9 @@ Use `--dirty` to review working tree changes before committing:
 
 ```bash
 roborev review --dirty           # Queue review of uncommitted changes
-roborev review --dirty --wait    # Wait for review and show result
 ```
+
+Results appear in `roborev tui` once the review completes.
 
 ### What Gets Reviewed
 
@@ -87,25 +89,10 @@ The `--dirty` flag includes:
 
 | Flag | Description |
 |------|-------------|
-| `--wait` | Wait for review to complete |
+| `--wait` | Block until review completes (for CI and scripting; see [When to use `--wait`](#when-to-use---wait)) |
 | `--quiet` | Suppress output |
 | `--agent <name>` | Use specific agent |
 | `--reasoning <level>` | Set reasoning depth |
-
-### Exit Codes
-
-The `--wait` flag exits with:
-- Code 0 for passing reviews
-- Code 1 for failing reviews
-
-This is useful for CI or pre-commit workflows:
-
-```bash
-if ! roborev review --dirty --wait --quiet; then
-    echo "Review failed - please address findings"
-    exit 1
-fi
-```
 
 ## Review Types
 
@@ -183,15 +170,41 @@ roborev wait --quiet                  # Block until verdict
 # Exit code 0 = pass, 1 = fail
 ```
 
+## When to use `--wait`
+
+By default, `roborev review` enqueues reviews and returns immediately. The `--wait` flag blocks until the review completes and prints the result to stdout.
+
+This is a convenience for:
+
+- **CI pipelines**: gate merges on review outcomes using the exit code
+- **Orchestrators and one-shot agents**: scripts or automated systems that need a synchronous result before proceeding
+- **`roborev refine`**: the iterative fix loop uses `--wait` internally to re-review after each fix
+
+`--wait` is **not recommended inside interactive agent sessions** (Claude Code, Codex, etc.). Reviews requested with `--wait` still appear in the TUI, but in practice the result scrolls past in the conversation and is easy to lose track of. The async workflow creates a persistent accountability loop: reviews stay open in the TUI queue until explicitly addressed and closed, so nothing falls through the cracks.
+
+### Exit Codes
+
+When `--wait` is used, the exit code reflects the review verdict:
+- Code 0 for passing reviews
+- Code 1 for failing reviews
+
+```bash
+# CI example
+if ! roborev review --branch --wait --quiet; then
+    echo "Reviews found issues"
+    exit 1
+fi
+```
+
 ## Addressing Findings
 
 After reviewing, use `roborev fix` to let an agent address any failed reviews:
 
 ```bash
-roborev review --dirty --wait
-# commit your changes
-roborev fix                      # Fix open reviews
+roborev fix                      # Fix open reviews on this branch
 ```
+
+Browse open reviews first with `roborev tui`, then fix them. See [Responding to Reviews](/guides/responding-to-reviews/) for the full set of options.
 
 ## See Also
 

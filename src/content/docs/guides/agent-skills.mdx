@@ -9,6 +9,12 @@ Install slash commands that let AI agents request reviews and fix findings direc
 roborev skills install
 ```
 
+:::tip[Prefer the async workflow for day-to-day reviews]
+The recommended roborev workflow is **async reviews + TUI**: reviews run in the background (via hooks or `roborev review`), and you browse, address, and close them in `roborev tui`. This creates a persistent accountability loop where open findings stay visible until resolved.
+
+The review skills below are a convenience for **requesting ad-hoc reviews from within an agent session**. They use `--wait` internally so the agent can present findings inline. For routine reviews, rely on the post-commit hook and check the TUI rather than requesting reviews through your agent.
+:::
+
 ## Available Skills
 
 | Skill | Description |
@@ -36,7 +42,7 @@ Request a code review without leaving your agent session:
 /roborev:review --type security
 ```
 
-The review runs in the background via `roborev review --wait`, so you can keep working. When it completes, the agent presents the findings and offers to address them with `/roborev:address`.
+The skill enqueues a review and waits for the result so it can present findings inline. If you already have reviews queued from the post-commit hook, use `/roborev:fix` to address them instead of requesting new ones.
 
 ### Review a branch
 
@@ -48,7 +54,7 @@ Review all commits since the current branch diverged from main:
 /roborev:review-branch --type security
 ```
 
-This runs `roborev review --branch --wait` in the background. Same workflow: results are presented when ready, with an offer to address findings.
+The skill enqueues a branch review and waits for results so the agent can present them inline.
 
 ### Design review
 
@@ -59,7 +65,7 @@ Request a design-focused review that evaluates completeness, feasibility, and ta
 /roborev:design-review abc123
 ```
 
-Runs `roborev review --wait --type design` in the background, following the same pattern as the other review skills.
+Enqueues a design review and waits for the result, following the same pattern as the other review skills.
 
 ### Design review a branch
 
@@ -70,7 +76,7 @@ Review all commits on the current branch with a design-focused lens:
 /roborev:design-review-branch --base develop
 ```
 
-This is the branch equivalent of `/roborev:design-review`, running `roborev review --branch --wait --type design` in the background.
+This is the branch equivalent of `/roborev:design-review`.
 
 ### Fix all open reviews at once
 
@@ -141,7 +147,7 @@ Skills are installed as agent-specific configuration:
 - **Claude Code**: Custom slash commands in `~/.claude/`
 - **Codex**: Custom agent skills directory
 
-The review skills call `roborev review --wait` to enqueue reviews and wait for results. The fix skills call `roborev show --job <id> --json` to fetch review data, then parse and present findings to the agent in a structured format.
+The review skills use `--wait` internally so the agent can present results inline. The fix skills call `roborev show --job <id> --json` to fetch review data, then parse and present findings to the agent in a structured format. All reviews (whether requested via skills or the post-commit hook) appear in the TUI queue.
 
 ## Waiting for Hook-Triggered Reviews
 
@@ -158,11 +164,13 @@ This is more token-efficient than polling `roborev list` or
 `roborev show` because the agent makes a single blocking call and
 reads the exit code. See [Waiting for a Review Without Enqueuing](/guides/reviewing-code/#waiting-for-a-review-without-enqueuing) for the full flag reference.
 
-## Interactive vs Automated
+## Skills vs Async Reviews
 
-Skills provide an **interactive** workflow. The review skills (`/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`) let you request reviews from within your agent session and see results inline. The `/roborev:fix` skill lets your agent address findings while you review the changes before committing.
+For most workflows, the **async approach** is better: reviews run automatically via the post-commit hook, results accumulate in the TUI, and you address them when ready. This keeps your agent session focused on writing code and creates a persistent record of what needs attention.
 
-For **fully automated** fixing, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
+Skills are useful when you want to **explicitly request a review** during an agent session, for example to review uncommitted changes or to get a design review before committing. The `/roborev:fix` skill is valuable in any workflow because it pulls findings from the TUI queue and addresses them within your session.
+
+For **fully automated** fixing outside an agent session, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
 
 ## See Also
 

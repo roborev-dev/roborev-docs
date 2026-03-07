@@ -52,13 +52,14 @@ AI coding agents write code fast, but they make mistakes. Most review feedback c
 
 1. **Ask your agents to commit often**, ideally every turn of work
 2. **roborev reviews** each commit in the background
-3. **Feed findings** into your agent sessions, or fix them autonomously with `roborev fix`
+3. **Check the TUI** (`roborev tui`) to browse findings as they arrive
+4. **Address findings** by copying reviews into your agent, using `/roborev:fix`, or running `roborev fix`
 
-Every commit gets reviewed. Issues surface in seconds, not hours.
+Every commit gets reviewed. Issues surface in seconds, not hours. Open reviews stay in the TUI queue until explicitly addressed and closed, so nothing falls through the cracks.
 
 <CardGrid stagger>
-  <Card title="Background Reviews" icon="pencil">
-    Every commit is reviewed automatically via git hooks. No workflow changes required.
+  <Card title="Review Ledger" icon="pencil">
+    Every commit is reviewed automatically via git hooks. Reviews accumulate in a persistent queue that acts as a ledger: nothing is closed until explicitly addressed.
   </Card>
   <Card title="Auto-Fix" icon="setting">
     `roborev fix` feeds review findings to an agent that applies fixes and commits.

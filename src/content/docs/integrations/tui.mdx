@@ -5,7 +5,7 @@ description: Interactive terminal interface for viewing and managing reviews
 
 import Screenshot from '../../../components/Screenshot.astro';
 
-The interactive terminal UI (`roborev tui`) provides a real-time view of the review queue.
+The interactive terminal UI (`roborev tui`) is the primary interface for working with roborev reviews. The review queue acts as a ledger: every commit review is recorded, and each entry stays open until you explicitly address and close it. This creates an accountability loop that ensures every line of agent-generated code is reviewed and every finding is resolved.
 
 ```bash
 roborev tui                         # Open TUI
@@ -239,12 +239,16 @@ If the TUI binary version differs from the running daemon version, a persistent 
 
 ## Workflow
 
+The TUI is designed around a review, address, close cycle:
+
 1. Run `roborev tui` to open the interface
-2. Navigate to reviews needing attention
-3. Press `Enter` to view full review
-4. Address the findings in your code
-5. Press `a` to mark as closed
-6. Use `h` to hide closed items
+2. Navigate to open reviews needing attention
+3. Press `Enter` to read the full review
+4. Address the findings: copy the review (`y`) into your agent, use `/roborev:fix`, or run `roborev fix`
+5. Press `a` to mark the review as closed
+6. Use `h` to hide closed items and focus on what remains
+
+Open reviews are your backlog. When the queue is clear, every commit on your branch has been reviewed and every finding has been addressed.
 
 ## See Also
 

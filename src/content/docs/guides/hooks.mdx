@@ -50,7 +50,8 @@ command = "echo {repo_name} {sha} {verdict} >> ~/review-log.txt"
 |-------|------|-------------|
 | `event` | string | Event pattern to match (see [Events](#events)) |
 | `command` | string | Shell command to run, with `{var}` template interpolation |
-| `type` | string | Built-in hook type (currently only `"beads"`). Mutually exclusive with `command` |
+| `type` | string | Built-in hook type: `"beads"` or `"webhook"`. Empty or `"command"` runs `command` |
+| `url` | string | Webhook destination URL (required when `type = "webhook"`) |
 
 ### Global vs Per-Repo Hooks
 
@@ -137,6 +138,26 @@ What the `type = "beads"` hook does for each event:
 | `review.completed` | `P` (pass) | No action |
 
 The hook runs in the repo's working directory so `bd` finds the correct `.beads/` database. Issue titles include the `roborev show` command so you can jump straight to the full review.
+
+## Built-in: Webhook Integration
+
+Use `type = "webhook"` to POST the review event as JSON to an external endpoint. This is useful for connecting roborev to dashboards, chatbots, or any service that accepts webhook payloads.
+
+```toml
+[[hooks]]
+event = "review.completed"
+type = "webhook"
+url = "https://example.com/roborev-webhook"
+
+[[hooks]]
+event = "review.failed"
+type = "webhook"
+url = "https://example.com/roborev-webhook"
+```
+
+The webhook sends a JSON POST with a 5-second timeout. The payload includes all event fields (`type`, `job_id`, `repo`, `repo_name`, `sha`, `agent`, `verdict`, `findings`, `error`). The `url` field is treated as sensitive and is masked in `roborev config list` output. Webhook URLs are redacted in daemon logs (only the scheme and host are shown).
+
+Webhook delivery is asynchronous and never blocks the review pipeline. Failed deliveries are logged but do not retry.
 
 ### Custom Beads Commands
 

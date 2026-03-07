@@ -94,7 +94,7 @@ Branches are lazy-loaded: they fetch from the daemon when you expand a repo or t
 
 The current working directory's repo sorts to the top of the tree, and its current branch sorts to the top of that repo's branch list.
 
-To start the TUI with closed items already hidden, set `hide_closed_by_default = true` in `~/.roborev/config.toml`. To auto-filter to the current repository on startup, set `auto_filter_repo = true`. See [Configuration](/configuration/) for details.
+To start the TUI with closed items already hidden, set `hide_closed_by_default = true` in `~/.roborev/config.toml`. To auto-filter to the current repository on startup, set `auto_filter_repo = true`. To auto-filter to the current branch or worktree, set `auto_filter_branch = true`. Both auto-filters add clearable filters (press `Esc`), and CLI flags (`--repo`, `--branch`) take priority when set. See [Configuration](/configuration/) for details.
 
 Pressing `h` toggles the hide-closed filter for the current session without changing the config.
 
@@ -116,6 +116,12 @@ The queue displays two separate status columns:
 
 - **Status**: The job's lifecycle state: Queued (yellow), Running (blue), Done (default), Error (orange), Canceled (gray).
 - **P/F**: The review verdict, shown once the review completes: Pass (green) or Fail (red). This reflects whether the code review found issues, not whether the job itself errored. A job can finish successfully (Status = Done) with a Fail verdict if the reviewer flagged problems.
+
+## Mouse Interactions
+
+Mouse support is enabled by default. Click to select rows, double-click to open a review, and use the scroll wheel to navigate lists.
+
+To disable mouse interactions globally, set `mouse_enabled = false` in `~/.roborev/config.toml`. You can also toggle this from within the TUI by pressing `o` to open the options menu and toggling "Mouse interactions". The change takes effect immediately and is persisted to your config file.
 
 ## Review View
 

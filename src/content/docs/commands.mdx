@@ -389,6 +389,7 @@ roborev daemon stop              # Stop daemon
 roborev daemon restart           # Restart daemon
 roborev daemon run               # Run in foreground
 
+roborev post-commit              # Hook entry point (called by git hook)
 roborev install-hook             # Install post-commit hook
 roborev install-hook --force     # Overwrite existing hook with a fresh one
 roborev uninstall-hook           # Remove hook
@@ -405,6 +406,30 @@ roborev install-hook --force
 ```
 This replaces the hook entirely with a known-good version.
 :::
+
+### Post-Commit Hook Entry Point
+
+`roborev post-commit` is the command the git hook calls after each commit. You do not need to run it manually. It silently exits on any error so hooks never block commits.
+
+```bash
+roborev post-commit              # Called by the git post-commit hook
+```
+
+| Flag | Description |
+|------|-------------|
+| `--repo <path>` | Path to git repository (default: current directory) |
+| `--base <branch>` | Base branch for branch review comparison |
+
+By default, `post-commit` reviews the single commit at HEAD. To review the entire branch (all commits since diverging from the base branch) instead, set `post_commit_review = "branch"` in `.roborev.toml`:
+
+```toml
+# .roborev.toml
+post_commit_review = "branch"
+```
+
+When set to `"branch"`, each commit triggers a `merge-base..HEAD` range review. On the base branch itself, detached HEAD, or any error, it falls back to a single-commit review.
+
+See: [Configuration](/configuration/#post-commit-review-mode)
 
 ## Checking Agents
 

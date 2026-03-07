@@ -5,6 +5,31 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.44
+<small>2026-03-07</small>
+
+**New features**
+
+- `mouse_enabled` global config flag (and TUI options menu toggle) to disable mouse interactions in the TUI.
+- `roborev post-commit` command and `post_commit_review` repo config to control post-commit review behavior, including branch review workflows.
+- Webhook review hooks (`type = "webhook"`) for external integrations.
+- `excluded_commit_patterns` repo config for skipping reviews based on commit message substrings.
+- `auto_filter_branch` global config to automatically filter the TUI to the current branch or worktree on startup.
+
+**Improvements**
+
+- Tighter review prompts and more consistent verdict parsing.
+- Daemon/client mismatch warnings surfaced through daemon status output.
+
+**Bug fixes**
+
+- Retry `fix` daemon calls automatically after a daemon restart.
+- Fix daemon startup restart loops.
+- Fix Enter key handling in the TUI inside embedded terminals.
+- Fix cases where the TUI fails to close cleanly.
+
+---
+
 ## 0.43
 <small>2026-03-06</small>
 

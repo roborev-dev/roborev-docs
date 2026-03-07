@@ -103,6 +103,8 @@ All public APIs must have documentation comments.
 | `display_name` | string | Custom name shown in TUI |
 | `review_context_count` | int | Number of recent reviews to include as context |
 | `excluded_branches` | array | Branches to skip automatic reviews on |
+| `excluded_commit_patterns` | array | Commit message substrings to skip reviews on (case-insensitive) |
+| `post_commit_review` | string | Post-commit hook behavior: `"commit"` (default) or `"branch"` |
 | `review_reasoning` | string | Reasoning level for reviews: thorough, standard, fast |
 | `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
 | `review_agent_<level>` | string | Agent to use for reviews at specific reasoning level |
@@ -237,6 +239,28 @@ excluded_branches = ["wip", "scratch", "experiment"]
 
 Reviews triggered manually with `roborev review` still work on these branches.
 
+### Excluded Commit Patterns
+
+Skip reviews for commits whose messages contain specific substrings (case-insensitive matching):
+
+```toml
+excluded_commit_patterns = ["[skip review]", "wip:", "fixup!"]
+```
+
+When reviewing a range, the range is skipped only if every commit in the range matches. Manually triggered reviews with `roborev review` are not affected.
+
+### Post-Commit Review Mode
+
+By default, the post-commit hook reviews the single commit at HEAD. Set `post_commit_review = "branch"` to review all commits since the branch diverged from the base branch instead:
+
+```toml
+post_commit_review = "branch"
+```
+
+When set to `"branch"`, each commit triggers a `merge-base..HEAD` range review covering the entire branch. On the base branch itself (e.g. `main`), detached HEAD, or any error, the hook falls back to a single-commit review.
+
+This setting only affects the post-commit hook. `roborev review` is not changed by this option.
+
 ## Global Configuration
 
 Create `~/.roborev/config.toml` to set system-wide defaults.
@@ -250,6 +274,8 @@ max_workers = 4
 job_timeout = "10m"  # Per-job timeout (default: 10m)
 hide_closed_by_default = true     # Start TUI with closed/failed/canceled hidden
 auto_filter_repo = true           # Auto-filter TUI to current repo on startup
+auto_filter_branch = true         # Auto-filter TUI to current branch/worktree on startup
+mouse_enabled = true              # Enable mouse interactions in the TUI
 tab_width = 4                     # Tab expansion width for code blocks in TUI (default: 2)
 column_borders = true             # Show separators between TUI columns
 ```
@@ -270,6 +296,8 @@ column_borders = true             # Show separators between TUI columns
 | `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
 | `hide_closed_by_default` | bool | false | Start TUI with closed/failed/canceled reviews hidden | N/A |
 | `auto_filter_repo` | bool | false | Auto-filter TUI to the current repo on startup | N/A |
+| `auto_filter_branch` | bool | false | Auto-filter TUI to the current branch/worktree on startup | N/A |
+| `mouse_enabled` | bool | true | Enable mouse interactions in the TUI (also togglable from the TUI options menu) | N/A |
 | `tab_width` | int | 2 | Tab expansion width for code blocks in TUI (1-16) | N/A |
 | `column_borders` | bool | false | Show `▕` separators between TUI columns | N/A |
 | `column_order` | array | | Custom queue column display order | N/A |
@@ -368,7 +396,8 @@ type = "beads"   # Built-in: creates a bd issue automatically
 |--------|------|-------------|
 | `event` | string | Event to match: `review.completed`, `review.failed`, or `review.*` |
 | `command` | string | Shell command with `{var}` template interpolation |
-| `type` | string | Built-in hook type (`beads`), or omit for custom command |
+| `type` | string | Built-in hook type (`beads`, `webhook`), or omit for custom command |
+| `url` | string | Webhook destination URL (required when `type = "webhook"`) |
 
 Template variables: `{job_id}`, `{repo}`, `{repo_name}`, `{sha}`, `{agent}`, `{verdict}`, `{findings}`, `{error}`
 

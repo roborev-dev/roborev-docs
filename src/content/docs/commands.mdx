@@ -178,6 +178,7 @@ roborev refine --branch feature  # Validate branch before refining
 | `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--quiet` | Only show progress/elapsed time |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
+| `--min-severity <level>` | Only fix findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 See: [Auto-Fix Agentic Loop with Refine](/guides/auto-fixing/)
 
@@ -204,6 +205,7 @@ roborev fix --list                 # List open reviews without fixing
 | `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
 | `--list` | List open reviews with details (job ID, ref, branch, agent, verdict) without running any fixes |
 | `--newest-first` | Process jobs newest first instead of oldest first (requires `--open`) |
+| `--min-severity <level>` | Only fix findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 See: [Assisted Refactoring](/guides/assisted-refactoring/)
 

@@ -82,6 +82,7 @@ If the agent makes no changes for a review, that review is skipped and refine mo
 | `--list` | List failed reviews that would be refined, without running |
 | `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
+| `--min-severity <level>` | Only fix findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 Some flags are mutually exclusive: `--all-branches` cannot be combined with `--branch` or `--since`, and `--list` cannot be combined with `--since`.
 

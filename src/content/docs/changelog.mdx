@@ -5,6 +5,27 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.45
+<small>2026-03-08</small>
+
+**New features**
+
+- `--min-severity` flag for `roborev fix` and `roborev refine` to limit fixes to findings at or above a chosen severity (`low`, `medium`, `high`, `critical`).
+
+**Improvements**
+
+- Review sessions on the current branch are reused more safely, keeping review workflows continuous without stale session conflicts.
+- Copied reviews now include review comments.
+- Agent tool-call narration is removed from review output for cleaner results.
+- Daemon status details are hidden from review views to keep the focus on review content.
+
+**Bug fixes**
+
+- Fix `roborev compact` using the wrong branch inside git worktrees.
+- Fix workflow model fallback so it uses the selected agent's actual default model instead of the global default.
+
+---
+
 ## 0.44
 <small>2026-03-07</small>
 

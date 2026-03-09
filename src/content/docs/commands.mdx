@@ -105,6 +105,8 @@ roborev log <job_id>             # View job log
 | `--prompt` | Show the prompt sent to the agent instead of the review output |
 | `--json` | Output as JSON for machine-readable workflows |
 
+`roborev show` displays review comments after the review output when comments exist, matching the layout in the TUI review detail view.
+
 See: [Terminal UI](/integrations/tui/)
 
 :::tip
@@ -162,6 +164,7 @@ roborev refine --quiet           # Show elapsed time only
 roborev refine --list            # Preview what would be refined
 roborev refine --all-branches    # Refine all branches with failures
 roborev refine --branch feature  # Validate branch before refining
+roborev refine --min-severity high  # Only fix high and critical findings
 ```
 
 | Flag | Description |
@@ -192,6 +195,7 @@ roborev fix --batch                # Batch all open into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
 roborev fix --all-branches         # Fix all open across all branches
 roborev fix --list                 # List open reviews without fixing
+roborev fix --min-severity medium  # Skip low-severity findings
 ```
 
 | Flag | Description |

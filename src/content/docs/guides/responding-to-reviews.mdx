@@ -24,7 +24,9 @@ The agent reads the review, applies changes, commits, and closes the review. Thi
 
 ## Copying Reviews
 
-Press `y` in the TUI to copy the full review content to your clipboard. Paste it into an AI coding agent session to address the findings. You can also share reviews with teammates, include them in GitHub issues, or reference them in commit messages.
+Press `y` in the TUI to copy the full review content to your clipboard, including any comments attached to the review. Paste it into an AI coding agent session to address the findings. The comments give the agent additional context about known issues, false positives, and prior discussion. You can also share reviews with teammates, include them in GitHub issues, or reference them in commit messages.
+
+`roborev show` also displays comments after the review output.
 
 <Screenshot src="/tui-copy.svg" alt="roborev TUI copy review to clipboard" />
 

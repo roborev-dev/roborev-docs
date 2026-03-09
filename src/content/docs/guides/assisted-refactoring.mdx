@@ -96,6 +96,7 @@ roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
 roborev fix --batch                # Batch all open into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
+roborev fix --min-severity medium  # Skip low-severity findings
 ```
 
 The agent reads the review findings, applies changes, commits, and closes the review. This is a one-shot fix. For an iterative loop with re-review, see [`roborev refine`](/guides/auto-fixing/).
@@ -171,6 +172,26 @@ roborev fix --batch
 Without `--batch`, `roborev fix` processes open reviews one at a time. As it commits fixes, the daemon automatically reviews the new commits, and if those new reviews fail, `roborev fix` picks them up and fixes them too. This means a single `roborev fix` invocation can work through a chain of analysis findings and their follow-on reviews without manual intervention.
 
 With `--batch`, all open reviews are concatenated into a single prompt (respecting the configured max prompt size), so the agent fixes everything in one pass. This is particularly useful after queuing several analysis jobs.
+
+## Severity Filtering
+
+Use `--min-severity` to limit which findings the agent addresses:
+
+```bash
+roborev fix --min-severity high          # Only fix high and critical findings
+roborev fix --min-severity medium        # Skip low-severity findings
+roborev fix --batch --min-severity high  # Severity filter works with batch mode
+```
+
+The severity filter is injected into the agent prompt as an instruction. Findings below the threshold are ignored. The filter does not apply to task or analysis jobs, which have free-form output without severity labels; if a batch includes any task jobs, the severity filter is suppressed for the entire batch.
+
+Set a default per repo in `.roborev.toml`:
+
+```toml
+fix_min_severity = "medium"
+```
+
+The CLI flag overrides the config value.
 
 ## Stream Output
 
@@ -272,6 +293,7 @@ max_prompt_size = 204800
 | `--all-branches` | Include jobs from all branches (requires `--open` or `--batch`) |
 | `--newest-first` | Process jobs newest first (requires `--open` or `--batch`) |
 | `--list` | List open reviews with details without running any fixes |
+| `--min-severity <level>` | Only fix findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 ## See Also
 

@@ -133,6 +133,61 @@ For `--dirty` reviews, diffs are limited to 200KB since uncommitted changes cann
 
 For committed changes, diffs over 250KB are omitted from the prompt - the agent is given only the commit hash and can inspect changes using `git show`.
 
+## Session Reuse
+
+:::caution[Experimental]
+Session reuse is experimental. The behavior and configuration may change in future releases. Enable it on a per-repo basis first to evaluate before rolling out globally.
+:::
+
+When reviewing a branch with multiple commits, each review normally starts a fresh agent session. This means the agent re-reads the repository context, re-analyzes unchanged files, and rebuilds its understanding from scratch for every commit. Session reuse changes this: when enabled, the daemon looks for a completed review on the same branch that used the same agent and review type, and resumes that session instead of starting a new one.
+
+The result is that the agent retains its prior conversation context (file contents it already read, architectural understanding it built up, earlier findings it made) and only needs to analyze what changed since the last review. This can substantially reduce token usage and review latency on active branches with frequent commits.
+
+### Enabling Session Reuse
+
+Set `reuse_review_session = true` in your config:
+
+```toml
+# Per repo (.roborev.toml)
+reuse_review_session = true
+
+# Or globally (~/.roborev/config.toml)
+reuse_review_session = true
+```
+
+### How It Works
+
+When a new review is enqueued, the daemon searches for a prior completed review on the same branch that matches the repo, agent, and review type. Candidates are checked newest-first and must pass two safety checks:
+
+1. **Ancestor check**: The candidate's reviewed commit must be an ancestor of the current target. This prevents reusing sessions from rebased or force-pushed branches where the history no longer applies.
+2. **Distance limit**: The candidate must be within 50 commits of the current target. Sessions from much earlier in the branch history are too stale to provide useful context.
+
+If a valid candidate is found, its session ID is passed to the agent, which resumes the prior conversation. If no candidate qualifies, the review starts fresh as usual.
+
+### Supported Agents
+
+Session reuse requires agent-side support for resuming conversations. The following agents support it:
+
+| Agent | Resume mechanism |
+|-------|-----------------|
+| Codex | `codex exec resume --json <session>` |
+| Claude Code | `claude --resume <session>` |
+| OpenCode | `opencode run --session <session>` |
+| Kilo | `kilo run --session <session>` |
+| Pi | `pi --session <path>` |
+
+Agents that do not support session reuse (Gemini, Copilot, Cursor, Kiro, Droid) ignore the setting and always start fresh sessions.
+
+### Tuning with Lookback
+
+By default, the daemon considers all prior sessions on the branch as candidates. On long-lived branches with many reviews, you can limit the search to the most recent N candidates:
+
+```toml
+reuse_review_session_lookback = 5   # Only consider 5 most recent sessions
+```
+
+This is rarely needed. The default (unlimited) works well because the ancestor and distance checks already filter out stale candidates.
+
 ## Waiting for a Review Without Enqueuing
 
 When a post-commit hook already triggers `roborev review`, you don't

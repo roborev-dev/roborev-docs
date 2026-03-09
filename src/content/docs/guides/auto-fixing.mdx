@@ -18,6 +18,7 @@ roborev refine --since HEAD~3        # Refine the last 3 commits
 roborev refine --list                # Preview which reviews would be refined
 roborev refine --all-branches        # Refine all branches with failed reviews
 roborev refine --branch feature-xyz  # Validate branch before refining
+roborev refine --min-severity high   # Only fix high and critical findings
 ```
 
 ## How It Works
@@ -82,6 +83,7 @@ If the agent makes no changes for a review, that review is skipped and refine mo
 | `--list` | List failed reviews that would be refined, without running |
 | `--newest-first` | Process newest first (requires `--all-branches` or `--list`) |
 | `--allow-unsafe-agents` | Allow agents without sandboxing |
+| `--min-severity <level>` | Only fix findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 Some flags are mutually exclusive: `--all-branches` cannot be combined with `--branch` or `--since`, and `--list` cannot be combined with `--since`.
 
@@ -128,6 +130,26 @@ roborev refine --branch feature-xyz
 ```
 
 This errors if the current branch doesn't match, preventing accidental refinement of the wrong branch.
+
+## Severity Filtering
+
+Use `--min-severity` to focus on findings above a certain threshold and skip low-priority noise:
+
+```bash
+roborev refine --min-severity high       # Only fix high and critical findings
+roborev refine --min-severity medium     # Skip low-severity findings
+roborev refine --min-severity critical   # Only fix critical findings
+```
+
+When severity filtering is active and all findings in a review fall below the threshold, refine automatically closes the review and moves on to the next one instead of treating it as a fix failure.
+
+You can also set a default per repo in `.roborev.toml`:
+
+```toml
+refine_min_severity = "medium"
+```
+
+The CLI flag overrides the config value. The severity filter does not apply to task or analysis jobs, which have free-form output without severity labels.
 
 ## Requirements
 

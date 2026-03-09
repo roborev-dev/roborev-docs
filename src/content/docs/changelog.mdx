@@ -5,6 +5,32 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.45
+<small>2026-03-08</small>
+
+**New features**
+
+- `--min-severity` flag for `roborev fix` and `roborev refine` to limit fixes to findings at or above a chosen severity (`low`, `medium`, `high`, `critical`). Also configurable per repo via `fix_min_severity` and `refine_min_severity` in `.roborev.toml`. When all findings in a review fall below the threshold, `refine` automatically closes the review instead of treating it as a fix failure.
+- Experimental: `reuse_review_session` config option (global and per repo) to resume prior agent sessions on the same branch, reducing token usage and review latency on active branches. See [Session Reuse](/guides/reviewing-code/#session-reuse).
+
+**Improvements**
+
+- `roborev show` now displays comments after the review output, matching the TUI review detail view.
+- Copied reviews (TUI `y` key) now include review comments, giving the fix agent more context when you paste into an agent session.
+- Agent tool-call narration (text the agent emits before tool calls) is stripped from persisted review output across all agents.
+- Daemon status details are hidden from the review detail view in the TUI; the queue view is unchanged.
+- Review prompts now instruct agents not to build projects, run tests, or execute code during review.
+- `roborev config set` and `roborev init` now produce commented TOML output with inline descriptions for each field.
+
+**Bug fixes**
+
+- Fix `roborev compact` using the wrong branch inside git worktrees. It was resolving the main checkout's branch instead of the worktree's branch.
+- Fix workflow model fallback so it uses the selected agent's actual default model instead of the global default.
+- Job log files are no longer permanently lost when the initial file open fails under resource pressure. The new log writer retries and buffers output until disk logging recovers.
+- Timed-out review jobs now unwind reliably instead of appearing to run past the configured `job_timeout`. Timeout errors are recorded as `agent timeout after <duration>` for clearer reporting in the TUI and hooks.
+
+---
+
 ## 0.44
 <small>2026-03-07</small>
 

@@ -90,7 +90,7 @@ refine_reasoning = "standard"  # For refine command (default: standard)
 fix_min_severity = "medium"     # Skip low-severity findings in fix
 refine_min_severity = "medium"  # Skip low-severity findings in refine
 
-# Session reuse
+# Session reuse (experimental)
 reuse_review_session = true     # Resume prior agent sessions on same branch
 
 # Project-specific review guidelines
@@ -116,8 +116,8 @@ All public APIs must have documentation comments.
 | `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
 | `fix_min_severity` | string | Minimum severity for `fix`: `critical`, `high`, `medium`, or `low` |
 | `refine_min_severity` | string | Minimum severity for `refine`: `critical`, `high`, `medium`, or `low` |
-| `reuse_review_session` | bool | Resume prior agent sessions on the same branch when possible |
-| `reuse_review_session_lookback` | int | Maximum number of recent session candidates to consider (default: unlimited) |
+| `reuse_review_session` | bool | (Experimental) Resume prior agent sessions on the same branch. See [Session Reuse](/guides/reviewing-code/#session-reuse) |
+| `reuse_review_session_lookback` | int | Max recent session candidates to consider (default: unlimited). See [Session Reuse](/guides/reviewing-code/#session-reuse) |
 | `review_agent_<level>` | string | Agent to use for reviews at specific reasoning level |
 | `review_model_<level>` | string | Model to use for reviews at specific reasoning level |
 | `refine_agent_<level>` | string | Agent to use for refine at specific reasoning level |
@@ -305,7 +305,7 @@ column_borders = true             # Show separators between TUI columns
 | `allow_unsafe_agents` | bool | false | Enable agentic mode globally | Yes |
 | `anthropic_api_key` | string | - | Anthropic API key for Claude Code | Yes |
 | `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
-| `reuse_review_session` | bool | false | Resume prior agent sessions on the same branch | Yes |
+| `reuse_review_session` | bool | false | (Experimental) Resume prior agent sessions on the same branch. See [Session Reuse](/guides/reviewing-code/#session-reuse) | Yes |
 | `reuse_review_session_lookback` | int | 0 | Max recent session candidates to consider (0 = unlimited) | Yes |
 | `hide_closed_by_default` | bool | false | Start TUI with closed/failed/canceled reviews hidden | N/A |
 | `auto_filter_repo` | bool | false | Auto-filter TUI to the current repo on startup | N/A |

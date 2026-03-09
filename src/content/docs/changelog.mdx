@@ -11,7 +11,7 @@ All notable changes to roborev, grouped by minor release.
 **New features**
 
 - `--min-severity` flag for `roborev fix` and `roborev refine` to limit fixes to findings at or above a chosen severity (`low`, `medium`, `high`, `critical`). Also configurable per repo via `fix_min_severity` and `refine_min_severity` in `.roborev.toml`. When all findings in a review fall below the threshold, `refine` automatically closes the review instead of treating it as a fix failure.
-- `reuse_review_session` config option (global and per repo) to resume prior agent sessions on the same branch. When enabled, roborev looks for a recent session matching the repo, branch, agent, and review type, and reuses it if its reviewed commit is still a recent ancestor of the branch tip. `reuse_review_session_lookback` controls how many candidates to consider (default: unlimited).
+- Experimental: `reuse_review_session` config option (global and per repo) to resume prior agent sessions on the same branch, reducing token usage and review latency on active branches. See [Session Reuse](/guides/reviewing-code/#session-reuse).
 
 **Improvements**
 

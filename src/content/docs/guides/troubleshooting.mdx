@@ -12,11 +12,16 @@ The most common issue is commits going unreviewed. Walk through these checks in 
 roborev uses a `post-commit` git hook to enqueue commits for review. Verify it exists:
 
 ```bash
-# Standard location
-cat .git/hooks/post-commit
-
-# If your repo uses core.hooksPath (Husky, etc.)
-cat "$(git config core.hooksPath)/post-commit"
+# Resolves core.hooksPath (relative or absolute) against the main
+# repo root, falling back to .git/hooks. Works from linked worktrees.
+COMMON="$(git rev-parse --path-format=absolute --git-common-dir)"
+HP="$(git config core.hooksPath || true)"
+if [ -n "$HP" ]; then
+  case "$HP" in /*) HOOKS="$HP" ;; *) HOOKS="${COMMON%/.git}/$HP" ;; esac
+else
+  HOOKS="$COMMON/hooks"
+fi
+cat "$HOOKS/post-commit"
 ```
 
 A healthy hook contains a `roborev enqueue` call. You should see something like:
@@ -47,6 +52,15 @@ roborev daemon start
 
 ```bash
 roborev daemon run 2>&1 | head -50
+```
+
+### Post-commit hook log
+
+roborev logs every post-commit hook invocation to `~/.roborev/post-commit.log` as JSONL. Each entry records a timestamp, the repository path, the outcome (`ok` or `error`), and a reason when the hook skips or fails. This is useful for diagnosing silent hook failures, especially in linked git worktrees where path resolution issues can prevent the hook from firing.
+
+```bash
+# View the last few hook invocations
+tail -5 ~/.roborev/post-commit.log | jq .
 ```
 
 ### Mangled hook file

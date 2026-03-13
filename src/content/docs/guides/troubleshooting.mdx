@@ -12,10 +12,17 @@ The most common issue is commits going unreviewed. Walk through these checks in 
 roborev uses a `post-commit` git hook to enqueue commits for review. Verify it exists:
 
 ```bash
-cat "$(git rev-parse --path-format=absolute --git-path hooks)/post-commit"
+# Resolves core.hooksPath (relative or absolute) against the main
+# repo root, falling back to .git/hooks. Works from linked worktrees.
+COMMON="$(git rev-parse --path-format=absolute --git-common-dir)"
+HP="$(git config core.hooksPath || true)"
+if [ -n "$HP" ]; then
+  case "$HP" in /*) HOOKS="$HP" ;; *) HOOKS="${COMMON%/.git}/$HP" ;; esac
+else
+  HOOKS="$COMMON/hooks"
+fi
+cat "$HOOKS/post-commit"
 ```
-
-This resolves `core.hooksPath` when set, falls back to `.git/hooks` otherwise, and produces an absolute path that works correctly from linked worktrees.
 
 A healthy hook contains a `roborev enqueue` call. You should see something like:
 

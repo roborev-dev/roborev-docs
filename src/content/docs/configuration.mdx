@@ -236,6 +236,27 @@ When a job fails with an agent error (not a review finding), roborev resolves th
 
 If a backup agent is found and installed, the job is retried with that agent. The failover is logged in the daemon output. If no backup is configured or the backup agent isn't installed, the job fails normally.
 
+### Agent Command Overrides
+
+If an agent binary is installed under a non-standard name or path, use a `*_cmd` setting to tell roborev where to find it:
+
+```toml
+# ~/.roborev/config.toml
+claude_code_cmd = "/opt/bin/claude"
+codex_cmd = "codex-nightly"
+cursor_cmd = "/usr/local/bin/cursor-cli"
+pi_cmd = "~/bin/pi"
+```
+
+| Option | Default command |
+|--------|----------------|
+| `claude_code_cmd` | `claude` |
+| `codex_cmd` | `codex` |
+| `cursor_cmd` | `cursor` |
+| `pi_cmd` | `pi` |
+
+These overrides affect both agent execution and availability detection. Without them, roborev only checks for the default command name when deciding whether an agent is installed.
+
 ### Agent Name Validation
 
 Unknown agent names in configuration files and CLI flags are now validated and rejected early. If you specify an agent name that roborev doesn't recognize, you'll get a clear error message at startup or command invocation instead of a confusing failure later.
@@ -315,6 +336,10 @@ column_borders = true             # Show separators between TUI columns
 | `column_borders` | bool | false | Show `▕` separators between TUI columns | N/A |
 | `column_order` | array | | Custom queue column display order | N/A |
 | `task_column_order` | array | | Custom task column display order | N/A |
+| `claude_code_cmd` | string | `claude` | Custom path or name for the Claude Code binary | Yes |
+| `codex_cmd` | string | `codex` | Custom path or name for the Codex binary | Yes |
+| `cursor_cmd` | string | `cursor` | Custom path or name for the Cursor binary | Yes |
+| `pi_cmd` | string | `pi` | Custom path or name for the Pi binary | Yes |
 
 :::note
 The previous config key `hide_addressed_by_default` is still read as a fallback. If you have it set and `hide_closed_by_default` is not present, the old value is used automatically. No action is required, but new configs should use the new name.
@@ -334,9 +359,11 @@ All roborev data is stored in `~/.roborev/` by default:
 
 ```
 ~/.roborev/
-├── config.toml    # Global configuration
-├── daemon.json    # Runtime state (port, PID)
-└── reviews.db     # SQLite database
+├── config.toml       # Global configuration
+├── daemon.json       # Runtime state (port, PID)
+├── post-commit.log   # JSONL log of post-commit hook invocations
+├── reviews.db        # SQLite database
+└── logs/jobs/        # Persistent job output logs
 ```
 
 Override with the `ROBOREV_DATA_DIR` environment variable:

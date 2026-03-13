@@ -5,6 +5,23 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.46
+<small>2026-03-11</small>
+
+**Improvements**
+
+- Agent availability checks now honor `*_cmd` config overrides (`claude_code_cmd`, `codex_cmd`, `cursor_cmd`, `pi_cmd`). Previously, custom agent commands were ignored during availability detection, so an agent could appear unavailable even when the configured binary was in PATH. See [Agent Command Overrides](/configuration/#agent-command-overrides).
+- The TUI review screen now displays the branch name stored with the review instead of resolving it dynamically via `git name-rev`. In worktree setups where the same SHA is reachable from multiple refs, the old behavior could display the wrong branch.
+
+**Bug fixes**
+
+- Fix the post-commit hook sending the worktree path instead of the main repository root to the daemon when running inside a linked git worktree. This caused commits to be registered under a phantom repo entry.
+- Fix `roborev fix --open`, `--list`, and `--batch` discovering reviews from other worktrees. Jobs are now filtered to only those reachable from the current worktree's HEAD or matching its branch name.
+- Fix the post-commit hook not firing in linked git worktrees when `core.hooksPath` is set to a relative path. Relative paths are now resolved against the main repository root instead of the worktree root. `init`, `install-hook`, and `uninstall-hook` also normalize the hooks path and fail early if it cannot be resolved.
+- Add JSONL post-commit hook logging to `~/.roborev/post-commit.log` so that silent hook failures leave an audit trail with timestamps, repo paths, and failure reasons. See [Troubleshooting](/guides/troubleshooting/#post-commit-hook-log).
+
+---
+
 ## 0.45
 <small>2026-03-08</small>
 

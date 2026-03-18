@@ -196,6 +196,7 @@ roborev fix 123                    # Fix a specific review by job ID
 roborev fix 42 43 44               # Fix multiple reviews sequentially
 roborev fix --batch                # Batch all open into one agent prompt
 roborev fix --batch 42 43 44       # Batch specific jobs into one prompt
+roborev fix --branch main          # Fix all open on a specific branch
 roborev fix --all-branches         # Fix all open across all branches
 roborev fix --list                 # List open reviews without fixing
 roborev fix --min-severity medium  # Skip low-severity findings
@@ -207,11 +208,11 @@ roborev fix --min-severity medium  # Skip low-severity findings
 | `-m, --model <model>` | Model to use |
 | `--reasoning <level>` | Set reasoning depth |
 | `--quiet` | Suppress agent output |
-| `--open` | Fix all open reviews on branch (default when no job IDs given) |
-| `--all-branches` | Include open jobs from all branches (implies `--open`) |
+| `--branch <name>` | Filter by branch (default: current branch) |
+| `--all-branches` | Include open jobs from all branches |
 | `--batch` | Concatenate multiple reviews into a single agent prompt instead of fixing one at a time |
 | `--list` | List open reviews with details (job ID, ref, branch, agent, verdict) without running any fixes |
-| `--newest-first` | Process jobs newest first instead of oldest first (requires `--open`) |
+| `--newest-first` | Process jobs newest first instead of oldest first |
 | `--min-severity <level>` | Only fix findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 See: [Assisted Refactoring](/guides/assisted-refactoring/)

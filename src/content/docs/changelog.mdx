@@ -5,6 +5,23 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.48
+<small>2026-03-18</small>
+
+**Improvements**
+
+- Review agents now run in a read-only sandbox. Codex review jobs use `--sandbox read-only` instead of `--full-auto`, matching Claude Code's existing read-only tool restrictions. Agentic mode (fix, refine, `--agentic`) is unchanged. All agent subprocesses set `GIT_OPTIONAL_LOCKS=0` to avoid contending with the user's own git operations.
+- `--open` and `--unaddressed` flags on `roborev fix` are deprecated. Open job discovery is now the default behavior when no positional job IDs are provided. The flags are hidden and silently ignored for backwards compatibility.
+- `--branch <name>` flag added to `roborev fix` for cross-branch fixing without switching branches.
+- Skip update notifications in development builds.
+
+**Bug fixes**
+
+- Avoid `.git/index.lock` contention during reviews by setting `GIT_OPTIONAL_LOCKS=0` in agent subprocess environments, reducing conflicts with concurrent git operations.
+- Fix `--all-branches` and `--branch` filtering when running `roborev fix` from a git worktree. The branch override was not being threaded through to `filterReachableJobs`, causing it to filter by the worktree's branch instead of the requested branch.
+
+---
+
 ## 0.47
 <small>2026-03-17</small>
 

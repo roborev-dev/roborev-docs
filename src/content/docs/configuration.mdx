@@ -111,6 +111,7 @@ All public APIs must have documentation comments.
 | `review_context_count` | int | Number of recent reviews to include as context |
 | `excluded_branches` | array | Branches to skip automatic reviews on |
 | `excluded_commit_patterns` | array | Commit message substrings to skip reviews on (case-insensitive) |
+| `exclude_patterns` | array | Filenames or glob patterns to exclude from review diffs for this repo |
 | `post_commit_review` | string | Post-commit hook behavior: `"commit"` (default) or `"branch"` |
 | `review_reasoning` | string | Reasoning level for reviews: thorough, standard, fast |
 | `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
@@ -245,6 +246,7 @@ If an agent binary is installed under a non-standard name or path, use a `*_cmd`
 claude_code_cmd = "/opt/bin/claude"
 codex_cmd = "codex-nightly"
 cursor_cmd = "/usr/local/bin/agent"
+opencode_cmd = "/usr/local/bin/opencode-wrapper"
 pi_cmd = "~/bin/pi"
 ```
 
@@ -253,6 +255,7 @@ pi_cmd = "~/bin/pi"
 | `claude_code_cmd` | `claude` |
 | `codex_cmd` | `codex` |
 | `cursor_cmd` | `agent` |
+| `opencode_cmd` | `opencode` |
 | `pi_cmd` | `pi` |
 
 These overrides affect both agent execution and availability detection. Without them, roborev only checks for the default command name when deciding whether an agent is installed.
@@ -280,6 +283,28 @@ excluded_commit_patterns = ["[skip review]", "wip:", "fixup!"]
 ```
 
 When reviewing a range, the range is skipped only if every commit in the range matches. Manually triggered reviews with `roborev review` are not affected.
+
+### Exclude Patterns
+
+Common lockfiles and generated files are excluded from review diffs by default: `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `bun.lock`, `uv.lock`, `poetry.lock`, `Pipfile.lock`, `pdm.lock`, `go.sum`, `Cargo.lock`, `Gemfile.lock`, `composer.lock`, `packages.lock.json`, `pubspec.lock`, `mix.lock`, `Package.resolved`, `Podfile.lock`, `flake.lock`, and the `.beads/`, `.gocache/`, and `.cache/` directories.
+
+To exclude additional files, use `exclude_patterns` in either global or per-repo config:
+
+```toml
+# .roborev.toml
+exclude_patterns = ["generated.go", "*.pb.go", "vendor/"]
+```
+
+```toml
+# ~/.roborev/config.toml
+exclude_patterns = ["*.min.js", "dist/"]
+```
+
+Patterns can be filenames, directory names (with trailing `/`), or glob patterns (including `**`). Both global and repo-level patterns are merged. User patterns are appended to the built-in exclusion list.
+
+:::note
+Security reviews (`--type security`) skip repo-level exclude patterns entirely. A compromised `.roborev.toml` on a branch cannot hide files from security review. Global-level patterns still apply.
+:::
 
 ### Post-Commit Review Mode
 
@@ -339,7 +364,9 @@ column_borders = true             # Show separators between TUI columns
 | `claude_code_cmd` | string | `claude` | Custom path or name for the Claude Code binary | Yes |
 | `codex_cmd` | string | `codex` | Custom path or name for the Codex binary | Yes |
 | `cursor_cmd` | string | `agent` | Custom path or name for the Cursor binary | Yes |
+| `opencode_cmd` | string | `opencode` | Custom path or name for the OpenCode binary | Yes |
 | `pi_cmd` | string | `pi` | Custom path or name for the Pi binary | Yes |
+| `exclude_patterns` | array | `[]` | Filenames or glob patterns to exclude from review diffs globally | Yes |
 
 :::note
 The previous config key `hide_addressed_by_default` is still read as a fallback. If you have it set and `hide_closed_by_default` is not present, the old value is used automatically. No action is required, but new configs should use the new name.
@@ -447,9 +474,12 @@ Reasoning levels control how deeply the AI analyzes code.
 
 | Level | Description | Best For |
 |-------|-------------|----------|
+| `maximum` | Deepest analysis; maps to Codex `xhigh` reasoning | Complex reviews requiring maximum depth |
 | `thorough` | Deep analysis with extended thinking | Code reviews (default) |
 | `standard` | Balanced analysis | Refine command (default) |
 | `fast` | Quick responses | Rapid feedback |
+
+`maximum` is accepted as `max` or `xhigh` on the command line. For agents without an xhigh equivalent (Droid, Kilo, Pi), it maps to their highest available level (same as thorough).
 
 Set per-command with `--reasoning`, or per-repo in `.roborev.toml`:
 

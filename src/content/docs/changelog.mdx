@@ -5,6 +5,34 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.47
+<small>2026-03-17</small>
+
+**New features**
+
+- `roborev summary` command shows aggregate review statistics: pass/fail trends, per-agent effectiveness, review duration percentiles, fix resolution rates, and per-repo breakdowns. Scopes to the current repo by default; use `--all` for cross-repo summary. Supports `--since`, `--branch`, `--repo`, and `--json` flags. See [Commands](/commands/#review-statistics).
+- TUI control socket for programmatic interaction with running TUI instances. External tools can query state and trigger mutations (filter, select, close, cancel, rerun, quit) over a Unix domain socket using a newline-delimited JSON protocol. Runtime metadata is written to `~/.roborev/tui.{PID}.json` for discoverability. See [TUI Control Socket](/integrations/tui/#control-socket).
+- `--no-quit` flag on `roborev tui` suppresses keyboard quit (`q`) in queue and tasks views, allowing external controllers to manage the TUI lifecycle. The `quit` control command still works regardless.
+- Token usage tracking: agent token consumption (peak context tokens and total output tokens) is automatically recorded after each job completes and displayed in the TUI review header and `roborev show` output. Requires `agentsview` to be installed. `roborev backfill-tokens` retroactively fetches token data for completed jobs that have session IDs but no stored usage.
+- `opencode_cmd` config key to override the OpenCode executable path, matching the existing pattern for other `*_cmd` overrides.
+
+**Improvements**
+
+- Common lockfiles and generated files (package-lock.json, yarn.lock, go.sum, Cargo.lock, uv.lock, and others) are excluded from review diffs by default. Add custom patterns via `exclude_patterns` in global or per-repo config. Security reviews skip repo-level exclude patterns to prevent suppression of sensitive files. See [Configuration](/configuration/#exclude-patterns).
+- `maximum` reasoning level (aliases: `max`, `xhigh`) maps to Codex's xhigh reasoning effort. For agents without an xhigh equivalent, it maps to thorough. See [Reasoning Levels](/configuration/#reasoning-levels).
+- Session ID column in the TUI queue view.
+- Column checkboxes in the TUI options menu respond to mouse clicks.
+- Long comment text word-wraps in the TUI review pane.
+- The TUI elapsed timer updates every second instead of only on data refreshes.
+- Skill names switched from colon syntax (`roborev:fix`) to hyphenated syntax (`roborev-fix`) for compatibility with GitHub Copilot CLI. Run `roborev skills update` to apply the new names. Both Claude Code and Codex skills are updated.
+
+**Bug fixes**
+
+- Fix `GetCurrentBranch` returning a `heads/`-prefixed branch name when git refs are ambiguous.
+- Update Gemini defaults and fall back cleanly when the configured model is unavailable.
+
+---
+
 ## 0.46
 <small>2026-03-11</small>
 

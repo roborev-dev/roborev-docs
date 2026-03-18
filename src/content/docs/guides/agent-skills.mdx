@@ -19,17 +19,17 @@ The review skills below are a convenience for **requesting ad-hoc reviews from w
 
 | Skill | Description |
 |-------|-------------|
-| `/roborev:review [commit] [--type ...]` | Request a code review for a commit |
-| `/roborev:review-branch [--base ...] [--type ...]` | Review all commits on the current branch |
-| `/roborev:design-review [commit]` | Request a design review for a commit |
-| `/roborev:design-review-branch [--base ...]` | Design review all commits on the current branch |
-| `/roborev:fix [job_id...]` | Discover and fix all open review findings in one pass |
-| `/roborev:respond <job_id> [message]` | Add a response to document changes |
+| `/roborev-review [commit] [--type ...]` | Request a code review for a commit |
+| `/roborev-review-branch [--base ...] [--type ...]` | Review all commits on the current branch |
+| `/roborev-design-review [commit]` | Request a design review for a commit |
+| `/roborev-design-review-branch [--base ...]` | Design review all commits on the current branch |
+| `/roborev-fix [job_id...]` | Discover and fix all open review findings in one pass |
+| `/roborev-respond <job_id> [message]` | Add a response to document changes |
 
 ## Usage
 
 :::note[Codex users]
-Replace the leading `/` with `$` in all examples below. For example, use `$roborev:review` instead of `/roborev:review`. See the [syntax table](#agent-specific-syntax) for details.
+Replace the leading `/` with `$` in all examples below. For example, use `$roborev-review` instead of `/roborev-review`. See the [syntax table](#agent-specific-syntax) for details.
 :::
 
 ### Review a commit
@@ -37,21 +37,21 @@ Replace the leading `/` with `$` in all examples below. For example, use `$robor
 Request a code review without leaving your agent session:
 
 ```
-/roborev:review
-/roborev:review abc123
-/roborev:review --type security
+/roborev-review
+/roborev-review abc123
+/roborev-review --type security
 ```
 
-The skill enqueues a review and waits for the result so it can present findings inline. If you already have reviews queued from the post-commit hook, use `/roborev:fix` to address them instead of requesting new ones.
+The skill enqueues a review and waits for the result so it can present findings inline. If you already have reviews queued from the post-commit hook, use `/roborev-fix` to address them instead of requesting new ones.
 
 ### Review a branch
 
 Review all commits since the current branch diverged from main:
 
 ```
-/roborev:review-branch
-/roborev:review-branch --base develop
-/roborev:review-branch --type security
+/roborev-review-branch
+/roborev-review-branch --base develop
+/roborev-review-branch --type security
 ```
 
 The skill enqueues a branch review and waits for results so the agent can present them inline.
@@ -61,8 +61,8 @@ The skill enqueues a branch review and waits for results so the agent can presen
 Request a design-focused review that evaluates completeness, feasibility, and task scoping:
 
 ```
-/roborev:design-review
-/roborev:design-review abc123
+/roborev-design-review
+/roborev-design-review abc123
 ```
 
 Enqueues a design review and waits for the result, following the same pattern as the other review skills.
@@ -72,24 +72,24 @@ Enqueues a design review and waits for the result, following the same pattern as
 Review all commits on the current branch with a design-focused lens:
 
 ```
-/roborev:design-review-branch
-/roborev:design-review-branch --base develop
+/roborev-design-review-branch
+/roborev-design-review-branch --base develop
 ```
 
-This is the branch equivalent of `/roborev:design-review`.
+This is the branch equivalent of `/roborev-design-review`.
 
 ### Fix all open reviews at once
 
-The most powerful skill is `/roborev:fix`. With no arguments it discovers all open failed reviews on recent commits and fixes them in a single pass:
+The most powerful skill is `/roborev-fix`. With no arguments it discovers all open failed reviews on recent commits and fixes them in a single pass:
 
 ```
-/roborev:fix
+/roborev-fix
 ```
 
 You can also target specific jobs:
 
 ```
-/roborev:fix 1019 1021
+/roborev-fix 1019 1021
 ```
 
 The agent:
@@ -105,24 +105,24 @@ This is the interactive equivalent of `roborev fix --batch` -- the agent sees al
 
 ### Fix a single review
 
-Target a specific job ID with `/roborev:fix`:
+Target a specific job ID with `/roborev-fix`:
 
 ```
-/roborev:fix 1019
+/roborev-fix 1019
 ```
 
 The agent fetches the review, fixes issues by priority, runs tests, and offers to commit.
 
 :::note
-The `/roborev:address` skill is deprecated. Use `/roborev:fix <job_id>` instead, which handles both single and multi-review fixes.
+The `/roborev-address` skill is deprecated. Use `/roborev-fix <job_id>` instead, which handles both single and multi-review fixes.
 :::
 
 ## Agent-Specific Syntax
 
 | Agent | Syntax |
 |-------|--------|
-| Claude Code | `/roborev:review`, `/roborev:review-branch`, `/roborev:design-review`, `/roborev:design-review-branch`, `/roborev:fix`, `/roborev:respond` |
-| Codex | `$roborev:review`, `$roborev:review-branch`, `$roborev:design-review`, `$roborev:design-review-branch`, `$roborev:fix`, `$roborev:respond` |
+| Claude Code | `/roborev-review`, `/roborev-review-branch`, `/roborev-design-review`, `/roborev-design-review-branch`, `/roborev-fix`, `/roborev-respond` |
+| Codex | `$roborev-review`, `$roborev-review-branch`, `$roborev-design-review`, `$roborev-design-review-branch`, `$roborev-fix`, `$roborev-respond` |
 
 ## Checking Skill Status
 
@@ -168,7 +168,7 @@ reads the exit code. See [Waiting for a Review Without Enqueuing](/guides/review
 
 For most workflows, the **async approach** is better: reviews run automatically via the post-commit hook, results accumulate in the TUI, and you address them when ready. This keeps your agent session focused on writing code and creates a persistent record of what needs attention.
 
-Skills are useful when you want to **explicitly request a review** during an agent session, for example to review uncommitted changes or to get a design review before committing. The `/roborev:fix` skill is valuable in any workflow because it pulls findings from the TUI queue and addresses them within your session.
+Skills are useful when you want to **explicitly request a review** during an agent session, for example to review uncommitted changes or to get a design review before committing. The `/roborev-fix` skill is valuable in any workflow because it pulls findings from the TUI queue and addresses them within your session.
 
 For **fully automated** fixing outside an agent session, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
 

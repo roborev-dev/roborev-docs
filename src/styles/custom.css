@@ -512,6 +512,10 @@ img.diagram-center {
   height: 29px;
 }
 
+.agent-matrix img[data-agent="pi"] {
+  height: 40px;
+}
+
 .agent-matrix .agent-text {
   font-size: 1.45rem;
   font-weight: 600;
@@ -537,6 +541,10 @@ img.diagram-center {
 
   .agent-matrix img[data-agent="gemini"] {
     height: 20px;
+  }
+
+  .agent-matrix img[data-agent="pi"] {
+    height: 28px;
   }
 
   .agent-matrix .agent-text {

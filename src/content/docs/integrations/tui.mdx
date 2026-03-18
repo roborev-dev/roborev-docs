@@ -19,6 +19,8 @@ roborev tui --branch=feature-x      # Pre-filter to specific branch
 |------|-------------|
 | `--repo [path]` | Lock filter to a repo. Without a value, resolves to the current repo. |
 | `--branch [name]` | Lock filter to a branch. Without a value, resolves to the current branch. |
+| `--no-quit` | Suppress keyboard quit (`q`) in queue and tasks views. Useful for managed TUI instances controlled externally. The `quit` control socket command still works. |
+| `--control-socket <path>` | Custom path for the control socket (default: `~/.roborev/tui.{PID}.sock`). |
 
 When set via flags, the filter is locked and cannot be changed in the TUI. This is useful for side-by-side working when you want to focus on a specific repo or branch.
 
@@ -153,7 +155,7 @@ The TUI includes an optional workflow for running fix jobs, applying patches, an
 See [Background Tasks](/advanced/background-tasks/) for the full reference.
 
 :::note
-Most users should address review findings from their coding agent session using [`/roborev:fix`](/guides/agent-skills/) or [`roborev fix`](/commands/#fixing-reviews). The background tasks workflow is intended for users who prefer to manage fixes entirely within the TUI.
+Most users should address review findings from their coding agent session using [`/roborev-fix`](/guides/agent-skills/) or [`roborev fix`](/commands/#fixing-reviews). The background tasks workflow is intended for users who prefer to manage fixes entirely within the TUI.
 :::
 
 ## Prompt View
@@ -250,11 +252,74 @@ The TUI is designed around a review, address, close cycle:
 1. Run `roborev tui` to open the interface
 2. Navigate to open reviews needing attention
 3. Press `Enter` to read the full review
-4. Address the findings: copy the review (`y`) into your agent, use `/roborev:fix`, or run `roborev fix`
+4. Address the findings: copy the review (`y`) into your agent, use `/roborev-fix`, or run `roborev fix`
 5. Press `a` to mark the review as closed
 6. Use `h` to hide closed items and focus on what remains
 
 Open reviews are your backlog. When the queue is clear, every commit on your branch has been reviewed and every finding has been addressed.
+
+## Control Socket
+
+The TUI exposes a Unix domain socket for programmatic interaction by external tools. The socket uses a newline-delimited JSON protocol: send a JSON request, receive a JSON response.
+
+On startup, the TUI writes runtime metadata to `~/.roborev/tui.{PID}.json` containing the PID, socket path, and daemon server address. External tools can read this file to discover running TUI instances.
+
+### Query Commands
+
+| Command | Description |
+|---------|-------------|
+| `get-state` | Current view, filters, hide-closed state, selected job ID, job counts |
+| `get-filter` | Active repo and branch filters with lock status |
+| `get-jobs` | List of visible jobs (ID, agent, status, repo, branch, verdict) |
+| `get-selected` | Currently selected job and whether it has a review |
+
+### Mutation Commands
+
+| Command | Description |
+|---------|-------------|
+| `set-filter` | Set repo and/or branch filter (resolves display names to paths) |
+| `clear-filter` | Clear active filters |
+| `set-hide-closed` | Toggle hide-closed state |
+| `select-job` | Select a job by ID (rejects jobs hidden by filters) |
+| `set-view` | Switch between `queue` and `tasks` views |
+| `close-review` | Toggle closed state for a job |
+| `cancel-job` | Cancel a running or queued job |
+| `rerun-job` | Rerun a completed, failed, or canceled job |
+| `quit` | Terminate the TUI (works even with `--no-quit`) |
+
+### Protocol
+
+Send a request as a single JSON line:
+
+```json
+{"command": "get-state"}
+{"command": "set-filter", "params": {"repo": "myrepo", "branch": "main"}}
+{"command": "close-review", "params": {"job_id": 42}}
+```
+
+Responses include an `ok` field, optional `error`, and optional `data`:
+
+```json
+{"ok": true, "data": {"view": "queue", "job_count": 15, ...}}
+{"ok": false, "error": "job not found"}
+```
+
+### Example
+
+```bash
+# Find the socket path from runtime metadata
+SOCKET=$(python3 -c "import json,glob; f=glob.glob('$HOME/.roborev/tui.*.json')[0]; print(json.load(open(f))['socket_path'])")
+
+# Query current state
+echo '{"command":"get-state"}' | nc -U "$SOCKET"
+
+# Set filter to a specific repo
+echo '{"command":"set-filter","params":{"repo":"myproject"}}' | nc -U "$SOCKET"
+```
+
+### Security
+
+The control socket is created with `0600` permissions so only the owning user can connect. The socket directory uses `0700` permissions. Stale sockets from dead processes are cleaned up automatically via PID liveness checks.
 
 ## See Also
 

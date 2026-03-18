@@ -14,7 +14,7 @@ uv tool install claudechic   # recommended
 pip install claudechic        # alternative
 ```
 
-**Prerequisites:** Both `roborev` and `claude` (Claude Code) must be on your PATH. To use the `/roborev:fix` skill, install roborev's agent skills first:
+**Prerequisites:** Both `roborev` and `claude` (Claude Code) must be on your PATH. To use the `/roborev-fix` skill, install roborev's agent skills first:
 
 ```bash
 roborev skills install
@@ -51,7 +51,7 @@ A typical review-fix cycle inside Claude Chic:
 2. roborev reviews your commits in the background
 3. The sidebar updates: a red F appears for job `#1019`
 4. Run `/reviews 1019` to read the full review inline
-5. Run `/roborev:fix` to batch-fix all open findings
+5. Run `/roborev-fix` to batch-fix all open findings
 6. The sidebar auto-updates: the verdict flips to a green P
 
 The entire loop happens without switching windows or terminals.

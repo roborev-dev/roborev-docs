@@ -241,6 +241,16 @@ Review content from AI agents is sanitized before display. Color and style codes
 
 The TUI automatically adapts to light and dark terminals. Colors are selected based on your terminal's background to ensure readability in both environments.
 
+To override auto-detection, set the `ROBOREV_COLOR_MODE` environment variable:
+
+```bash
+ROBOREV_COLOR_MODE=dark roborev tui    # Force dark palette
+ROBOREV_COLOR_MODE=light roborev tui   # Force light palette
+ROBOREV_COLOR_MODE=none roborev tui    # Strip all colors
+```
+
+`NO_COLOR` is honored across all TUI screens, including review and prompt detail views. When set, all ANSI color sequences are stripped. See [Color Mode](/configuration/#color-mode) for details.
+
 ## Version Mismatch Warning
 
 If the TUI binary version differs from the running daemon version, a persistent red banner displays at the top of the screen. This prevents confusing behavior from stale binaries (common in post-commit hooks). Restart the daemon with `roborev daemon restart` to resolve.

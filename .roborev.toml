@@ -1,0 +1,33 @@
+review_guidelines = """
+This is a documentation site (Astro/Starlight). There is no runtime code,
+no API surface, no database, and no user input handling. Reviews should focus
+on accuracy, completeness, and clarity of the documentation content.
+
+## Documented features describe roborev's design decisions
+
+The docs describe roborev's architecture and security model as implemented.
+Do not flag documented behavior as a security vulnerability. Specifically:
+
+- Agent tool permissions (allow-all-tools with deny-list, --sandbox read-only,
+  Copilot --allow-all-tools) are intentional design decisions documented in
+  roborev's security model. The deny-list is defense-in-depth, not a security
+  boundary. Users reviewing untrusted code are expected to use sandboxed
+  environments.
+
+- Data aggregation in commands like `roborev insights` operates on locally
+  stored review data from the user's own repositories. All data originates
+  from the operator's own filesystem. Do not flag local data aggregation as
+  a data exposure risk.
+
+- roborev is a single-user local CLI. The daemon binds to localhost (or a
+  Unix socket with 0600 permissions). Review content, paths, and metadata
+  are the operator's own data on their own machine.
+
+## What to review instead
+
+- Factual accuracy: do documented flags, defaults, and behaviors match?
+- Completeness: are new features fully documented?
+- Broken links or missing cross-references
+- Unclear or ambiguous instructions
+- Style: no emdashes or hyphens connecting sentence fragments
+"""

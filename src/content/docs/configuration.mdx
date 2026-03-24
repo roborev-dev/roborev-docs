@@ -142,6 +142,7 @@ All public APIs must have documentation comments.
 | `security_backup_agent` | string | Fallback agent for security reviews |
 | `design_backup_agent` | string | Fallback agent for design reviews |
 | `review_guidelines` | string | Project-specific guidelines for the reviewer |
+| `max_prompt_size` | int | Maximum prompt size in bytes for this repo (default: 200000) |
 
 ### Review Guidelines
 
@@ -306,6 +307,20 @@ Patterns can be filenames, directory names (with trailing `/`), or glob patterns
 Security reviews (`--type security`) skip repo-level exclude patterns entirely. A compromised `.roborev.toml` on a branch cannot hide files from security review. Global-level patterns still apply.
 :::
 
+### Prompt Size Budget
+
+The `max_prompt_size` (per repo) and `default_max_prompt_size` (global) settings control the maximum size in bytes of the prompt sent to review agents. The per-repo value takes precedence over the global default. The default is 200,000 bytes (~200 KB).
+
+```toml
+# ~/.roborev/config.toml
+default_max_prompt_size = 300000   # 300 KB global default
+
+# .roborev.toml
+max_prompt_size = 500000           # 500 KB for this repo only
+```
+
+This limit applies to all review commands (`review`, `compact`, `ci review`) and all agents. When a diff exceeds the budget, roborev truncates it at a UTF-8 boundary and includes fallback instructions that guide the agent to read the diff locally using git commands. Optional context (prior reviews, guidelines) is trimmed first to preserve as much diff as possible.
+
 ### Post-Commit Review Mode
 
 By default, the post-commit hook reviews the single commit at HEAD. Set `post_commit_review = "branch"` to review all commits since the branch diverged from the base branch instead:
@@ -345,7 +360,7 @@ column_borders = true             # Show separators between TUI columns
 | `default_backup_agent` | string | - | Fallback agent when the primary fails | Yes |
 | `default_backup_model` | string | - | Fallback model used when a backup agent runs | Yes |
 | `default_model` | string | agent default | Model to use (format varies by agent) | Yes |
-| `server_addr` | string | 127.0.0.1:7373 | Daemon listen address | No |
+| `server_addr` | string | 127.0.0.1:7373 | Daemon listen address. Use `unix://` for Unix domain socket (see [Unix Domain Socket](#unix-domain-socket)) | No |
 | `max_workers` | int | 4 | Number of parallel review workers | No |
 | `job_timeout` | duration | 10m | Per-job timeout | Yes |
 | `allow_unsafe_agents` | bool | false | Enable agentic mode globally | Yes |
@@ -367,6 +382,7 @@ column_borders = true             # Show separators between TUI columns
 | `opencode_cmd` | string | `opencode` | Custom path or name for the OpenCode binary | Yes |
 | `pi_cmd` | string | `pi` | Custom path or name for the Pi binary | Yes |
 | `exclude_patterns` | array | `[]` | Filenames or glob patterns to exclude from review diffs globally | Yes |
+| `default_max_prompt_size` | int | 200000 | Default maximum prompt size in bytes for review prompts | Yes |
 
 :::note
 The previous config key `hide_addressed_by_default` is still read as a fallback. If you have it set and `hide_closed_by_default` is not present, the old value is used automatically. No action is required, but new configs should use the new name.
@@ -398,6 +414,61 @@ Override with the `ROBOREV_DATA_DIR` environment variable:
 ```bash
 export ROBOREV_DATA_DIR=/custom/path
 ```
+
+### Unix Domain Socket
+
+On Unix systems, the daemon can listen on a Unix domain socket instead of TCP loopback. This provides filesystem-level access control: the socket is created with `0600` permissions and its parent directory with `0700`, so only the owning user can connect.
+
+To enable Unix domain sockets, set `server_addr` to `unix://`:
+
+```toml
+# ~/.roborev/config.toml
+server_addr = "unix://"
+```
+
+With `unix://` (no path), the socket is created at `/tmp/roborev-{UID}/daemon.sock`, where `{UID}` is your numeric user ID. To use a specific path:
+
+```toml
+server_addr = "unix:///var/run/roborev/daemon.sock"
+```
+
+The CLI flag works the same way:
+
+```bash
+roborev --server unix:// tui
+roborev daemon run --addr "unix:///custom/path.sock"
+```
+
+Stale socket files from previous daemon runs are cleaned up automatically on startup. The socket is removed on graceful shutdown.
+
+:::note
+Unix domain sockets are not supported on Windows. Socket path length is limited to 104 bytes on macOS and 108 bytes on Linux.
+:::
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ROBOREV_DATA_DIR` | Override default data directory (`~/.roborev`) |
+| `ROBOREV_COLOR_MODE` | Color theme: `auto` (default), `dark`, `light`, `none`. See [Color Mode](#color-mode) |
+| `NO_COLOR` | Set to any value to disable all color output ([no-color.org](https://no-color.org)) |
+
+### Color Mode
+
+The TUI automatically adapts to light and dark terminals by default. Use `ROBOREV_COLOR_MODE` to override the auto-detection:
+
+| Value | Behavior |
+|-------|----------|
+| `auto` | Detect terminal background color (default) |
+| `dark` | Force dark color palette |
+| `light` | Force light color palette |
+| `none` | Strip all colors (equivalent to `NO_COLOR=1`) |
+
+```bash
+ROBOREV_COLOR_MODE=dark roborev tui
+```
+
+`NO_COLOR` takes precedence over `ROBOREV_COLOR_MODE` at all layers. When `NO_COLOR` is set, all ANSI color sequences are stripped regardless of `ROBOREV_COLOR_MODE`.
 
 ### Model Selection
 

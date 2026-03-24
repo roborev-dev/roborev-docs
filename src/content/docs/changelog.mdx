@@ -5,6 +5,30 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.49
+<small>2026-03-24</small>
+
+**New features**
+
+- `roborev insights` command analyzes failing code reviews to identify recurring patterns, hotspot areas, noise candidates, and guideline gaps. Outputs actionable suggestions for improving `review_guidelines` in `.roborev.toml`. Runs as a daemon-backed job, queued and tracked like reviews. See [Commands](/commands/#insights).
+- Unix domain socket support for CLI-to-daemon communication on Unix systems. Set `server_addr = "unix://"` in `~/.roborev/config.toml` to listen on `/tmp/roborev-{UID}/daemon.sock` instead of TCP loopback. Socket permissions (`0600`) enforce per-user access control. See [Configuration](/configuration/#unix-domain-socket).
+- `ROBOREV_COLOR_MODE` environment variable to force `auto`, `dark`, `light`, or `none` color output across all TUI screens and CLI rendering. See [Configuration](/configuration/#color-mode).
+
+**Improvements**
+
+- Skill installation and status reporting use a shared multi-agent catalog. `roborev skills` now shows per-agent status (installed, outdated, not installed, no agent) for both Claude Code and Codex. Adding future agents requires a single catalog entry.
+- Large Codex reviews are more reliable. Prompt budgeting is now configurable via `max_prompt_size` (per repo) and `default_max_prompt_size` (global), with smart fallback instructions that guide Codex to read diffs locally when they exceed the prompt budget. Diffs are read in bounded chunks with UTF-8-safe truncation.
+- Pre-commit auto-fixes and lint hook management now use [prek](https://prek.j178.dev/) instead of a custom shell script (roborev development workflow only).
+
+**Bug fixes**
+
+- `NO_COLOR` is honored on TUI review and prompt detail screens. Previously, glamour markdown rendering defaulted to TrueColor regardless of `NO_COLOR`.
+- `roborev refine` branch reviews now use the configured review agent instead of the fix agent.
+- Reviews and hooks for commits made in git worktrees now run in the correct worktree directory. A `worktree_path` field is persisted per job so agents and hooks operate on the right branch.
+- Copilot reviews no longer fail with permission denials in non-interactive (daemon) mode. The agent now uses `--allow-all-tools` with a deny-list for destructive operations in review mode.
+
+---
+
 ## 0.48
 <small>2026-03-18</small>
 

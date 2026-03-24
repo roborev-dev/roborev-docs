@@ -132,6 +132,20 @@ See which skills are installed and whether any need updating:
 roborev skills
 ```
 
+The output shows each skill with per-agent status. Skills are checked for both Claude Code and Codex (if installed):
+
+```
+Skills:
+
+  roborev-fix
+  Discover and fix all open review findings in one pass
+
+    Claude Code (installed)     /roborev-fix
+    Codex (not installed)       $roborev-fix
+```
+
+Status values: `installed`, `outdated`, `not installed`, `no agent` (binary not found).
+
 ## Updating Skills
 
 Skills are updated automatically when you run:

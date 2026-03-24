@@ -307,6 +307,20 @@ Patterns can be filenames, directory names (with trailing `/`), or glob patterns
 Security reviews (`--type security`) skip repo-level exclude patterns entirely. A compromised `.roborev.toml` on a branch cannot hide files from security review. Global-level patterns still apply.
 :::
 
+### Prompt Size Budget
+
+The `max_prompt_size` (per repo) and `default_max_prompt_size` (global) settings control the maximum size in bytes of the prompt sent to review agents. The per-repo value takes precedence over the global default. The default is 200,000 bytes (~200 KB).
+
+```toml
+# ~/.roborev/config.toml
+default_max_prompt_size = 300000   # 300 KB global default
+
+# .roborev.toml
+max_prompt_size = 500000           # 500 KB for this repo only
+```
+
+This limit applies to all review commands (`review`, `compact`, `ci review`) and all agents. When a diff exceeds the budget, roborev truncates it at a UTF-8 boundary and includes fallback instructions that guide the agent to read the diff locally using git commands. Optional context (prior reviews, guidelines) is trimmed first to preserve as much diff as possible.
+
 ### Post-Commit Review Mode
 
 By default, the post-commit hook reviews the single commit at HEAD. Set `post_commit_review = "branch"` to review all commits since the branch diverged from the base branch instead:

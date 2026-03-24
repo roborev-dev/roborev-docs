@@ -15,6 +15,7 @@ roborev init [--agent <name>]    # Initialize repo + daemon + hook
 roborev fix                      # Fix open reviews
 roborev status                   # Check daemon and queue
 roborev summary                  # Aggregate review statistics
+roborev insights                 # Analyze review patterns
 roborev tui                      # Interactive terminal UI
                                  # --repo: pre-filter to repo
                                  # --branch: pre-filter to branch
@@ -278,6 +279,41 @@ The summary includes:
 - **Repos** (with `--all`): Per-repo breakdown with pass/fail/addressed counts
 - **Failures**: Total failures, retries, and error categories
 
+## Insights
+
+```bash
+roborev insights                          # Analyze last 30 days
+roborev insights --since 7d              # Last 7 days
+roborev insights --branch main           # Filter to main branch
+roborev insights --repo /path/to/repo    # Specific repository
+roborev insights --agent gemini          # Use specific agent
+roborev insights --wait=false            # Enqueue without waiting
+roborev insights --json                  # Output as JSON
+```
+
+| Flag | Description |
+|------|-------------|
+| `--since <duration>` | Time window for reviews (e.g. `7d`, `30d`, `90d`, `2w`; default: `30d`) |
+| `--branch <name>` | Scope to a single branch |
+| `--repo <path>` | Scope to a single repo (default: current repo) |
+| `--agent <name>` | Agent to use for analysis |
+| `-m, --model <model>` | Model to use |
+| `--reasoning <level>` | Set reasoning depth (`thorough`/`standard`/`fast`) |
+| `--wait` | Wait for completion and display result (default: true) |
+| `--json` | Output job info as JSON |
+
+Analyzes failing code reviews to identify recurring patterns and suggest improvements to review guidelines. The command queries completed reviews (focusing on failures) within the time window, includes the current `review_guidelines` from `.roborev.toml` as context, and sends the batch to an agent for structured analysis.
+
+The agent produces:
+
+- Recurring finding patterns across reviews
+- Hotspot areas (files/packages with concentrated failures)
+- Noise candidates (findings consistently dismissed without code changes)
+- Guideline gaps (patterns flagged by reviews but not covered by guidelines)
+- Suggested guideline additions (concrete text for `.roborev.toml`)
+
+If no failing reviews match the time window and branch filter, the command exits with a message instead of queuing a job.
+
 ## Token Usage
 
 Token usage is tracked automatically for completed jobs when `agentsview` is installed. Usage appears in the TUI review header and `roborev show` output (e.g. `118.0k ctx · 28.8k out`).
@@ -531,7 +567,7 @@ These flags work across most commands:
 
 | Flag | Description |
 |------|-------------|
-| `--server <addr>` | Daemon address (default: `http://127.0.0.1:7373`) |
+| `--server <addr>` | Daemon address (default: `http://127.0.0.1:7373`). Accepts `unix://` for Unix domain sockets |
 | `-v, --verbose` | Verbose output |
 
 ## Update

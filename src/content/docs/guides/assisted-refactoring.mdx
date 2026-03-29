@@ -18,13 +18,13 @@ Seven built-in analysis types target common refactoring concerns:
 
 | Type | Description |
 |------|-------------|
-| `duplication` | Finds exact and structural code duplication across files. Reports consolidation opportunities with estimated line reduction. |
-| `refactor` | Identifies code smells like long functions, complex conditionals, poor naming, and tight coupling. Ranks suggestions by impact. |
-| `complexity` | Flags cyclomatic complexity hotspots, deep nesting, and functions with too many parameters. Suggests simplifications. |
-| `test-fixtures` | Finds repeated test setup, duplicated mocks, and similar assertion sequences. Proposes reusable helpers and fixtures. |
+| `duplication` | Finds exact and structural code duplication across files and suggests consolidation opportunities. |
+| `refactor` | Identifies code smells like long functions, complex conditionals, poor naming, and tight coupling. |
+| `complexity` | Flags cyclomatic complexity hotspots, deep nesting, and functions with too many parameters. |
+| `test-fixtures` | Finds repeated test setup, duplicated mocks, and similar assertion sequences across test files. |
 | `api-design` | Reviews public API surface for naming consistency, parameter ordering, and error handling patterns. |
-| `dead-code` | Finds unused exports, unreachable code paths, and stale commented-out code. Flags confidence level per finding. |
-| `architecture` | Evaluates package organization, dependency flow, and separation of concerns. Identifies circular dependencies and layering violations. |
+| `dead-code` | Finds unused exports, unreachable code paths, and stale commented-out code. |
+| `architecture` | Evaluates package organization, dependency flow, separation of concerns, and layering violations. |
 
 List available types with `roborev analyze --list`, or preview a prompt template with `roborev analyze --show-prompt <type>`. If you have shell completions enabled, `roborev analyze <TAB>` will suggest analysis types with descriptions.
 

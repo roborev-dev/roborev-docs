@@ -18,13 +18,13 @@ Seven built-in analysis types target common refactoring concerns:
 
 | Type | Description |
 |------|-------------|
-| `test-fixtures` | Find test fixture and helper opportunities to reduce duplication |
-| `duplication` | Find code duplication across files |
-| `refactor` | Suggest refactoring opportunities |
-| `complexity` | Analyze complexity and suggest simplifications |
-| `api-design` | Review API consistency and design patterns |
-| `dead-code` | Find unused exports and unreachable code |
-| `architecture` | Review architectural patterns and structure |
+| `duplication` | Finds exact and structural code duplication across files. Reports similarity percentages, consolidation opportunities with example code, and estimated line reduction. |
+| `refactor` | Identifies code smells and anti-patterns: long functions, complex conditionals, poor naming, tight coupling, and missing or excessive abstractions. Suggests specific refactorings ranked by impact. |
+| `complexity` | Flags cyclomatic complexity hotspots, deeply nested control flow, complex boolean expressions, and functions with too many parameters. Suggests concrete simplifications with trade-off notes. |
+| `test-fixtures` | Scans test files for repeated data construction, common setup/teardown patterns, similar assertion sequences, and duplicated mocks. Proposes reusable helper functions and fixtures. |
+| `api-design` | Reviews the public API surface for naming consistency, parameter ordering, return value patterns, and error handling. Flags confusing or ambiguous APIs and suggests improvements. |
+| `dead-code` | Finds unused exports, unreachable code paths, stale commented-out code, and debug leftovers. Flags confidence level since some exports may have external callers. |
+| `architecture` | Evaluates package organization, dependency flow, separation of concerns, coupling, and cohesion. Identifies circular dependencies, leaky abstractions, and layering violations. |
 
 List available types with `roborev analyze --list`, or preview a prompt template with `roborev analyze --show-prompt <type>`. If you have shell completions enabled, `roborev analyze <TAB>` will suggest analysis types with descriptions.
 

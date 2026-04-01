@@ -464,7 +464,7 @@ Unix domain sockets are not supported on Windows. Socket path length is limited 
 
 ### Persistent Daemon
 
-`roborev daemon start` runs the daemon in the background, but it won't survive a reboot. For persistent operation, set up a system service.
+`roborev daemon start` runs the daemon in the background and is sufficient for most users. It won't survive a reboot, so if you need the daemon to start automatically on boot, set up a system service.
 
 :::caution[Use `--no-daemon` with system services]
 If you manage the daemon with systemd or launchd, use `roborev init --no-daemon` when registering repos. Otherwise, `roborev init` auto-starts a background daemon that conflicts with the service-managed one.
@@ -527,7 +527,7 @@ For on-demand startup via socket activation, enable the socket unit instead. The
 systemctl --user enable --now roborev.socket
 ```
 
-If the unit files are not available (e.g., you used `go install` or the install script), create one manually:
+If the unit files are not available (e.g., you used `go install` or the install script), create a service unit manually. This covers the always-on service mode; socket activation requires the bundled unit files.
 
 ```bash
 # Resolve the actual binary path for ExecStart

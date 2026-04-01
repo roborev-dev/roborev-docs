@@ -443,7 +443,7 @@ To enable Unix domain sockets, set `server_addr` to `unix://`:
 server_addr = "unix://"
 ```
 
-With `unix://` (no path), the socket is created at `$XDG_RUNTIME_DIR/roborev/daemon.sock` when `$XDG_RUNTIME_DIR` is set and points to an existing absolute directory. Otherwise, the socket falls back to the platform temp directory at `/tmp/roborev-{UID}/daemon.sock` (where `{UID}` is your numeric user ID). To use a specific path:
+With `unix://` (no path), the socket is created at `$XDG_RUNTIME_DIR/roborev/daemon.sock` when `$XDG_RUNTIME_DIR` is set and points to an existing absolute directory. Otherwise, the socket is placed under the platform temp directory (e.g. `/tmp` on Linux, `/var/folders/.../T` on macOS) at `{tempdir}/roborev-{UID}/daemon.sock`, where `{UID}` is your numeric user ID. To use a specific path:
 
 ```toml
 server_addr = "unix:///var/run/roborev/daemon.sock"

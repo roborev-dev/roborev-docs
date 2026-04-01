@@ -12,7 +12,7 @@ The CI poller runs inside the roborev daemon. On each interval it:
 1. Lists open PRs for each configured repo via `gh pr list`
 2. Skips PRs that have already been reviewed at their current HEAD SHA
 3. Fetches the PR head commit (including fork-based PRs)
-4. Computes the merge-base range (`base..head`) and enqueues review jobs
+4. Computes the merge-base range (`base..head`), includes human PR discussion from trusted collaborators in the review prompt, and enqueues review jobs
 5. When all reviews complete, posts the result as a PR comment
 
 For multi-agent or multi-type configurations, results from all jobs are synthesized by an LLM into a single combined PR comment. When only one job is configured, the output is posted directly (no synthesis overhead).
@@ -349,6 +349,20 @@ The heredoc expands `${ROBOREV_BIN}`, `${BREW_PREFIX}`, and `${HOME}` at generat
 
 **Linux (systemd):**
 
+roborev ships with `roborev.service` and `roborev.socket` unit files in its `packaging/systemd/` directory. If your package manager installed the unit files, enable the user-level service:
+
+```bash
+systemctl --user enable --now roborev
+```
+
+For on-demand startup via socket activation, enable the socket unit instead. The daemon starts automatically when a client connects and uses `Type=notify` to signal readiness back to systemd:
+
+```bash
+systemctl --user enable --now roborev.socket
+```
+
+If the unit files are not available (e.g., you used `go install` or the install script), create one manually:
+
 ```bash
 # Resolve the actual binary path for ExecStart
 ROBOREV_BIN="$(command -v roborev)"
@@ -543,6 +557,7 @@ Per-repo overrides take priority over the global `[ci]` config. Any field not se
 | `synthesis_backup_agent` | string | | Backup agent for synthesis when the primary fails |
 | `synthesis_model` | string | | Model override for synthesis |
 | `upsert_comments` | bool | `false` | Update existing PR comments instead of creating new ones |
+| `batch_timeout` | string | `"3m"` | Maximum time to wait for all jobs in a multi-agent batch before posting available results. Set `"0"` to disable. |
 
 When `agents` is empty, the poller auto-detects the first available agent from: codex, claude-code, gemini, copilot, cursor, opencode, droid, kilo, kiro, pi.
 

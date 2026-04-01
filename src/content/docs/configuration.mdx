@@ -93,6 +93,9 @@ refine_min_severity = "medium"  # Skip low-severity findings in refine
 # Session reuse (experimental)
 reuse_review_session = true     # Resume prior agent sessions on same branch
 
+# Auto-close passing reviews
+auto_close_passing_reviews = true
+
 # Project-specific review guidelines
 review_guidelines = """
 No database migrations needed - no production databases yet.
@@ -113,6 +116,7 @@ All public APIs must have documentation comments.
 | `excluded_commit_patterns` | array | Commit message substrings to skip reviews on (case-insensitive) |
 | `exclude_patterns` | array | Filenames or glob patterns to exclude from review diffs for this repo |
 | `post_commit_review` | string | Post-commit hook behavior: `"commit"` (default) or `"branch"` |
+| `auto_close_passing_reviews` | bool | Automatically close reviews that pass with no findings |
 | `review_reasoning` | string | Reasoning level for reviews: thorough, standard, fast |
 | `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
 | `fix_min_severity` | string | Minimum severity for `fix`: `critical`, `high`, `medium`, or `low` |
@@ -333,6 +337,18 @@ When set to `"branch"`, each commit triggers a `merge-base..HEAD` range review c
 
 This setting only affects the post-commit hook. `roborev review` is not changed by this option.
 
+### Auto-Close Passing Reviews
+
+By default, all reviews remain open in the queue until you explicitly close them. Set `auto_close_passing_reviews = true` to automatically close reviews that pass with no findings:
+
+```toml
+auto_close_passing_reviews = true
+```
+
+When enabled, reviews with a passing verdict are closed immediately after the verdict is parsed. Failed reviews remain open for attention. This is useful if you only want to focus on reviews that found issues.
+
+The option works in both global config (`~/.roborev/config.toml`) and per-repo config (`.roborev.toml`). Per-repo settings override the global value.
+
 ## Global Configuration
 
 Create `~/.roborev/config.toml` to set system-wide defaults.
@@ -368,6 +384,7 @@ column_borders = true             # Show separators between TUI columns
 | `review_context_count` | int | 3 | Recent reviews to include as context | Yes |
 | `reuse_review_session` | bool | false | (Experimental) Resume prior agent sessions on the same branch. See [Session Reuse](/guides/reviewing-code/#session-reuse) | Yes |
 | `reuse_review_session_lookback` | int | 0 | Max recent session candidates to consider (0 = unlimited) | Yes |
+| `auto_close_passing_reviews` | bool | false | Automatically close reviews that pass with no findings | Yes |
 | `hide_closed_by_default` | bool | false | Start TUI with closed/failed/canceled reviews hidden | N/A |
 | `auto_filter_repo` | bool | false | Auto-filter TUI to the current repo on startup | N/A |
 | `auto_filter_branch` | bool | false | Auto-filter TUI to the current branch/worktree on startup | N/A |
@@ -426,7 +443,7 @@ To enable Unix domain sockets, set `server_addr` to `unix://`:
 server_addr = "unix://"
 ```
 
-With `unix://` (no path), the socket is created at `/tmp/roborev-{UID}/daemon.sock`, where `{UID}` is your numeric user ID. To use a specific path:
+With `unix://` (no path), the socket is created at `$XDG_RUNTIME_DIR/roborev/daemon.sock` when `$XDG_RUNTIME_DIR` is set and points to an existing absolute directory. Otherwise, the socket falls back to the platform temp directory at `/tmp/roborev-{UID}/daemon.sock` (where `{UID}` is your numeric user ID). To use a specific path:
 
 ```toml
 server_addr = "unix:///var/run/roborev/daemon.sock"

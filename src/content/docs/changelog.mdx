@@ -5,6 +5,28 @@ description: Release history for roborev
 
 All notable changes to roborev, grouped by minor release.
 
+## 0.50
+<small>2026-03-31</small>
+
+**New features**
+
+- `auto_close_passing_reviews` config option to automatically close reviews that pass with no findings. When enabled, pass reviews are closed immediately instead of staying open in the queue. See [Configuration](/configuration/#auto-close-passing-reviews).
+- Bundled `roborev-refine` skills for Claude Code and Codex to run iterative review-fix-review loops from within an agent session. The skill performs the full refine workflow inline (review, fix, commit, re-review) rather than shelling out to the CLI. See [Agent Skills](/guides/agent-skills/#refine-a-branch).
+- Bundled systemd service and socket unit files for Linux daemon deployments. The service uses `Type=notify` for readiness signaling. Socket activation is supported for on-demand daemon startup. See [Keeping the Daemon Running](/integrations/github/#keeping-the-daemon-running).
+
+**Improvements**
+
+- The TUI updates instantly by subscribing to the daemon event stream (SSE) instead of polling on a timer. Polling is retained as a 15-second fallback.
+- CI review prompts now include human PR discussion (issue comments, review summaries, and inline review comments) from trusted collaborators with maintain or admin access. Discussion is treated as untrusted context with safety guardrails.
+- The daemon socket path prefers `$XDG_RUNTIME_DIR/roborev/daemon.sock` when the variable is set and points to an existing absolute directory. Falls back to the platform temp directory otherwise. See [Configuration](/configuration/#unix-domain-socket).
+
+**Bug fixes**
+
+- Preserve the requested model when rerunning reviews. Previously, rerunning a review could resolve a different model from config defaults instead of preserving the model specified in the original request. A separate `requested_model` field now tracks explicit user intent.
+- Enforce a `batch_timeout` (default: 3 minutes) on CI PR comment batches to prevent indefinite hangs when some jobs in a multi-agent batch get stuck. When the timeout expires, available results are posted and remaining jobs are canceled. See [CI Options Reference](/integrations/github/#ci-options-reference).
+
+---
+
 ## 0.49
 <small>2026-03-24</small>
 

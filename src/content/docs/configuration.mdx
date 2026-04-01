@@ -462,6 +462,94 @@ Stale socket files from previous daemon runs are cleaned up automatically on sta
 Unix domain sockets are not supported on Windows. Socket path length is limited to 104 bytes on macOS and 108 bytes on Linux.
 :::
 
+### Persistent Daemon
+
+`roborev daemon start` runs the daemon in the background, but it won't survive a reboot. For persistent operation, set up a system service.
+
+:::caution[Use `--no-daemon` with system services]
+If you manage the daemon with systemd or launchd, use `roborev init --no-daemon` when registering repos. Otherwise, `roborev init` auto-starts a background daemon that conflicts with the service-managed one.
+:::
+
+**macOS (launchd):**
+
+```bash
+# Resolve paths — Homebrew prefix differs between Intel and Apple Silicon
+ROBOREV_BIN="$(command -v roborev)"
+BREW_PREFIX="$(brew --prefix 2>/dev/null || echo /usr/local)"
+
+mkdir -p ~/Library/Logs/roborev
+cat > ~/Library/LaunchAgents/com.roborev.daemon.plist << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.roborev.daemon</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>${ROBOREV_BIN}</string>
+        <string>daemon</string>
+        <string>run</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>${BREW_PREFIX}/bin:${BREW_PREFIX}/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>${HOME}/Library/Logs/roborev/daemon.log</string>
+    <key>StandardErrorPath</key>
+    <string>${HOME}/Library/Logs/roborev/daemon.log</string>
+</dict>
+</plist>
+EOF
+
+launchctl load ~/Library/LaunchAgents/com.roborev.daemon.plist
+```
+
+The heredoc expands `${ROBOREV_BIN}`, `${BREW_PREFIX}`, and `${HOME}` at generation time so the plist contains absolute paths. Launchd does not expand `~` or environment variables in plist values.
+
+**Linux (systemd):**
+
+roborev ships with `roborev.service` and `roborev.socket` unit files in its `packaging/systemd/` directory. If your package manager installed the unit files, enable the user-level service:
+
+```bash
+systemctl --user enable --now roborev
+```
+
+For on-demand startup via socket activation, enable the socket unit instead. The daemon starts automatically when a client connects and uses `Type=notify` to signal readiness back to systemd:
+
+```bash
+systemctl --user enable --now roborev.socket
+```
+
+If the unit files are not available (e.g., you used `go install` or the install script), create one manually:
+
+```bash
+# Resolve the actual binary path for ExecStart
+ROBOREV_BIN="$(command -v roborev)"
+
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/roborev.service << EOF
+[Unit]
+Description=roborev daemon
+After=network.target
+
+[Service]
+ExecStart=${ROBOREV_BIN} daemon run
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user enable --now roborev
+```
+
 ### Environment Variables
 
 | Variable | Description |

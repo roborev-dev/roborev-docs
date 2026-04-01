@@ -12,7 +12,7 @@ All notable changes to roborev, grouped by minor release.
 
 - `auto_close_passing_reviews` config option to automatically close reviews that pass with no findings. When enabled, pass reviews are closed immediately instead of staying open in the queue. See [Configuration](/configuration/#auto-close-passing-reviews).
 - Bundled `roborev-refine` skills for Claude Code and Codex to run iterative review-fix-review loops from within an agent session. The skill performs the full refine workflow inline (review, fix, commit, re-review) rather than shelling out to the CLI. See [Agent Skills](/guides/agent-skills/#refine-a-branch).
-- Bundled systemd service and socket unit files for Linux daemon deployments. The service uses `Type=notify` for readiness signaling. Socket activation is supported for on-demand daemon startup. See [Keeping the Daemon Running](/integrations/github/#keeping-the-daemon-running).
+- Bundled systemd service and socket unit files for Linux daemon deployments. The service uses `Type=notify` for readiness signaling. Socket activation is supported for on-demand daemon startup. See [Persistent Daemon](/configuration/#persistent-daemon).
 
 **Improvements**
 

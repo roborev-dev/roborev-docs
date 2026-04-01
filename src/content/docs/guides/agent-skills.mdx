@@ -24,6 +24,7 @@ The review skills below are a convenience for **requesting ad-hoc reviews from w
 | `/roborev-design-review [commit]` | Request a design review for a commit |
 | `/roborev-design-review-branch [--base ...]` | Design review all commits on the current branch |
 | `/roborev-fix [job_id...]` | Discover and fix all open review findings in one pass |
+| `/roborev-refine [--since ...] [--branch ...] [--max-iterations ...]` | Iterative review-fix-review loop until all reviews pass |
 | `/roborev-respond <job_id> [message]` | Add a response to document changes |
 
 ## Usage
@@ -117,12 +118,31 @@ The agent fetches the review, fixes issues by priority, runs tests, and offers t
 The `/roborev-address` skill is deprecated. Use `/roborev-fix <job_id>` instead, which handles both single and multi-review fixes.
 :::
 
+### Refine a branch
+
+`/roborev-refine` runs an iterative review-fix-review loop on your branch. It finds failed reviews, fixes them, waits for re-review, and repeats until everything passes or the iteration limit is reached:
+
+```
+/roborev-refine
+/roborev-refine --max-iterations 5
+/roborev-refine --since HEAD~3
+/roborev-refine --branch feature-xyz
+```
+
+| Flag | Description |
+|------|-------------|
+| `--since <commit>` | Refine commits after this commit (exclusive); required on the default branch |
+| `--branch <name>` | Validate that the current branch matches before refining |
+| `--max-iterations <n>` | Maximum fix-review cycles (default: 10) |
+
+Unlike `roborev refine` on the CLI, the skill performs the full workflow inside your agent session: it reviews via the daemon, fixes findings inline, commits, and re-reviews. This gives the agent direct access to the codebase while fixing, which can produce better results than the CLI's isolated worktree approach.
+
 ## Agent-Specific Syntax
 
 | Agent | Syntax |
 |-------|--------|
-| Claude Code | `/roborev-review`, `/roborev-review-branch`, `/roborev-design-review`, `/roborev-design-review-branch`, `/roborev-fix`, `/roborev-respond` |
-| Codex | `$roborev-review`, `$roborev-review-branch`, `$roborev-design-review`, `$roborev-design-review-branch`, `$roborev-fix`, `$roborev-respond` |
+| Claude Code | `/roborev-review`, `/roborev-review-branch`, `/roborev-design-review`, `/roborev-design-review-branch`, `/roborev-fix`, `/roborev-refine`, `/roborev-respond` |
+| Codex | `$roborev-review`, `$roborev-review-branch`, `$roborev-design-review`, `$roborev-design-review-branch`, `$roborev-fix`, `$roborev-refine`, `$roborev-respond` |
 
 ## Checking Skill Status
 
@@ -182,7 +202,7 @@ reads the exit code. See [Waiting for a Review Without Enqueuing](/guides/review
 
 For most workflows, the **async approach** is better: reviews run automatically via the post-commit hook, results accumulate in the TUI, and you address them when ready. This keeps your agent session focused on writing code and creates a persistent record of what needs attention.
 
-Skills are useful when you want to **explicitly request a review** during an agent session, for example to review uncommitted changes or to get a design review before committing. The `/roborev-fix` skill is valuable in any workflow because it pulls findings from the TUI queue and addresses them within your session.
+Skills are useful when you want to **explicitly request a review** during an agent session, for example to review uncommitted changes or to get a design review before committing. The `/roborev-fix` skill is valuable in any workflow because it pulls findings from the TUI queue and addresses them within your session. The `/roborev-refine` skill goes further, running an iterative loop that re-reviews after each fix until everything passes.
 
 For **fully automated** fixing outside an agent session, use `roborev fix --batch` (headless, no agent interaction) or `roborev refine` (iterative loop until all reviews pass).
 

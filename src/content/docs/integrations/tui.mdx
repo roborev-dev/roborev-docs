@@ -5,7 +5,7 @@ description: Interactive terminal interface for viewing and managing reviews
 
 import Screenshot from '../../../components/Screenshot.astro';
 
-The interactive terminal UI (`roborev tui`) is the primary interface for working with roborev reviews. The review queue acts as a ledger: every commit review is recorded, and each entry stays open until you explicitly address and close it. This creates an accountability loop that ensures every line of agent-generated code is reviewed and every finding is resolved.
+The interactive terminal UI (`roborev tui`) is the primary interface for working with roborev reviews. The queue updates in real time by subscribing to the daemon event stream over SSE; polling is retained as a 15-second fallback. The review queue acts as a ledger: every commit review is recorded, and each entry stays open until you explicitly close it (or until [`auto_close_passing_reviews`](/configuration/#auto-close-passing-reviews) closes passing reviews automatically). This creates an accountability loop that ensures every line of agent-generated code is reviewed and every finding is resolved.
 
 ```bash
 roborev tui                         # Open TUI

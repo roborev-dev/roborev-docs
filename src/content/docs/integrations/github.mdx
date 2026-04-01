@@ -13,7 +13,7 @@ The CI poller runs inside the roborev daemon. On each interval it:
 2. Skips PRs that have already been reviewed at their current HEAD SHA
 3. Fetches the PR head commit (including fork-based PRs)
 4. Computes the merge-base range (`base..head`), includes human PR discussion from trusted collaborators in the review prompt, and enqueues review jobs
-5. When all reviews complete, posts the result as a PR comment
+5. When all reviews complete (or `batch_timeout` expires), posts the result as a PR comment
 
 For multi-agent or multi-type configurations, results from all jobs are synthesized by an LLM into a single combined PR comment. When only one job is configured, the output is posted directly (no synthesis overhead).
 

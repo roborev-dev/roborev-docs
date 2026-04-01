@@ -464,7 +464,7 @@ Unix domain sockets are not supported on Windows. Socket path length is limited 
 
 ### Persistent Daemon
 
-`roborev daemon start` runs the daemon in the background and is sufficient for most users. It won't survive a reboot, so if you need the daemon to start automatically on boot, set up a system service.
+The daemon starts automatically when you run `roborev init` or any command that needs it, and stays running in the background. This is sufficient for most users. If you need the daemon to restart automatically after a reboot, set up a system service.
 
 :::caution[Use `--no-daemon` with system services]
 If you manage the daemon with systemd or launchd, use `roborev init --no-daemon` when registering repos. Otherwise, `roborev init` auto-starts a background daemon that conflicts with the service-managed one.

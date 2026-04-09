@@ -86,7 +86,8 @@ excluded_branches = ["wip", "scratch"]  # Branches to skip reviews on
 review_reasoning = "thorough"  # For code reviews (default: thorough)
 refine_reasoning = "standard"  # For refine command (default: standard)
 
-# Severity filtering for fix and refine
+# Severity filtering
+review_min_severity = "medium"  # Skip low-severity findings in reviews
 fix_min_severity = "medium"     # Skip low-severity findings in fix
 refine_min_severity = "medium"  # Skip low-severity findings in refine
 
@@ -119,6 +120,7 @@ All public APIs must have documentation comments.
 | `auto_close_passing_reviews` | bool | Automatically close reviews that pass with no findings |
 | `review_reasoning` | string | Reasoning level for reviews: thorough, standard, fast |
 | `refine_reasoning` | string | Reasoning level for refine: thorough, standard, fast |
+| `review_min_severity` | string | Minimum severity for reviews: `critical`, `high`, `medium`, or `low`. Cascades: CLI flag > repo config > global config |
 | `fix_min_severity` | string | Minimum severity for `fix`: `critical`, `high`, `medium`, or `low` |
 | `refine_min_severity` | string | Minimum severity for `refine`: `critical`, `high`, `medium`, or `low` |
 | `reuse_review_session` | bool | (Experimental) Resume prior agent sessions on the same branch. See [Session Reuse](/guides/reviewing-code/#session-reuse) |
@@ -385,6 +387,10 @@ column_borders = true             # Show separators between TUI columns
 | `reuse_review_session` | bool | false | (Experimental) Resume prior agent sessions on the same branch. See [Session Reuse](/guides/reviewing-code/#session-reuse) | Yes |
 | `reuse_review_session_lookback` | int | 0 | Max recent session candidates to consider (0 = unlimited) | Yes |
 | `auto_close_passing_reviews` | bool | false | Automatically close reviews that pass with no findings | Yes |
+| `review_min_severity` | string | - | Default minimum severity for reviews: `critical`, `high`, `medium`, or `low` | Yes |
+| `fix_min_severity` | string | - | Default minimum severity for `fix`: `critical`, `high`, `medium`, or `low` | Yes |
+| `refine_min_severity` | string | - | Default minimum severity for `refine`: `critical`, `high`, `medium`, or `low` | Yes |
+| `disable_codex_sandbox` | bool | false | Disable Codex `bwrap` sandboxing for systems where it is unavailable | Yes |
 | `hide_closed_by_default` | bool | false | Start TUI with closed/failed/canceled reviews hidden | N/A |
 | `auto_filter_repo` | bool | false | Auto-filter TUI to the current repo on startup | N/A |
 | `auto_filter_branch` | bool | false | Auto-filter TUI to the current branch/worktree on startup | N/A |

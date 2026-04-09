@@ -66,6 +66,7 @@ fi
 | `--quiet` | Suppress output |
 | `--agent <name>` | Use specific agent |
 | `--reasoning <level>` | Set reasoning depth |
+| `--min-severity <level>` | Only report findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 ## Uncommitted Changes
 
@@ -93,6 +94,7 @@ The `--dirty` flag includes:
 | `--quiet` | Suppress output |
 | `--agent <name>` | Use specific agent |
 | `--reasoning <level>` | Set reasoning depth |
+| `--min-severity <level>` | Only report findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 
 ## Review Types
 
@@ -114,6 +116,25 @@ roborev review --branch --type security  # Security review of branch
 Review types work with all review modes (`--branch`, `--dirty`, `--since`, single commits, ranges).
 
 Each type can have its own agent and model configuration via `{type}_agent` and `{type}_model` in `.roborev.toml` or global config. See [Workflow-Specific Agent and Model](/configuration/#workflow-specific-agent-and-model).
+
+## Severity Filtering
+
+Use `--min-severity` to limit which findings the reviewer reports:
+
+```bash
+roborev review --min-severity high          # Only report high and critical findings
+roborev review --branch --min-severity medium  # Skip low-severity findings in branch reviews
+```
+
+The severity filter is injected into the review prompt as an instruction. Findings below the threshold are omitted from the review output. When `min_severity` is set and all findings fall below the threshold, the review receives a passing verdict.
+
+Set a default per repo in `.roborev.toml` or globally in `~/.roborev/config.toml`:
+
+```toml
+review_min_severity = "medium"
+```
+
+The cascade order is: CLI flag > per-repo config > global config. The CLI flag overrides the config value. See [Configuration](/configuration/#per-repository-options).
 
 ## Specific Commit Ranges
 

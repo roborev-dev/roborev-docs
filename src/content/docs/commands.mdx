@@ -60,6 +60,7 @@ roborev review --type design     # Design-focused review
 | `--type <type>` | Review type (`security`, `design`) — changes system prompt |
 | `--reasoning <level>` | Set reasoning depth (`maximum`/`thorough`/`standard`/`fast`) |
 | `--fast` | Shorthand for `--reasoning fast` |
+| `--min-severity <level>` | Only report findings at or above this severity (`low`/`medium`/`high`/`critical`) |
 | `--local` | Run review locally without the daemon (streams output to console) |
 | `--repo <path>` | Specify repository path |
 
@@ -106,7 +107,7 @@ roborev log <job_id>             # View job log
 | Flag | Description |
 |------|-------------|
 | `--job` | Force interpretation as job ID |
-| `--prompt` | Show the prompt sent to the agent instead of the review output |
+| `--prompt` | Show the prompt sent to the agent instead of the review output. Works for queued jobs that have not started yet |
 | `--json` | Output as JSON for machine-readable workflows |
 
 `roborev show` displays review comments after the review output when comments exist, matching the layout in the TUI review detail view.

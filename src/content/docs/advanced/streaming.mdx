@@ -1,7 +1,39 @@
 ---
-title: Event Streaming
-description: Stream review events in real-time for integrations
+title: Event Streaming & Daemon API
+description: Stream review events and integrate with the daemon REST API
 ---
+
+## Daemon API
+
+The daemon exposes a REST API on the configured `server_addr`. With the default value of `127.0.0.1:7373`, the API is reachable at `http://127.0.0.1:7373`. An OpenAPI 3.1.0 spec is available at `/openapi.json` for client generation and integration tooling.
+
+```bash
+# Fetch the OpenAPI spec (TCP, default address)
+curl http://127.0.0.1:7373/openapi.json
+
+# With Unix domain socket (path depends on your configuration; see Configuration > Unix Domain Socket)
+curl --unix-socket "$XDG_RUNTIME_DIR/roborev/daemon.sock" http://localhost/openapi.json
+```
+
+### Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/jobs` | GET | List review jobs (supports cursor-based pagination via `before` parameter) |
+| `/api/review` | GET | Get review by job ID or SHA |
+| `/api/comments` | GET | List comments for a job or commit |
+| `/api/repos` | GET | List repos with job counts |
+| `/api/branches` | GET | List branches with job counts |
+| `/api/status` | GET | Get daemon status |
+| `/api/summary` | GET | Get review summary statistics |
+| `/api/job/cancel` | POST | Cancel a queued or running job |
+| `/api/job/rerun` | POST | Re-enqueue a completed or failed job |
+| `/api/review/close` | POST | Close or reopen a review |
+| `/api/comment` | POST | Add a comment to a job or commit |
+
+These endpoints have typed request/response schemas in the OpenAPI spec. The daemon also exposes additional endpoints used by the CLI, TUI, and subsystems (enqueue, job output streaming, sync, fix orchestration, health checks) that are not part of the OpenAPI surface.
+
+## Event Stream
 
 Stream review events in real-time for integrations, notifications, or custom tooling:
 

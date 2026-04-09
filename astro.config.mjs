@@ -125,7 +125,7 @@ export default defineConfig({
             { label: 'Custom Tasks & Agentic Mode', slug: 'advanced/custom-tasks' },
             { label: 'Agent Client Protocol (ACP)', slug: 'advanced/acp' },
             { label: 'PostgreSQL Sync', slug: 'advanced/postgres-sync' },
-            { label: 'Event Streaming', slug: 'advanced/streaming' },
+            { label: 'Streaming & Daemon API', slug: 'advanced/streaming' },
           ],
         },
         {

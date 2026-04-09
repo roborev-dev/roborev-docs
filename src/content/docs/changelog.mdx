@@ -10,7 +10,7 @@ All notable changes to roborev, grouped by minor release.
 
 **New features**
 
-- OpenAPI spec for the daemon REST API, served at `/openapi.json`. All endpoints use typed request/response schemas (OpenAPI 3.1.0 via Huma), enabling client generation and integration tooling. Endpoint discovery and schema inspection are available without separate documentation. See [Event Streaming](/advanced/streaming/#daemon-api).
+- OpenAPI spec for the daemon REST API, served at `/openapi.json` (OpenAPI 3.1.0 via Huma). All endpoints except `/api/job/output` (which uses streaming NDJSON) have typed request/response schemas, enabling client generation and integration tooling. See [Streaming & Daemon API](/advanced/streaming/#daemon-api).
 - Cascading `review_min_severity` setting and `--min-severity` flag on `roborev review` to filter review findings by severity. The setting cascades from CLI flag to per-repo `.roborev.toml` to global `config.toml`, matching the existing pattern for `fix_min_severity` and `refine_min_severity`. Global defaults for all three (`review_min_severity`, `fix_min_severity`, `refine_min_severity`) are now supported in global config. See [Configuration](/configuration/#per-repository-options).
 
 **Improvements**

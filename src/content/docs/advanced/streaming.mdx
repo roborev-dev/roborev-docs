@@ -8,11 +8,11 @@ description: Stream review events and integrate with the daemon REST API
 The daemon exposes a REST API on the configured `server_addr` (default: `http://127.0.0.1:7373`). An OpenAPI 3.1.0 spec is available at `/openapi.json` for client generation and integration tooling.
 
 ```bash
-# Fetch the OpenAPI spec
+# Fetch the OpenAPI spec (TCP, default address)
 curl http://127.0.0.1:7373/openapi.json
 
-# With Unix domain socket
-curl --unix-socket /tmp/roborev-$(id -u)/daemon.sock http://localhost/openapi.json
+# With Unix domain socket (path depends on your configuration; see Configuration > Unix Domain Socket)
+curl --unix-socket "$XDG_RUNTIME_DIR/roborev/daemon.sock" http://localhost/openapi.json
 ```
 
 ### Endpoints

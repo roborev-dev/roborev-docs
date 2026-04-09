@@ -10,7 +10,7 @@ All notable changes to roborev, grouped by minor release.
 
 **New features**
 
-- OpenAPI spec for the daemon REST API, served at `/openapi.json` (OpenAPI 3.1.0 via Huma). All endpoints except `/api/job/output` (which uses streaming NDJSON) have typed request/response schemas, enabling client generation and integration tooling. See [Streaming & Daemon API](/advanced/streaming/#daemon-api).
+- OpenAPI spec for the daemon REST API, served at `/openapi.json` (OpenAPI 3.1.0 via Huma). The spec covers the primary query and mutation endpoints used by integrations (jobs, reviews, comments, repos, branches, status, summary, cancel, rerun, close). Internal endpoints used by the CLI, TUI, and daemon subsystems (enqueue, streaming, sync, fix orchestration) are not part of the OpenAPI surface. See [Streaming & Daemon API](/advanced/streaming/#daemon-api).
 - Cascading `review_min_severity` setting and `--min-severity` flag on `roborev review` to filter review findings by severity. The setting cascades from CLI flag to per-repo `.roborev.toml` to global `config.toml`, matching the existing pattern for `fix_min_severity` and `refine_min_severity`. Global defaults for all three (`review_min_severity`, `fix_min_severity`, `refine_min_severity`) are now supported in global config. See [Configuration](/configuration/#per-repository-options).
 
 **Improvements**
@@ -18,7 +18,7 @@ All notable changes to roborev, grouped by minor release.
 - Branch review prompts include per-commit review context. When reviewing a commit range, the prompt includes summaries and verdicts from individual per-commit reviews, with instructions to focus on cross-commit interactions instead of re-raising known issues.
 - Fix prompts include user comments and prior tool attempts. Developer comments and previous automated fix attempts are separated and included in the prompt, giving the fix agent more context about what has already been tried and what the developer flagged.
 - Global reasoning defaults are honored consistently across review, fix, refine, and related workflows. Resolution order: explicit CLI flag > per-repo config > global config > default.
-- `roborev show --prompt` works for queued jobs. You can inspect the full prompt before the job starts running. See [Commands](/commands/#viewing-reviews).
+- The TUI lets you inspect the full prompt while a job is still queued, before it starts running. Press `p` on any queued job that has a stored prompt (task, fix, compact, insights).
 
 **Bug fixes**
 

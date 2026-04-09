@@ -32,7 +32,7 @@ curl --unix-socket "$XDG_RUNTIME_DIR/roborev/daemon.sock" http://localhost/opena
 | `/api/comment` | POST | Add a comment to a job or commit |
 | `/api/job/output` | GET | Stream job output as NDJSON (not included in OpenAPI spec) |
 
-All endpoints except `/api/job/output` have typed request/response schemas in the OpenAPI spec. `/api/job/output` uses streaming NDJSON and is registered as a plain handler outside the schema.
+These endpoints have typed request/response schemas in the OpenAPI spec. The daemon also exposes internal endpoints used by the CLI, TUI, and subsystems (enqueue, streaming, sync, fix orchestration, health checks) that are not part of the OpenAPI surface.
 
 ## Event Stream
 

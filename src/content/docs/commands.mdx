@@ -392,9 +392,10 @@ See: [GitHub Integration](/integrations/github/)
 ## Code Analysis
 
 ```bash
-roborev analyze test-fixtures internal/*_test.go   # Run built-in analysis
-roborev analyze refactor --fix ./...               # Analyze and auto-fix
+roborev analyze duplication ./...                   # Find duplication
+roborev analyze refactor --fix *.go                # Suggest and apply refactors
 roborev analyze complexity --per-file src/*.go      # One job per file
+roborev analyze test-fixtures internal/*_test.go   # Find test helper opportunities
 roborev analyze refactor --branch                  # Analyze changed files on branch
 roborev analyze refactor --branch=feature-xyz      # Analyze a specific branch
 roborev analyze --list                             # List analysis types

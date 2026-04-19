@@ -101,6 +101,42 @@ model = "gpt-4.1"  # Override for this repo
 
 Model resolution priority: CLI flag > per-repo config > global config > agent default.
 
+## Routing Claude Code to a Proxy
+
+The `claude-code` agent accepts a model spec of the form `<model>@<base_url>`. When `<base_url>` starts with `http://` or `https://`, roborev points Claude Code at that endpoint and pins all tier aliases (Opus, Sonnet, Haiku, subagent) to the given model. This lets you use local runtimes (Ollama, LM Studio) or gateways (LiteLLM, OpenRouter) that expose an Anthropic-compatible API.
+
+```toml
+# .roborev.toml: local Ollama for reviews, real Anthropic for fixes
+agent = "claude-code"
+review_model = "glm-5.1:cloud@http://127.0.0.1:11434"
+fix_model    = "sonnet"
+```
+
+Or per invocation:
+
+```bash
+roborev review --model 'glm-5.1:cloud@http://127.0.0.1:11434'
+```
+
+A bare proxy spec (`@http://...` with no model) is rejected with an error. The full URL (including any path or query string) is forwarded as-is to `ANTHROPIC_BASE_URL`, so include the path your gateway expects. For example, LiteLLM typically wants a trailing `/v1`, while Ollama wants no path.
+
+### Proxy Authentication
+
+Set `ROBOREV_CLAUDE_PROXY_TOKEN` in your environment to forward a bearer token to the proxy as `ANTHROPIC_AUTH_TOKEN`. If unset, roborev sends a placeholder token, which is sufficient for gateways that do not validate the header (such as Ollama).
+
+roborev does not forward `anthropic_api_key` (or `ANTHROPIC_API_KEY`) to proxy endpoints. Doing so would leak a real Anthropic credential to arbitrary third parties.
+
+### URL Restrictions
+
+- Proxy URLs must not embed `user:pass@` credentials. Use `ROBOREV_CLAUDE_PROXY_TOKEN` instead.
+- `http://` is only accepted for loopback hosts (`127.0.0.1`, `::1`, `localhost`), so plaintext tokens can't be sent over the wire. Use `https://` for remote proxies.
+
+### Environment Behavior
+
+:::caution
+As of 0.52, the `claude-code` agent always strips the following variables from the child process environment: `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, `ANTHROPIC_DEFAULT_OPUS_MODEL`, `ANTHROPIC_DEFAULT_SONNET_MODEL`, `ANTHROPIC_DEFAULT_HAIKU_MODEL`, and `CLAUDE_CODE_SUBAGENT_MODEL`. If you previously routed Claude Code by exporting these in your shell, switch to the `<model>@<base_url>` spec, or configure `anthropic_api_key` in `~/.roborev/config.toml` for native (non-proxy) mode. roborev re-injects the configured key rather than inheriting from the operator's shell.
+:::
+
 ## Agentic Support
 
 Different agents have different levels of support for agentic mode (file edits and commands):

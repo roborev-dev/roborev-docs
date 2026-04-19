@@ -615,12 +615,12 @@ The `[advanced]` section controls opt-in features that are not part of the defau
 ```toml
 # ~/.roborev/config.toml
 [advanced]
-enable_tasks = true   # Enable background tasks in the TUI
+tasks_enabled = true   # Enable background tasks in the TUI
 ```
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `enable_tasks` | bool | false | Enable the TUI background tasks workflow (fix jobs, patch application, rebasing) |
+| `tasks_enabled` | bool | false | Enable the TUI background tasks workflow (fix jobs, patch application, rebasing) |
 
 When enabled, the TUI exposes the `F` (fix) and `T` (tasks) shortcuts for launching fix jobs and managing patches. See [Background Tasks](/advanced/background-tasks/) for the full reference.
 

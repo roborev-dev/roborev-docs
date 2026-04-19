@@ -41,8 +41,8 @@ When set via flags, the filter is locked and cannot be changed in the TUI. This 
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
-| `F` | Launch fix job (requires [`advanced.enable_tasks`](/advanced/background-tasks/)) |
-| `T` | Switch to Tasks view (requires [`advanced.enable_tasks`](/advanced/background-tasks/)) |
+| `F` | Launch fix job (requires [`advanced.tasks_enabled`](/advanced/background-tasks/)) |
+| `T` | Switch to Tasks view (requires [`advanced.tasks_enabled`](/advanced/background-tasks/)) |
 | `o` | Column options (reorder, toggle visibility) |
 | `f` | Open filter (repo/branch tree) |
 | `b` | Open filter with branches expanded |
@@ -141,7 +141,7 @@ Press `Enter` on a job to view its review.
 | `y` | Copy review to clipboard |
 | `x` | Cancel running/queued job |
 | `r` | Rerun completed/failed/canceled job |
-| `F` | Open inline fix panel (requires [`advanced.enable_tasks`](/advanced/background-tasks/)) |
+| `F` | Open inline fix panel (requires [`advanced.tasks_enabled`](/advanced/background-tasks/)) |
 | `l` | View job log |
 | `p` | Switch between review/prompt |
 | `m` | View commit message |
@@ -150,7 +150,7 @@ Press `Enter` on a job to view its review.
 
 ## Background Tasks
 
-The TUI includes an optional workflow for running fix jobs, applying patches, and rebasing directly from the terminal. This is disabled by default. To enable it, set `enable_tasks = true` under the `[advanced]` section in `~/.roborev/config.toml`.
+The TUI includes an optional workflow for running fix jobs, applying patches, and rebasing directly from the terminal. This is disabled by default. To enable it, set `tasks_enabled = true` under the `[advanced]` section in `~/.roborev/config.toml`.
 
 See [Background Tasks](/advanced/background-tasks/) for the full reference.
 

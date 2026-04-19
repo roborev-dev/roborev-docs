@@ -44,7 +44,7 @@ if [[ -z "${ROBOREV_DATA_DIR:-}" ]]; then
     echo "ERROR: ROBOREV_DATA_DIR must be set (this script runs inside Docker)"
     exit 1
 fi
-roborev config set advanced.enable_tasks false --global
+roborev config set advanced.tasks_enabled false --global
 
 # --- Start tmux session (tall for hero, resized later) ---
 tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 50

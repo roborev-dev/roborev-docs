@@ -1,0 +1,217 @@
+---
+title: Auto Design Review
+description: Opt-in router that decides per-commit whether a design review is warranted, using fast heuristics first and a classifier agent fallback for ambiguous cases.
+---
+
+By default, design reviews run only on demand: `roborev review --type design`, or by listing `"design"` in `[ci].review_types`. The auto design review router adds a third path. When enabled, every commit is evaluated against fast path, size, and message heuristics, and a design review is enqueued automatically for commits that warrant it. Off by default.
+
+## Enabling
+
+Add to `~/.roborev/config.toml` for everywhere, or `.roborev.toml` for one repo:
+
+```toml
+[auto_design_review]
+enabled = true
+```
+
+That's enough. The defaults pick up schema and migration files, large diffs, doc-only changes, and conventional commit prefixes.
+
+The per-repo setting overrides the global one in either direction. To enable globally but silence a specific noisy repo:
+
+```toml
+# ~/.roborev/config.toml
+[auto_design_review]
+enabled = true
+```
+
+```toml
+# noisy-repo/.roborev.toml
+[auto_design_review]
+enabled = false
+```
+
+The per-repo `enabled` is tri-state: omitted means "inherit", explicit `true` or `false` overrides. Setting `enabled = false` per-repo is not the same as omitting the field.
+
+## Decision Flow
+
+For each commit, the router runs heuristics in this fixed order. The first match wins.
+
+1. **Trigger paths**: any changed file matches a `trigger_paths` glob. Run design review.
+2. **Large diff**: line count at or above `large_diff_lines`. Run.
+3. **Wide change**: file count at or above `large_file_count`. Run.
+4. **Trigger message**: commit subject matches a `trigger_message_patterns` regex. Run.
+5. **Trivial diff**: line count below `min_diff_lines`. Skip.
+6. **All-skip paths**: every changed file matches a `skip_paths` glob. Skip.
+7. **Skip message**: commit subject matches a `skip_message_patterns` regex. Skip.
+8. **Classifier**: nothing above fired. The classifier agent decides yes or no.
+
+Trigger rules run before skip rules. A commit that touches `db/migrations/0001.sql` AND has subject `docs: explain new schema` triggers, because step 1 fires before step 7 ever runs. A 6-line typo fix to `internal/foo.go` skips at step 5, so the classifier is never consulted. A 200-line edit across `internal/auth/handler.go` with subject `feat: rotate keys` falls through every heuristic and is delegated to the classifier.
+
+## Configuration Reference
+
+All options below live under `[auto_design_review]` in either `~/.roborev/config.toml` (global) or `.roborev.toml` (per-repo). Per-repo values override global values; both override the defaults baked into the binary.
+
+### Routing options
+
+| Option | Type | Default | Behavior |
+|---|---|---|---|
+| `enabled` | bool | `false` | Master switch. Per-repo value is tri-state (`*bool`): omit to inherit, set explicitly to override a globally-enabled default. |
+| `min_diff_lines` | int | `10` | Diffs with fewer changed lines skip automatically. Set to `0` to disable trivial-diff skipping. |
+| `large_diff_lines` | int | `500` | Diffs at or above this line count trigger automatically. Set to `0` to disable. |
+| `large_file_count` | int | `10` | Commits touching at least this many files trigger automatically. Set to `0` to disable. |
+| `trigger_paths` | string[] | (see below) | Doublestar globs. Any one match triggers. |
+| `skip_paths` | string[] | `**/*.md`, `**/*_test.go`, `**/*.spec.*`, `**/testdata/**` | Doublestar globs. EVERY changed file must match for the skip to fire. |
+| `trigger_message_patterns` | string[] | `\b(refactor\|redesign\|rewrite\|architect\|breaking)\b` | RE2 regexes against the commit subject. Any match triggers. |
+| `skip_message_patterns` | string[] | `^(docs\|test\|style\|chore)(\(.+\))?:` | RE2 regexes against the commit subject. Any match skips. |
+| `classifier_timeout_seconds` | int | `60` | Per-classify-job timeout. The job is marked `skipped` with reason `classifier timed out` if exceeded. |
+| `classifier_max_prompt_size` | int (bytes) | `20480` | Cap on the classifier prompt. Diffs larger than this are truncated before being sent to the classifier. |
+
+Default `trigger_paths`:
+
+```
+**/migrations/**
+**/schema/**
+**/*.sql
+docs/superpowers/specs/**
+docs/design/**
+docs/plans/**
+**/*-design.md
+**/*-plan.md
+```
+
+### Classifier execution options
+
+These live at the **top level** of the config file, alongside `agent` and `model`. They are not inside `[auto_design_review]`.
+
+| Option | Type | Default | Behavior |
+|---|---|---|---|
+| `classify_agent` | string | `claude-code` | Agent used for the schema-constrained classifier. Must implement the `SchemaAgent` capability. |
+| `classify_model` | string | (agent default) | Model override for the classifier. |
+| `classify_reasoning` | string | `fast` | Reasoning level: `fast`, `standard`, `medium`, `thorough`, or `maximum`. |
+| `classify_backup_agent` | string | (none) | Fallback classifier on quota exhaustion or transient agent failure. Must also be a `SchemaAgent`. |
+| `classify_backup_model` | string | (none) | Model override for the backup. |
+
+```toml
+classify_agent = "claude-code"
+classify_reasoning = "fast"
+# classify_backup_agent must also be a supported SchemaAgent.
+# Leave unset until a second candidate lands.
+```
+
+`claude-code` is the only supported classifier today. It is invoked with `--json-schema` and `--tools ""` to deny shell and file tool use during classification, because the classifier reads untrusted commit text and must not be promotable into arbitrary tool execution via prompt injection.
+
+Codex is explicitly rejected as `classify_agent` or `classify_backup_agent`: the codex CLI has no documented flag that disables tool or file access for a single invocation, so routing untrusted commit text through it would re-open the injection surface. If you set `classify_agent` to an unsupported agent (gemini, copilot, cursor, opencode, kiro, kilo, droid, pi), the daemon exits at startup with a clear error naming the valid choices.
+
+## List fields replace, they do not merge
+
+When you set `trigger_paths`, `skip_paths`, `trigger_message_patterns`, or `skip_message_patterns` in your config, the value **replaces** the default list wholesale. The defaults are NOT merged in.
+
+```toml
+[auto_design_review]
+trigger_paths = ["**/contracts/**"]   # ONLY contracts/. Migrations, schema, sql etc. are no longer triggers.
+```
+
+If you want the defaults plus your additions, copy the defaults explicitly:
+
+```toml
+[auto_design_review]
+trigger_paths = [
+  "**/migrations/**",
+  "**/schema/**",
+  "**/*.sql",
+  "docs/superpowers/specs/**",
+  "docs/design/**",
+  "docs/plans/**",
+  "**/*-design.md",
+  "**/*-plan.md",
+  "**/contracts/**",
+]
+```
+
+The empty list is meaningful and is distinct from omitting the field. `trigger_paths = []` disables the path-trigger heuristic entirely, while omitting `trigger_paths` keeps the defaults.
+
+```toml
+[auto_design_review]
+trigger_paths = []           # disable path-based triggering
+skip_message_patterns = []   # disable conventional-marker skipping
+```
+
+## Worked examples
+
+### Trigger via path glob
+
+Commit touches `db/migrations/0001_users.sql`. Step 1 fires; a design review is enqueued. The reason recorded on the row reads `touches db/migrations/0001_users.sql (design-relevant)`.
+
+### Skip via trivial diff
+
+Commit fixes a typo, total diff is 4 lines. Step 5 fires; a `skipped` row is recorded with reason `trivial diff (4 lines)`. The classifier is not consulted, so this path costs zero tokens.
+
+### Skip via all-doc paths
+
+Commit changes `README.md` AND `docs/install.md`. Every file matches `**/*.md`, so step 6 fires; reason `doc/test-only change`.
+
+If the same commit also touched `internal/foo.go`, step 6 would NOT fire (`internal/foo.go` doesn't match any default skip glob), and the decision would fall through to the classifier.
+
+### Trigger wins over skip
+
+Commit subject `refactor: split docs handler` AND only changes `docs/api.md`. Step 4 fires (matches `\brefactor\b`); a design review runs even though the only file is doc-only. Trigger rules always run before skip rules.
+
+### Per-repo override of a global default
+
+Global config enables auto-design with the default trigger list. A specific repo's `.roborev.toml` adds:
+
+```toml
+[auto_design_review]
+enabled = true
+large_diff_lines = 200    # this repo: trigger at lower threshold
+trigger_paths = []        # disable path-based triggering for this repo only
+```
+
+Effect: this repo triggers on diffs of 200 or more lines, the file-count and message rules use the inherited defaults, and path-based triggering is disabled (explicit empty list, not omission).
+
+### Classifier fallback
+
+Commit changes 80 lines in `internal/payment/retry.go`, subject `feat: optimize retry`. No path matches a trigger or skip glob, line count is between `min_diff_lines` and `large_diff_lines`, the subject matches no pattern. Decision is delegated to the classifier. The row is recorded with `job_type = 'classify'` until the classifier returns; it is then either promoted to a queued design review or marked `skipped` with the classifier's reason.
+
+## Validation
+
+Invalid globs or regexes do NOT silently disable auto-design. They fail loudly:
+
+- **Globally enabled, invalid pattern**: the daemon exits at startup with the offending pattern named.
+- **Per-repo enabled, invalid pattern**: the daemon logs the error and no-ops auto-design dispatch for that repo's commits. Other repos continue to dispatch normally.
+
+Run `roborev config get auto_design_review.trigger_paths` to inspect the resolved value.
+
+## Observability
+
+When auto-design is enabled globally or for any registered repo, `GET /api/status` includes an `auto_design` subobject with per-outcome counters:
+
+```json
+{
+  "auto_design": {
+    "enabled": true,
+    "triggered_heuristic": 3,
+    "skipped_heuristic": 7,
+    "triggered_classifier": 1,
+    "skipped_classifier": 2,
+    "classifier_failed": 0
+  }
+}
+```
+
+When disabled everywhere, the field is omitted entirely.
+
+In the TUI, skipped auto-design rows render with a dimmed style and a truncated reason. In CI, the synthesis comment includes an `Auto-design-review skipped: <reason>` section for skipped rows so reviewers can see that the design check was considered.
+
+## Interaction with existing controls
+
+- `roborev review --type design` always runs. Auto mode is not consulted.
+- `"design"` in `[ci].review_types` always runs. Auto mode is bypassed.
+- Auto mode only ever adds a design review. It never alters the standard review, security review, or any other job type.
+- Dirty (uncommitted) review jobs are excluded from auto mode. The router needs the `ChangedFiles` list to evaluate path heuristics, and that list is only populated for commit-backed jobs today.
+
+## See also
+
+- [Configuration](/configuration/): config layering, file precedence, and the `roborev config` command.
+- [Supported Agents](/agents/): which agents implement `SchemaAgent` capability.
+- [GitHub Integration](/integrations/github/): CI batch behavior; auto-design participates in batch counters.

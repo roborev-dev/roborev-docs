@@ -115,6 +115,7 @@ export default defineConfig({
             { label: 'Agent Skills', slug: 'guides/agent-skills' },
             { label: 'Code Analysis & Refactoring', slug: 'guides/assisted-refactoring' },
             { label: 'Auto-Fix with Refine', slug: 'guides/auto-fixing' },
+            { label: 'Auto Design Review', slug: 'guides/auto-design-review' },
             { label: 'Repository Management', slug: 'guides/repository-management' },
           ],
         },
